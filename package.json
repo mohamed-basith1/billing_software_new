@@ -21,8 +21,14 @@
     "@mui/icons-material": "^6.4.4",
     "@mui/material": "^6.4.4",
     "@mui/x-data-grid": "^7.27.0",
+    "@reduxjs/toolkit": "^2.5.1",
+    "@types/lodash.debounce": "^4.0.9",
+    "@types/mongoose": "^5.11.96",
+    "lodash.debounce": "^4.0.8",
+    "mongoose": "^8.10.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-redux": "^9.2.0",
     "react-router-dom": "^7.1.5"
   },
   "devDependencies": {
