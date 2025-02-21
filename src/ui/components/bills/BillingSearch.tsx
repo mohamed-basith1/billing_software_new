@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Box,
   TextField,
@@ -8,139 +8,169 @@ import {
   ListItemText,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import debounce from "lodash.debounce";
 import {
   setBillingField,
   selectBillValue,
   selectCurrentTabValue,
 } from "../../pages/BillsPage/BillsSlice";
 
-const itemSuggestions = [
-  "Apple",
-  "Banana",
-  "Cherry",
-  "Date",
-  "Eggplant",
-  "Fig",
-  "Grapes",
-  "Honeydew",
-  "Iceberg Lettuce",
-  "Jackfruit",
-  "Kiwi",
-  "Lemon",
-  "Mango",
-];
-
-const BillingSearch = ({ billingSearchItem }: any) => {
+const BillingSearch = () => {
   const dispatch = useDispatch();
   const currentTab = useSelector(selectCurrentTabValue);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const [suggestions, setSuggestions] = useState<[]>([]);
+  const [selectedIndex, setSelectedIndex] = useState<number>(-1);
 
-  const billingSearch =
-    useSelector(selectBillValue).find(
-      (bill: any) => bill.bill_number === currentTab
-    ) || {
-      itemsearch: "",
-      code: "",
-      uom: "",
-      qty: "",
-      rate: "",
-      amount: "",
-      showSuggestions: false,
-      filteredItems: [],
-    };
+  const billingSearch = useSelector(selectBillValue).find(
+    (bill: any) => bill.bill_number === currentTab
+  ) || {
+    bill_number: currentTab, // Ensuring bill_number is present
+    itemsearch: "",
+    code: 0,
+    uom: "",
+    qty: 0,
+    rate: 0,
+    amount: 0,
+  };
 
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
     }
-  }, []);
+  }, [currentTab]);
 
-  const debouncedFilter = useCallback(
-    debounce((value: string) => {
-      const filtered =
-        value.length > 0
-          ? itemSuggestions.filter((item) =>
-              item.toLowerCase().includes(value.toLowerCase())
-            )
-          : [];
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (
+        document.activeElement &&
+        (document.activeElement as HTMLElement).tagName === "INPUT"
+      ) {
+        return; // Ignore if the user is already typing in an input
+      }
 
-      dispatch(
-        setBillingField({
-          bill_number: billingSearch.bill_number,
-          field: "filteredItems",
-          value: filtered,
-        })
-      );
-      dispatch(
-        setBillingField({
-          bill_number: billingSearch.bill_number,
-          field: "showSuggestions",
-          value: filtered.length > 0,
-        })
-      );
-    }, 300),
-    [dispatch, billingSearch.bill_number]
-  );
-
-  const handleItemChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    dispatch(
-      setBillingField({
-        bill_number: billingSearch.bill_number,
-        field: "itemsearch",
-        value,
-      })
-    );
-    debouncedFilter(value);
-  };
-
-  const handleOtherFieldChange = (field: string, value: string) => {
-    dispatch(
-      setBillingField({
-        bill_number: billingSearch.bill_number,
-        field,
-        value,
-      })
-    );
-  };
-
-  const handleSelectItem = (selectedItem: string) => {
-    dispatch(
-      setBillingField({
-        bill_number: billingSearch.bill_number,
-        field: "itemsearch",
-        value: selectedItem,
-      })
-    );
-    dispatch(
-      setBillingField({
-        bill_number: billingSearch.bill_number,
-        field: "showSuggestions",
-        value: false,
-      })
-    );
-  };
-
-  const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (document.activeElement !== inputRef.current) {
-      const isOtherFieldsEmpty =
-        !billingSearch.code &&
-        !billingSearch.uom &&
-        !billingSearch.qty &&
-        !billingSearch.rate &&
+      const isAlphabet = /^[a-zA-Z]$/.test(event.key); // Check if the key is a letter
+      const isAnyFieldEmpty =
+        !billingSearch.code ||
+        !billingSearch.uom ||
+        !billingSearch.qty ||
+        !billingSearch.rate ||
         !billingSearch.amount;
 
-      if (isOtherFieldsEmpty) {
-        event.preventDefault();
-        if (inputRef.current) {
-          inputRef.current.focus();
-          inputRef.current.value += event.key; // Append the keypress to input
-          handleItemChange({
-            target: inputRef.current,
-          } as React.ChangeEvent<HTMLInputElement>);
-        }
+      if (isAlphabet && isAnyFieldEmpty) {
+        dispatch(
+          setBillingField({
+            bill_number: billingSearch.bill_number,
+            field: "itemsearch",
+            value: (prevState: string) => prevState + event.key, // Use functional update
+          })
+        );
+        inputRef.current?.focus(); // Auto-focus the item search field
       }
+    };
+
+    document.addEventListener("keydown", handleKeyPress);
+    return () => document.removeEventListener("keydown", handleKeyPress);
+  }, [billingSearch, dispatch]);
+
+  const handleItemChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = event.target.value;
+
+    dispatch(
+      setBillingField({
+        bill_number: billingSearch.bill_number,
+        field: "itemsearch",
+        value,
+      })
+    );
+
+    if (value.length > 0) {
+      try {
+        const sanitizedData = JSON.parse(JSON.stringify(value));
+        console.log("sanitizedData", sanitizedData);
+        //@ts-ignore
+        const results = await window.electronAPI.searchItem(sanitizedData);
+        // const results = await
+
+        setSuggestions(results);
+      } catch (error) {
+        console.error("Error fetching suggestions:", error);
+      }
+    } else {
+      setSuggestions([]);
+    }
+  };
+
+  const handleSelectItem = (selectedItem: {
+    item_name: string;
+    code: string;
+    uom: string;
+    qty: number;
+    rate: number;
+    amount: number;
+  }) => {
+    dispatch(
+      setBillingField({
+        bill_number: billingSearch.bill_number,
+        field: "itemsearch",
+        value: selectedItem.item_name,
+      })
+    );
+    dispatch(
+      setBillingField({
+        bill_number: billingSearch.bill_number,
+        field: "code",
+        value: selectedItem.code,
+      })
+    );
+    dispatch(
+      setBillingField({
+        bill_number: billingSearch.bill_number,
+        field: "uom",
+        value: selectedItem.uom,
+      })
+    );
+    dispatch(
+      setBillingField({
+        bill_number: billingSearch.bill_number,
+        field: "qty",
+        value: selectedItem.qty,
+      })
+    );
+    dispatch(
+      setBillingField({
+        bill_number: billingSearch.bill_number,
+        field: "rate",
+        value: selectedItem.rate,
+      })
+    );
+    dispatch(
+      setBillingField({
+        bill_number: billingSearch.bill_number,
+        field: "amount",
+        value: selectedItem.amount,
+      })
+    );
+
+    setSuggestions([]);
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (suggestions.length === 0) return;
+
+    if (event.key === "ArrowDown") {
+      event.preventDefault(); // Prevent default scrolling behavior
+      setSelectedIndex((prev) =>
+        prev < suggestions.length - 1 ? prev + 1 : prev
+      );
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault(); // Prevent default scrolling behavior
+      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : prev));
+    } else if (event.key === "Enter" && selectedIndex >= 0) {
+      event.preventDefault();
+      handleSelectItem(suggestions[selectedIndex]);
+      setSelectedIndex(-1); // Reset selection after choosing an item
     }
   };
 
@@ -154,18 +184,18 @@ const BillingSearch = ({ billingSearchItem }: any) => {
         gap: "10px",
         position: "relative",
       }}
-      onKeyDown={handleKeyDown}
     >
       <TextField
-        label="Item Name"
+        label="Item Name or Code"
         id="item-name-field"
         size="small"
         sx={{ width: "30%" }}
         value={billingSearch.itemsearch || ""}
         onChange={handleItemChange}
-        inputRef={inputRef} // Auto-focus reference
+        onKeyDown={handleKeyDown}
+        inputRef={inputRef}
       />
-      {billingSearch.showSuggestions && (
+      {suggestions.length > 0 && (
         <Paper
           sx={{
             position: "absolute",
@@ -176,27 +206,67 @@ const BillingSearch = ({ billingSearchItem }: any) => {
           }}
         >
           <List>
-            {billingSearch.filteredItems?.map((item: string) => (
+            {suggestions.map((item: any, index: number) => (
               <ListItem
                 component="div"
-                key={item}
+                key={item.code}
                 onClick={() => handleSelectItem(item)}
+                sx={{
+                  borderBottom: ".5px solid lightgray",
+                  backgroundColor:
+                    selectedIndex === index ? "#b3d4fc" : "white",
+                  cursor: "pointer",
+                }}
               >
-                <ListItemText primary={item} />
+                <ListItemText
+                  primary={`${item.item_name}`}
+                  sx={{ width: "30%" }}
+                />
+                <ListItemText
+                  primary={`${item.code}`}
+                  sx={{ width: "17.5%" }}
+                />
+                <ListItemText primary={`${item.qty}`} sx={{ width: "17.5%" }} />
+                <ListItemText primary={`${item.uom}`} sx={{ width: "17.5%" }} />
+                <ListItemText
+                  primary={`${item.rate}`}
+                  sx={{ width: "17.5%" }}
+                />
+                <ListItemText
+                  primary={`${item.amount}`}
+                  sx={{ width: "17.5%" }}
+                />
               </ListItem>
             ))}
           </List>
         </Paper>
       )}
-      {["code", "uom", "qty", "rate", "amount"].map((field) => (
+      {["code", "qty", "uom", "rate", "amount"].map((field: any) => (
         <TextField
           key={field}
           label={field.toUpperCase()}
-          type="number"
+          type={
+            ["code", "qty", "rate", "amount"].includes(field)
+              ? "number"
+              : "text"
+          }
           size="small"
-          sx={{ width: "17.5%" }}
+          sx={{
+            width: "17.5%",
+            pointerEvents: field === "qty" ? "auto" : "none",
+          }}
           value={billingSearch[field] || ""}
-          onChange={(e) => handleOtherFieldChange(field, e.target.value)}
+          onChange={(e) =>
+            dispatch(
+              setBillingField({
+                bill_number: billingSearch.bill_number,
+                field,
+                value: ["code", "qty", "rate", "amount"].includes(field)
+                  ? parseFloat(e.target.value) || 0
+                  : e.target.value,
+              })
+            )
+          }
         />
       ))}
     </Box>

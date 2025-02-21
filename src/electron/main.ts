@@ -5,6 +5,8 @@ import { isDev } from "./utils.js";
 import { getPreloadPath, getUIPath } from "./pathResolver.js";
 import { BillingRouter } from "./Routes/BillingRoute.js";
 
+app.commandLine.appendSwitch("disable-features", "AutofillServerCommunication");
+app.commandLine.appendSwitch("disable-features", "AutofillAddressServerSuggestion");
 app.on("ready", async () => {
   await connectDB();
   BillingRouter()

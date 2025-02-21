@@ -67,7 +67,9 @@ const billsSlice = createSlice({
         );
         state.currentTab =
           state.bills.length > 0
-            ? state.bills[state.bills.length - 1].bill_number
+            ? state.currentTab === action.payload
+              ? state.bills[state.bills.length - 1].bill_number
+              : state.currentTab
             : 0;
       }
     },
@@ -76,7 +78,7 @@ const billsSlice = createSlice({
     },
     setBillingField: <K extends keyof Bill>(
       state: BillsState,
-      action: PayloadAction<{ bill_number: number; field: K; value: Bill[K] }>
+      action: PayloadAction<{ bill_number: number; field: K; value:any }>
     ) => {
       const { bill_number, field, value } = action.payload;
       const bill = state.bills.find((b) => b.bill_number === bill_number);
@@ -88,7 +90,12 @@ const billsSlice = createSlice({
 });
 
 // Actions
-export const { addBillsTabs, decrementBillsTabs, setCurrentTab, setBillingField } = billsSlice.actions;
+export const {
+  addBillsTabs,
+  decrementBillsTabs,
+  setCurrentTab,
+  setBillingField,
+} = billsSlice.actions;
 
 // Selectors
 export const selectBillValue = (state: any) => state.bills.bills;

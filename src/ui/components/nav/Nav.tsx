@@ -33,7 +33,7 @@ const Nav = () => {
     <>
       <CssBaseline />
       {/* App Bar */}
-      <AppBar
+      {/* <AppBar
         position="fixed"
         sx={{
           width: `calc(100% - ${drawerWidth}px)`,
@@ -50,7 +50,7 @@ const Nav = () => {
             <AccountCircle sx={{ fontSize: "2rem" }} />
           </IconButton>
         </Toolbar>
-      </AppBar>
+      </AppBar> */}
       {/* Sidebar */}
       <Drawer
         sx={{

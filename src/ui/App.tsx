@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
 import { lazy, Suspense } from "react";
 import Nav, { drawerWidth } from "./components/nav/Nav.js";
+import { useSelector } from "react-redux";
 
 // Lazy load components
 const BillsPage = lazy(() => import("./pages/BillsPage/BillsPage.js"));
@@ -14,6 +14,9 @@ const CustomersPage = lazy(
 );
 
 export default function CustomSidebar() {
+  const storeData = useSelector((state: any) => state);
+
+  console.log("storeData", storeData);
   return (
     <Router>
       <Box sx={{ display: "flex" }}>
@@ -25,11 +28,13 @@ export default function CustomSidebar() {
             bgcolor: "background.default",
           }}
         >
-          <Toolbar sx={{ height: "65px" }} />
+          {/* <Toolbar sx={{ height: "65px" }} /> */}
           <Box
             sx={{
               width: `calc(100vw - ${drawerWidth}px)`,
-              height: `calc(100vh - 65px)`,
+              // height: `calc(100vh - 65px)`,
+              height: `calc(100vh)`,
+
               p: 1,
               overflow: "auto",
               bgcolor: "#F7F7FE",
@@ -52,42 +57,23 @@ export default function CustomSidebar() {
   );
 }
 
-// const [data, setData] = React.useState<Item[]>([]);
-// const [input, setInput] = React.useState("");
+// async function addData(itemData: {
+//   item_name: string;
+//   code: string;
+//   uom: string;
+//   qty: number;
+//   rate: number;
+//   amount: number;
+// }) {
+//   console.log("Adding item:", itemData);
 
-// React.useEffect(() => {
-//   loadData();
-// }, []);
-// //@ts-ignore
-// console.log("electronAPI:", window.electronAPI);
-// //@ts-ignore
+//   const sanitizedData = JSON.parse(JSON.stringify(itemData)); // Removes undefined & BigInt
 
-// if (!window.electronAPI) {
-//   console.error("Electron API is not available! Check preload script.");
-// }
-
-// async function loadData() {
-//   //@ts-ignore
-
-//   const result = await window.electronAPI.getData();
-//   setData(result);
-// }
-
-// async function addData() {
-//   //@ts-ignore
-//   console.log("logs", input);
-
-//   // await window.electronAPI.insertData({ name: input });
-//   const sanitizedData = JSON.parse(JSON.stringify({ name: input })); // Removes undefined & BigInt
-//   //@ts-ignore
-//   await window.electronAPI.insertData(sanitizedData);
-//   setInput("");
-//   loadData();
-// }
-
-// async function deleteItem(id: string) {
-//   //@ts-ignore
-
-//   await window.electronAPI.deleteData(id);
-//   loadData();
+//   try {
+//     //@ts-ignore
+//     await window.electronAPI.insertItem(sanitizedData);
+//     console.log("Item added successfully!");
+//   } catch (error) {
+//     console.error("Error inserting item:", error);
+//   }
 // }
