@@ -86,6 +86,7 @@ const billsSlice = createSlice({
         amount,
         item_name,
         createdAt,
+        purchased_rate,
       } = action.payload;
 
       // Find the bill with the given bill_number
@@ -93,7 +94,17 @@ const billsSlice = createSlice({
 
       if (bill) {
         // Push the new item to the items array
-        bill.items.push({ code, uom, qty, rate, amount, item_name, createdAt ,id:code});
+        bill.items.push({
+          code,
+          uom,
+          qty,
+          rate,
+          amount,
+          item_name,
+          createdAt,
+          id: code,
+          purchased_rate,
+        });
         (bill.code = null),
           (bill.itemsearch = ""),
           (bill.uom = ""),
@@ -109,7 +120,7 @@ const billsSlice = createSlice({
       action: PayloadAction<{ bill_number: number; field: any; value: any }>
     ) => {
       const { bill_number, field, value } = action.payload;
-      const bill = state.bills.find((b) => b.bill_number === bill_number);
+      const bill: any = state.bills.find((b) => b.bill_number === bill_number);
       if (bill) {
         bill[field] = value;
       }

@@ -33,21 +33,15 @@ const columns: GridColDef[] = [
   },
 ];
 
-const rows = Array.from({ length: 25 }, (_, index) => ({
-  id: index + 1,
-  item_code: `IC-${1000 + index}`,
-  item: `Item ${index + 1}`,
-  uom: ["PCS", "KG", "LTR", "BOX"][index % 4],
-  qty: Math.floor(Math.random() * 100) + 1,
-  rate: `₹${(Math.random() * 5000).toFixed(2)}`,
-  amount: `₹${(Math.random() * 20000).toFixed(2)}`,
-}));
-
 const BillingItems = memo(({ billingItems }: any) => {
-  console.log("billingItems", billingItems);
   return (
     <Box sx={{ height: "calc(100% - 12rem)", width: "100%" }}>
-      <DataGrid rows={billingItems.items} columns={columns} disableColumnMenu hideFooter />
+      <DataGrid
+        rows={billingItems.items}
+        columns={columns}
+        disableColumnMenu
+        hideFooter
+      />
     </Box>
   );
 });

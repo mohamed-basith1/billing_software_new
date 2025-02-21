@@ -71,6 +71,7 @@ const BillingSearch = () => {
               amount,
               item_name,
               createdAt,
+              purchased_rate
             } = billingSearch;
 
             let payload: any = {
@@ -82,6 +83,7 @@ const BillingSearch = () => {
               amount,
               item_name,
               createdAt,
+              purchased_rate
             };
             dispatch(setItem(payload));
             enterPressCount.current = 0; // Reset count after logging
@@ -184,6 +186,8 @@ const BillingSearch = () => {
     qty: number;
     rate: number;
     amount: number;
+    createdAt:any;
+    purchased_rate:number
   }) => {
     dispatch(
       setBillingField({
@@ -290,6 +294,7 @@ const BillingSearch = () => {
         amount,
         item_name,
         createdAt,
+        purchased_rate
       }: any = billingSearch;
 
       // Check if all required fields are filled
@@ -319,6 +324,7 @@ const BillingSearch = () => {
           amount,
           item_name,
           createdAt,
+          purchased_rate
         };
         dispatch(setItem(payload));
         enterPressCount.current = 0; // Reset counter after logging
@@ -449,9 +455,7 @@ const BillingSearch = () => {
                   value: updatedBillingSearch.amount,
                 })
               );
-              // if (inputRef.current) {
-              //   inputRef.current.focus();
-              // }
+             
             }
           }}
         />
