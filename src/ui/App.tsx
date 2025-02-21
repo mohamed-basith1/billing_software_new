@@ -3,6 +3,7 @@ import Box from "@mui/material/Box";
 import { lazy, Suspense } from "react";
 import Nav, { drawerWidth } from "./components/nav/Nav.js";
 import { useSelector } from "react-redux";
+import { sampleData } from "./sampleData.js";
 
 // Lazy load components
 const BillsPage = lazy(() => import("./pages/BillsPage/BillsPage.js"));
@@ -17,6 +18,8 @@ export default function CustomSidebar() {
   const storeData = useSelector((state: any) => state);
 
   console.log("storeData", storeData);
+
+  // addData(sampleData)
   return (
     <Router>
       <Box sx={{ display: "flex" }}>
@@ -57,23 +60,16 @@ export default function CustomSidebar() {
   );
 }
 
-// async function addData(itemData: {
-//   item_name: string;
-//   code: string;
-//   uom: string;
-//   qty: number;
-//   rate: number;
-//   amount: number;
-// }) {
-//   console.log("Adding item:", itemData);
+async function addData(itemData: any) {
+  console.log("Adding item:", itemData);
 
-//   const sanitizedData = JSON.parse(JSON.stringify(itemData)); // Removes undefined & BigInt
+  const sanitizedData = JSON.parse(JSON.stringify(itemData)); // Removes undefined & BigInt
 
-//   try {
-//     //@ts-ignore
-//     await window.electronAPI.insertItem(sanitizedData);
-//     console.log("Item added successfully!");
-//   } catch (error) {
-//     console.error("Error inserting item:", error);
-//   }
-// }
+  try {
+    //@ts-ignore
+    await window.electronAPI.insertItem(sanitizedData);
+    console.log("Item added successfully!");
+  } catch (error) {
+    console.error("Error inserting item:", error);
+  }
+}

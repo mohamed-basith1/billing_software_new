@@ -12,14 +12,18 @@ import {
   setBillingField,
   selectBillValue,
   selectCurrentTabValue,
+  setItem,
 } from "../../pages/BillsPage/BillsSlice";
 
 const BillingSearch = () => {
   const dispatch = useDispatch();
   const currentTab = useSelector(selectCurrentTabValue);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const qtyRef = useRef<HTMLInputElement | null>(null);
+  const enterPressCount = useRef(0);
   const [suggestions, setSuggestions] = useState<[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
+  const [trigger, setTrigger] = useState(true);
 
   const billingSearch = useSelector(selectBillValue).find(
     (bill: any) => bill.bill_number === currentTab
@@ -38,6 +42,62 @@ const BillingSearch = () => {
       inputRef.current.focus();
     }
   }, [currentTab]);
+  useEffect(() => {
+    setSuggestions([]);
+  }, []);
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      // Check if all fields are filled
+      const allFieldsFilled =
+        billingSearch.code &&
+        billingSearch.uom &&
+        billingSearch.qty &&
+        billingSearch.rate &&
+        billingSearch.amount;
+
+      if (event.key === "Enter") {
+        if (allFieldsFilled) {
+          enterPressCount.current += 1;
+
+          if (enterPressCount.current === 2) {
+            // Log the billing details
+
+            const {
+              bill_number,
+              code,
+              uom,
+              qty,
+              rate,
+              amount,
+              item_name,
+              createdAt,
+            } = billingSearch;
+
+            let payload: any = {
+              bill_number,
+              code,
+              uom,
+              qty,
+              rate,
+              amount,
+              item_name,
+              createdAt,
+            };
+            dispatch(setItem(payload));
+            enterPressCount.current = 0; // Reset count after logging
+            if (inputRef.current) {
+              inputRef.current.focus();
+            }
+          }
+        }
+      } else {
+        enterPressCount.current = 0; // Reset count if another key is pressed
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [billingSearch]);
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -88,7 +148,7 @@ const BillingSearch = () => {
     if (value.length > 0) {
       try {
         const sanitizedData = JSON.parse(JSON.stringify(value));
-        console.log("sanitizedData", sanitizedData);
+
         //@ts-ignore
         const results = await window.electronAPI.searchItem(sanitizedData);
         // const results = await
@@ -102,6 +162,21 @@ const BillingSearch = () => {
     }
   };
 
+  const calculateAmount = (uom: string, qty: number, rate: number): number => {
+    switch (uom) {
+      case "Kg":
+      case "liter":
+      case "piece":
+        return qty * rate;
+
+      case "gram":
+        return (qty / 1000) * rate; // Convert grams to Kg
+
+      default:
+        console.warn(`Unknown UOM: ${uom}`);
+        return 0; // Return 0 as a fallback
+    }
+  };
   const handleSelectItem = (selectedItem: {
     item_name: string;
     code: string;
@@ -149,11 +224,39 @@ const BillingSearch = () => {
       setBillingField({
         bill_number: billingSearch.bill_number,
         field: "amount",
-        value: selectedItem.amount,
+        value: calculateAmount(
+          selectedItem.uom,
+          selectedItem.qty,
+          selectedItem.rate
+        ),
+      })
+    );
+
+    dispatch(
+      setBillingField({
+        bill_number: billingSearch.bill_number,
+        field: "createdAt",
+        value: selectedItem.createdAt,
+      })
+    );
+
+    dispatch(
+      setBillingField({
+        bill_number: billingSearch.bill_number,
+        field: "item_name",
+        value: selectedItem.item_name,
+      })
+    );
+    dispatch(
+      setBillingField({
+        bill_number: billingSearch.bill_number,
+        field: "purchased_rate",
+        value: selectedItem.purchased_rate,
       })
     );
 
     setSuggestions([]);
+    setTimeout(() => qtyRef.current?.focus(), 100);
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -171,6 +274,60 @@ const BillingSearch = () => {
       event.preventDefault();
       handleSelectItem(suggestions[selectedIndex]);
       setSelectedIndex(-1); // Reset selection after choosing an item
+    }
+  };
+
+  const handleQtyKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      enterPressCount.current += 1;
+
+      const {
+        bill_number,
+        code,
+        uom,
+        qty,
+        rate,
+        amount,
+        item_name,
+        createdAt,
+      }: any = billingSearch;
+
+      // Check if all required fields are filled
+      const allFieldsFilled: any = Object.values({
+        bill_number,
+        code,
+        uom,
+        qty,
+        rate,
+        amount,
+        item_name,
+      }).every(
+        (value) => value !== null && value !== undefined && value !== ""
+      );
+
+      if (enterPressCount.current === 2 && allFieldsFilled) {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+
+        let payload: any = {
+          bill_number,
+          code,
+          uom,
+          qty,
+          rate,
+          amount,
+          item_name,
+          createdAt,
+        };
+        dispatch(setItem(payload));
+        enterPressCount.current = 0; // Reset counter after logging
+      } else if (enterPressCount.current === 2) {
+        console.warn("Please fill all required fields before proceeding.");
+        enterPressCount.current = 0; // Reset counter if fields are missing
+      }
+    } else {
+      enterPressCount.current = 0; // Reset count if a different key is pressed
     }
   };
 
@@ -256,17 +413,47 @@ const BillingSearch = () => {
             pointerEvents: field === "qty" ? "auto" : "none",
           }}
           value={billingSearch[field] || ""}
-          onChange={(e) =>
+          inputRef={field === "qty" ? qtyRef : null}
+          onKeyDown={field === "qty" ? handleQtyKeyDown : undefined}
+          onChange={(e) => {
+            const newValue: any = ["code", "qty", "rate", "amount"].includes(
+              field
+            )
+              ? parseFloat(e.target.value) || 0
+              : e.target.value;
+
+            let updatedBillingSearch = { ...billingSearch, [field]: newValue };
+
+            if (field === "qty") {
+              const amount = calculateAmount(
+                billingSearch.uom,
+                newValue,
+                billingSearch.rate
+              );
+              updatedBillingSearch.amount = amount;
+            }
+
             dispatch(
               setBillingField({
                 bill_number: billingSearch.bill_number,
                 field,
-                value: ["code", "qty", "rate", "amount"].includes(field)
-                  ? parseFloat(e.target.value) || 0
-                  : e.target.value,
+                value: updatedBillingSearch[field],
               })
-            )
-          }
+            );
+
+            if (field === "qty") {
+              dispatch(
+                setBillingField({
+                  bill_number: billingSearch.bill_number,
+                  field: "amount",
+                  value: updatedBillingSearch.amount,
+                })
+              );
+              // if (inputRef.current) {
+              //   inputRef.current.focus();
+              // }
+            }
+          }}
         />
       ))}
     </Box>

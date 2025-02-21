@@ -6,6 +6,7 @@ const ItemSchema = new mongoose.Schema(
     code: { type: String, required: true, unique: true },
     uom: { type: String, required: true },
     qty: { type: Number, required: true },
+    purchased_rate: { type: Number, required: true },
     rate: { type: Number, required: true },
     amount: { type: Number, required: true },
   },

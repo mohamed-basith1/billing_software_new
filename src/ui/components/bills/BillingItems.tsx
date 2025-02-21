@@ -3,10 +3,10 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, Typography } from "@mui/material";
 
 const columns: GridColDef[] = [
-  { field: "item_code", headerName: "CODE", flex: 1 },
+  { field: "code", headerName: "CODE", flex: 1 },
   {
-    field: "item",
-    headerName: "ITEM",
+    field: "item_name",
+    headerName: "ITEM NAME",
     flex: 3,
     renderCell: (params) => (
       <Typography color="primary" sx={{ cursor: "pointer" }}>
@@ -14,8 +14,9 @@ const columns: GridColDef[] = [
       </Typography>
     ),
   },
-  { field: "uom", headerName: "UOM", flex: 1 },
+
   { field: "qty", headerName: "QUANTITY", flex: 1 },
+  { field: "uom", headerName: "UOM", flex: 1 },
   {
     field: "rate",
     headerName: "RATE",
@@ -43,9 +44,10 @@ const rows = Array.from({ length: 25 }, (_, index) => ({
 }));
 
 const BillingItems = memo(({ billingItems }: any) => {
+  console.log("billingItems", billingItems);
   return (
     <Box sx={{ height: "calc(100% - 12rem)", width: "100%" }}>
-      <DataGrid rows={rows} columns={columns} disableColumnMenu hideFooter />
+      <DataGrid rows={billingItems.items} columns={columns} disableColumnMenu hideFooter />
     </Box>
   );
 });

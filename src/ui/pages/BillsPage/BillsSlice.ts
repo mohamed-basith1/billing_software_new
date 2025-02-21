@@ -76,9 +76,37 @@ const billsSlice = createSlice({
     setCurrentTab: (state, action: PayloadAction<number>) => {
       state.currentTab = action.payload;
     },
+    setItem: (state, action: any) => {
+      const {
+        bill_number,
+        code,
+        uom,
+        qty,
+        rate,
+        amount,
+        item_name,
+        createdAt,
+      } = action.payload;
+
+      // Find the bill with the given bill_number
+      const bill = state.bills.find((b) => b.bill_number === bill_number);
+
+      if (bill) {
+        // Push the new item to the items array
+        bill.items.push({ code, uom, qty, rate, amount, item_name, createdAt ,id:code});
+        (bill.code = null),
+          (bill.itemsearch = ""),
+          (bill.uom = ""),
+          (bill.qty = null),
+          (bill.rate = null),
+          (bill.amount = null),
+          (bill.showSuggestions = false),
+          (bill.filteredItems = []);
+      }
+    },
     setBillingField: <K extends keyof Bill>(
       state: BillsState,
-      action: PayloadAction<{ bill_number: number; field: K; value:any }>
+      action: PayloadAction<{ bill_number: number; field: any; value: any }>
     ) => {
       const { bill_number, field, value } = action.payload;
       const bill = state.bills.find((b) => b.bill_number === bill_number);
@@ -95,6 +123,7 @@ export const {
   decrementBillsTabs,
   setCurrentTab,
   setBillingField,
+  setItem,
 } = billsSlice.actions;
 
 // Selectors
