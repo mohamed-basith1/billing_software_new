@@ -1,7 +1,7 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Drawer from "@mui/material/Drawer";
 import CssBaseline from "@mui/material/CssBaseline";
-import AppBar from "@mui/material/AppBar";
+
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
 import Typography from "@mui/material/Typography";
@@ -15,8 +15,8 @@ import InventoryIcon from "@mui/icons-material/Inventory2Outlined";
 import ReceiptIcon from "@mui/icons-material/ReceiptOutlined";
 import PaymentsIcon from "@mui/icons-material/PaymentsOutlined";
 import ReportIcon from "@mui/icons-material/AssessmentOutlined";
-import { IconButton } from "@mui/material";
-import { AccountCircle } from "@mui/icons-material";
+
+import { useEffect } from "react";
 
 export const drawerWidth = 240;
 
@@ -29,10 +29,16 @@ const menuItems = [
   { text: "Reports", path: "/reports", icon: <ReportIcon /> },
 ];
 const Nav = () => {
+  const navigate = useNavigate();
+  useEffect(() => {
+    console.log("nav log", location.pathname);
+
+    navigate("/");
+  }, []);
   return (
     <>
       <CssBaseline />
-    
+
       {/* Sidebar */}
       <Drawer
         sx={{
