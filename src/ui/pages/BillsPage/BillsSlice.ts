@@ -78,7 +78,6 @@ const billsSlice = createSlice({
     },
     setItem: (state, action: any) => {
       const {
-        bill_number,
         code,
         uom,
         qty,
@@ -87,34 +86,105 @@ const billsSlice = createSlice({
         item_name,
         createdAt,
         purchased_rate,
+        edited,
       } = action.payload;
-
+      console.log("set Item", action.payload);
       // Find the bill with the given bill_number
-      const bill = state.bills.find((b) => b.bill_number === bill_number);
+      const bill = state.bills.find((b) => b.bill_number === state.currentTab);
 
       if (bill) {
-        // Push the new item to the items array
-        bill.items.push({
-          code,
-          uom,
-          qty,
-          rate,
-          amount,
-          item_name,
-          createdAt,
-          id: code,
-          purchased_rate,
-        });
-        (bill.code = null),
-          (bill.itemsearch = ""),
-          (bill.uom = ""),
-          (bill.qty = null),
-          (bill.rate = null),
-          (bill.amount = null),
-          (bill.showSuggestions = false),
-          (bill.filteredItems = []);
+        // Check if the item already exists in the bill items
+        const existingItem = bill.items.find((item) => item.code === code);
+        const existingItemIndex = bill.items.findIndex(
+          (item) => item.code === code
+        );
+
+        if (edited) {
+          console.log("new update data", action.payload);
+          bill.items[existingItemIndex] = {
+            code,
+            uom,
+            qty,
+            rate,
+            amount,
+            item_name,
+            createdAt,
+            id: code,
+            purchased_rate,
+          };
+        }
+        if (existingItem && edited === undefined) {
+          // Update existing item's quantity and amount
+          existingItem.qty += qty;
+          existingItem.amount += amount;
+        } else {
+          if (edited === undefined) {
+            // Add new item if it does not exist
+            bill.items.push({
+              code,
+              uom,
+              qty,
+              rate,
+              amount,
+              item_name,
+              createdAt,
+              id: code,
+              purchased_rate,
+            });
+          }
+        }
+
+        // Reset bill-related fields
+        bill.code = null;
+        bill.itemsearch = "";
+        bill.uom = "";
+        bill.qty = null;
+        bill.rate = null;
+        bill.amount = null;
+        bill.showSuggestions = false;
+        bill.filteredItems = [];
       }
     },
+
+    // setItem: (state, action: any) => {
+    //   const {
+    //     bill_number,
+    //     code,
+    //     uom,
+    //     qty,
+    //     rate,
+    //     amount,
+    //     item_name,
+    //     createdAt,
+    //     purchased_rate,
+    //   } = action.payload;
+
+    //   // Find the bill with the given bill_number
+    //   const bill = state.bills.find((b) => b.bill_number === bill_number);
+
+    //   if (bill) {
+    //     // Push the new item to the items array
+    //     bill.items.push({
+    //       code,
+    //       uom,
+    //       qty,
+    //       rate,
+    //       amount,
+    //       item_name,
+    //       createdAt,
+    //       id: code,
+    //       purchased_rate,
+    //     });
+    //     (bill.code = null),
+    //       (bill.itemsearch = ""),
+    //       (bill.uom = ""),
+    //       (bill.qty = null),
+    //       (bill.rate = null),
+    //       (bill.amount = null),
+    //       (bill.showSuggestions = false),
+    //       (bill.filteredItems = []);
+    //   }
+    // },
     setBillingField: <K extends keyof Bill>(
       state: BillsState,
       action: PayloadAction<{ bill_number: number; field: any; value: any }>

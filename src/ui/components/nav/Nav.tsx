@@ -32,25 +32,7 @@ const Nav = () => {
   return (
     <>
       <CssBaseline />
-      {/* App Bar */}
-      {/* <AppBar
-        position="fixed"
-        sx={{
-          width: `calc(100% - ${drawerWidth}px)`,
-          ml: `${drawerWidth}px`,
-          bgcolor: "#F7F7FE",
-          color: "#333",
-          height:"65px"
-        }}
-        elevation={.1}
-      >
-        <Toolbar sx={{ display: "flex", justifyContent: "flex-end" }}>
-          <Typography noWrap>Mohamed Basith</Typography>
-          <IconButton color="inherit">
-            <AccountCircle sx={{ fontSize: "2rem" }} />
-          </IconButton>
-        </Toolbar>
-      </AppBar> */}
+    
       {/* Sidebar */}
       <Drawer
         sx={{

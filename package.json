@@ -24,6 +24,8 @@
     "@reduxjs/toolkit": "^2.5.1",
     "@types/lodash.debounce": "^4.0.9",
     "@types/mongoose": "^5.11.96",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4",
     "lodash.debounce": "^4.0.8",
     "mongoose": "^8.10.1",
     "react": "^19.0.0",
