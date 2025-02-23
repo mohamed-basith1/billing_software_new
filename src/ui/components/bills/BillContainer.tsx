@@ -7,6 +7,7 @@ import {
 import BillingItems from "./BillingItems";
 import BillingPrice from "./BillingPrice";
 import BillingSearch from "./BillingSearch";
+import NestedModal from "./CustomerModal";
 
 const BillContainer = () => {
   const billsValue = useSelector(selectBillValue);
@@ -25,7 +26,7 @@ const BillContainer = () => {
             height: "100%",
             borderRadius: "8px",
             p: 1,
-            boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.05)",
+            boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
@@ -35,6 +36,7 @@ const BillContainer = () => {
           <BillingSearch />
           <BillingItems />
           <BillingPrice />
+          <NestedModal />
         </Box>
       )}
     </Box>

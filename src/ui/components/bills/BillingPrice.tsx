@@ -7,8 +7,10 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import {
   selectCurrentTabValue,
   selectBillValue,
+  setCustomerSelectModal,
 } from "../../pages/BillsPage/BillsSlice";
 import { generateInvoicePDF } from "./utils";
+import NestedModal from "./CustomerModal";
 
 const BillingPrice = () => {
   const selectCurrentTab = useSelector(selectCurrentTabValue);
@@ -111,15 +113,6 @@ const BillingPrice = () => {
               />
             </Box>
           </Box>
-          {/* <Box
-            sx={{
-              display: "flex",
-              width: "100%",
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography>Gst %</Typography>
-          </Box> */}
         </Box>
 
         <Box sx={{ bgcolor: "lightgray", height: ".5px", width: "100%" }}></Box>
@@ -167,19 +160,14 @@ const BillingPrice = () => {
           variant="contained"
           sx={{ bgcolor: "#1E1E2D" }}
           onClick={() => {
-            generateInvoicePDF(filteredBill, subAmount, discount, TotalAmount);
-            console.log(
-              "filteredBill, subAmount, discount, TotalAmount",
-              filteredBill,
-              subAmount,
-              discount,
-              TotalAmount
-            );
+            //generateInvoicePDF(filteredBill, subAmount, discount, TotalAmount);
+            dispatch(setCustomerSelectModal(true));
           }}
         >
           Bill
         </Button>
       </Box>
+   
     </Box>
   );
 };

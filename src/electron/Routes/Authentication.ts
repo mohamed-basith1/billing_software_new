@@ -9,7 +9,7 @@ export function AuthenticationRouter() {
 
       // Check if an administrator exists
       const admin = await Authendication.findOne({
-        user_access: "administrator",
+        role: "administrator",
       });
 
       if (!admin) {
@@ -17,13 +17,16 @@ export function AuthenticationRouter() {
         const newAdmin = await Authendication.create({
           username,
           password,
-          user_access: "administrator",
+          role: "administrator",
         });
 
         return {
           status: 201,
           message: "Administrator account created successfully.",
-          data: JSON.parse(JSON.stringify(newAdmin)),
+          data: {
+            username: newAdmin.username,
+            role: newAdmin.role,
+          },
         };
       }
 
@@ -48,13 +51,16 @@ export function AuthenticationRouter() {
       const newUser = await Authendication.create({
         username,
         password,
-        user_access: "employee",
+        role: "employee",
       });
 
       return {
         status: 201,
         message: "Employee account created successfully.",
-        data: JSON.parse(JSON.stringify(newUser)),
+        data: {
+          username: newUser.username,
+          role: newUser.role,
+        },
       };
     } catch (error: any) {
       console.error("Error creating account:", error);
@@ -92,7 +98,10 @@ export function AuthenticationRouter() {
       return {
         status: 200,
         message: "Login successful.",
-        data: JSON.parse(JSON.stringify(user)),
+        data: {
+          username: user.username,
+          role: user.role,
+        },
       };
     } catch (error: any) {
       console.error("Error logging in:", error);

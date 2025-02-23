@@ -10,7 +10,7 @@ import {
 import { useDispatch } from "react-redux";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import loginImage from "../../assets/Image/illustrate/login.png";
-import { setAuthenticate } from "./LoginSlice";
+import { setAuthenticate, setUserName } from "./LoginSlice";
 import { toast } from "react-toastify";
 
 export default function LoginPage() {
@@ -33,6 +33,7 @@ export default function LoginPage() {
     if (response.status !== 200) {
       toast.error(`${response.message}`, { position: "bottom-left" });
     } else {
+      dispatch(setUserName(response.data));
       dispatch(setAuthenticate(true));
     }
   };

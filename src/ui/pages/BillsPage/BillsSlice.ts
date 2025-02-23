@@ -16,6 +16,8 @@ interface Bill {
 interface BillsState {
   bills: Bill[];
   currentTab: number;
+  customerSelectModal: boolean;
+  customerModal: boolean;
 }
 
 const initialState: BillsState = {
@@ -34,6 +36,8 @@ const initialState: BillsState = {
     },
   ],
   currentTab: 0,
+  customerSelectModal: false,
+  customerModal: false,
 };
 
 const billsSlice = createSlice({
@@ -88,7 +92,7 @@ const billsSlice = createSlice({
         purchased_rate,
         edited,
       } = action.payload;
-      console.log("set Item", action.payload);
+
       // Find the bill with the given bill_number
       const bill = state.bills.find((b) => b.bill_number === state.currentTab);
 
@@ -100,7 +104,6 @@ const billsSlice = createSlice({
         );
 
         if (edited) {
-          console.log("new update data", action.payload);
           bill.items[existingItemIndex] = {
             code,
             uom,
@@ -145,46 +148,6 @@ const billsSlice = createSlice({
         bill.filteredItems = [];
       }
     },
-
-    // setItem: (state, action: any) => {
-    //   const {
-    //     bill_number,
-    //     code,
-    //     uom,
-    //     qty,
-    //     rate,
-    //     amount,
-    //     item_name,
-    //     createdAt,
-    //     purchased_rate,
-    //   } = action.payload;
-
-    //   // Find the bill with the given bill_number
-    //   const bill = state.bills.find((b) => b.bill_number === bill_number);
-
-    //   if (bill) {
-    //     // Push the new item to the items array
-    //     bill.items.push({
-    //       code,
-    //       uom,
-    //       qty,
-    //       rate,
-    //       amount,
-    //       item_name,
-    //       createdAt,
-    //       id: code,
-    //       purchased_rate,
-    //     });
-    //     (bill.code = null),
-    //       (bill.itemsearch = ""),
-    //       (bill.uom = ""),
-    //       (bill.qty = null),
-    //       (bill.rate = null),
-    //       (bill.amount = null),
-    //       (bill.showSuggestions = false),
-    //       (bill.filteredItems = []);
-    //   }
-    // },
     setBillingField: <K extends keyof Bill>(
       state: BillsState,
       action: PayloadAction<{ bill_number: number; field: any; value: any }>
@@ -194,6 +157,12 @@ const billsSlice = createSlice({
       if (bill) {
         bill[field] = value;
       }
+    },
+    setCustomerSelectModal: (state, action) => {
+      state.customerSelectModal = action.payload;
+    },
+    setCustomerModal: (state, action) => {
+      state.customerModal = action.payload;
     },
   },
 });
@@ -205,10 +174,14 @@ export const {
   setCurrentTab,
   setBillingField,
   setItem,
+  setCustomerSelectModal,
+  setCustomerModal,
 } = billsSlice.actions;
 
 // Selectors
 export const selectBillValue = (state: any) => state.bills.bills;
 export const selectCurrentTabValue = (state: any) => state.bills.currentTab;
-
+export const selectCustomerSelectModal = (state: any) =>
+  state.bills.customerSelectModal;
+export const selectCustomerModal = (state: any) => state.bills.customerModal;
 export default billsSlice.reducer;
