@@ -70,8 +70,11 @@ const Nav = () => {
           "& .MuiDrawer-paper": {
             width: drawerWidth,
             boxSizing: "border-box",
-            bgcolor: "#1E1E2D", // Dark background
+            // bgcolor: "#1E1E2D", // Dark background
+            bgcolor: "white", // Light background
             color: "#fff",
+            // boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+            border: ".1px solid lightgrey",
           },
         }}
         variant="permanent"
@@ -96,7 +99,7 @@ const Nav = () => {
               sx={{ p: 0 }}
             >
               <AccountCircleIcon
-                sx={{ width: 30, height: 30, color: "white" }}
+                sx={{ width: 30, height: 30, color: "#1E1E2D" }}
               />
             </IconButton>
           </Tooltip>
@@ -118,12 +121,19 @@ const Nav = () => {
                   whiteSpace: "nowrap",
                   maxWidth: "150px", // Adjust width as needed
                   textTransform: "capitalize", // Capitalize first letter
+                  color: "#1E1E2D",
                 }}
               >
                 {userName}
               </Typography>
             </Tooltip>
-            <Typography sx={{ fontSize: ".6rem", textTransform: "capitalize" }}>
+            <Typography
+              sx={{
+                fontSize: ".6rem",
+                textTransform: "capitalize",
+                color: "#1E1E2D",
+              }}
+            >
               {role}
             </Typography>
           </Box>
@@ -174,12 +184,14 @@ const Nav = () => {
           </Menu>
         </Toolbar>
 
-        <Divider sx={{ borderColor: "#444" }} />
+        {/* <Divider sx={{ borderColor: "#444" }} /> */}
 
         <List>
-          {menuItems.map((item) => (
-            <NavItem key={item.text} {...item} />
-          ))}
+          {role === "employee"
+            ? menuItems
+                .filter((data: any) => data.text !== "Reports")
+                .map((item) => <NavItem key={item.text} {...item} />)
+            : menuItems.map((item) => <NavItem key={item.text} {...item} />)}
         </List>
       </Drawer>
     </>
@@ -199,14 +211,24 @@ const NavItem = ({ text, path, icon }: { text: any; path: any; icon: any }) => {
         to={path}
         sx={{
           backgroundColor:
-            location.pathname === path ? "#22b378" : "transparent",
+            // location.pathname === path ? "#22b378" : "transparent",
+            location.pathname === path ? "#1E1E2D" : "transparent",
+
           borderRadius: "8px",
         }}
       >
-        <ListItemIcon sx={{ color: "#fff", fontSize: "1.5rem" }}>
+        <ListItemIcon
+          sx={{
+            color: location.pathname === path ? "#22b378" : "#1E1E2D",
+            fontSize: "1.5rem",
+          }}
+        >
           {icon}
         </ListItemIcon>
-        <ListItemText primary={text} />
+        <ListItemText
+          primary={text}
+          sx={{ color: location.pathname === path ? "#fff" : "#1E1E2D" }}
+        />
       </ListItemButton>
     </ListItem>
   );

@@ -21,7 +21,7 @@ const DynamicTabs = ({ data }: { data: { bill_number: number } }) => {
     <Box
       onClick={() => dispatch(setCurrentTab(data.bill_number))}
       sx={{
-        background: isActive ? "rgba(30, 30, 45, .9)" : "white",
+        background: isActive ? "rgba(30, 30, 45)" : "white",
         padding: "3px 25px",
         flexDirection: "row",
         display: "flex",

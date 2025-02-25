@@ -7,7 +7,7 @@ import {
 import BillingItems from "./BillingItems";
 import BillingPrice from "./BillingPrice";
 import BillingSearch from "./BillingSearch";
-import NestedModal from "./CustomerModal";
+import CustomerSelectModal from "../modals/CustomerSelectModal";
 
 const BillContainer = () => {
   const billsValue = useSelector(selectBillValue);
@@ -18,7 +18,7 @@ const BillContainer = () => {
   );
 
   return (
-    <Box sx={{ height: "calc(100% - 4.5rem)", width: "100%" }}>
+    <Box sx={{ height: "calc(100% - 3.5rem)", width: "100%" }}>
       {selectedBill && (
         <Box
           sx={{
@@ -26,7 +26,8 @@ const BillContainer = () => {
             height: "100%",
             borderRadius: "8px",
             p: 1,
-            boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+            mt: 2,
+            border: ".1px solid lightgrey",
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
@@ -36,7 +37,7 @@ const BillContainer = () => {
           <BillingSearch />
           <BillingItems />
           <BillingPrice />
-          <NestedModal />
+          <CustomerSelectModal />
         </Box>
       )}
     </Box>

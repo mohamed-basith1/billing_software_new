@@ -11,6 +11,14 @@ interface Bill {
   amount: number | null;
   showSuggestions?: boolean;
   filteredItems?: string[];
+  sub_amount: number;
+  total_amount: number;
+  discount: number;
+  paid: boolean;
+  payment_method: string;
+  balance: number;
+  customer_name: string;
+  customer_id: string;
 }
 
 interface BillsState {
@@ -33,8 +41,17 @@ const initialState: BillsState = {
       amount: null,
       showSuggestions: false,
       filteredItems: [],
+      sub_amount: 0,
+      total_amount: 0,
+      discount: 0,
+      paid: false,
+      payment_method: "",
+      balance: 0,
+      customer_name: "",
+      customer_id: "",
     },
   ],
+
   currentTab: 0,
   customerSelectModal: false,
   customerModal: false,
@@ -61,6 +78,14 @@ const billsSlice = createSlice({
         amount: null,
         showSuggestions: false,
         filteredItems: [],
+        sub_amount: 0,
+        total_amount: 0,
+        discount: 0,
+        paid: false,
+        payment_method: "",
+        balance: 0,
+        customer_name: "",
+        customer_id: "",
       });
       state.currentTab = lastBillNumber + 1;
     },
@@ -164,6 +189,76 @@ const billsSlice = createSlice({
     setCustomerModal: (state, action) => {
       state.customerModal = action.payload;
     },
+    setBillPriceDetails: (state, action: any) => {
+      const {
+        sub_amount,
+        total_amount,
+        discount,
+        paid,
+        payment_method,
+        balance,
+      } = action.payload;
+
+      // Find the bill with the given bill_number (matching currentTab)
+      const billIndex = state.bills.findIndex(
+        (b) => b.bill_number === state.currentTab
+      );
+
+      if (billIndex !== -1) {
+        state.bills[billIndex] = {
+          ...state.bills[billIndex],
+          sub_amount,
+          total_amount,
+          discount,
+          paid,
+          payment_method,
+          balance,
+        };
+      }
+    },
+    setBillCustomerDetails: (state, action: any) => {
+      const { customer_id, customer_name } = action.payload;
+
+      // Find the bill with the given bill_number (matching currentTab)
+      const billIndex = state.bills.findIndex(
+        (b) => b.bill_number === state.currentTab
+      );
+
+      if (billIndex !== -1) {
+        state.bills[billIndex] = {
+          ...state.bills[billIndex],
+          customer_id,
+          customer_name,
+        };
+      }
+    },
+    setClearBill: (state) => {
+      const billIndex = state.bills.findIndex(
+        (b) => b.bill_number === state.currentTab
+      );
+      if (billIndex !== -1) {
+        state.bills[billIndex] = {
+          bill_number: state.currentTab,
+          items: [],
+          code: null,
+          itemsearch: "",
+          uom: "",
+          qty: null,
+          rate: null,
+          amount: null,
+          showSuggestions: false,
+          filteredItems: [],
+          sub_amount: 0,
+          total_amount: 0,
+          discount: 0,
+          paid: false,
+          payment_method: "",
+          balance: 0,
+          customer_name: "",
+          customer_id: "",
+        };
+      }
+    },
   },
 });
 
@@ -174,14 +269,13 @@ export const {
   setCurrentTab,
   setBillingField,
   setItem,
-  setCustomerSelectModal,
-  setCustomerModal,
+  setBillPriceDetails,
+  setBillCustomerDetails,
+  setClearBill,
 } = billsSlice.actions;
 
 // Selectors
 export const selectBillValue = (state: any) => state.bills.bills;
 export const selectCurrentTabValue = (state: any) => state.bills.currentTab;
-export const selectCustomerSelectModal = (state: any) =>
-  state.bills.customerSelectModal;
-export const selectCustomerModal = (state: any) => state.bills.customerModal;
+
 export default billsSlice.reducer;

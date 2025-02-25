@@ -39,7 +39,6 @@ const columns: GridColDef[] = [
     align: "right",
     headerAlign: "right",
     valueGetter: (params) => {
-      console.log("Rate Column Params:", params);
       return params !== undefined ? `₹${params}` : " ₹0";
     },
   },
@@ -50,7 +49,6 @@ const columns: GridColDef[] = [
     align: "right",
     headerAlign: "right",
     valueGetter: (params) => {
-      console.log("Amount Column Params:", params);
       return params !== undefined ? `₹${params}` : " ₹0";
     },
   },
@@ -61,7 +59,7 @@ const BillingItems = () => {
   const selectBill = useSelector(selectBillValue);
   const dispatch = useDispatch();
 
-  const filteredBill =
+  const modifiedBill =
     selectBill
       .find((data: any) => data.bill_number === selectCurrentTab)
       ?.items.map((item: any, index: number) => ({
@@ -94,13 +92,13 @@ const BillingItems = () => {
     };
 
     scrollToBottom();
-  }, [filteredBill.length]); // Trigger scroll when new rows are added
-
+  }, [modifiedBill.length]); // Trigger scroll when new rows are added
+  console.log("selectBill", selectBill);
   return (
     <Box sx={{ height: "calc(100% - 17rem)", width: "100%" }}>
       <div ref={gridRef} style={{ height: "100%", overflow: "hidden" }}>
         <DataGrid
-          rows={filteredBill}
+          rows={modifiedBill}
           columns={columns}
           disableColumnMenu
           hideFooter

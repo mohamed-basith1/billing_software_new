@@ -109,15 +109,43 @@ export const generateInvoicePDF = (items, subAmount, discount, TotalAmount) => {
 };
 
 export async function addData(itemData: any) {
-  console.log("Adding item:", itemData);
+ 
 
   const sanitizedData = JSON.parse(JSON.stringify(itemData)); // Removes undefined & BigInt
 
   try {
     //@ts-ignore
     await window.electronAPI.insertItem(sanitizedData);
-    console.log("Item added successfully!");
+   
   } catch (error) {
     console.error("Error inserting item:", error);
   }
 }
+
+const renameIdField = (array) => {
+  return array.map((obj) => {
+    if (!obj.id && obj._id) {
+      const { _id, ...rest } = obj;
+      return { id: _id, ...rest };
+    }
+    return obj;
+  });
+};
+
+export const handleSearchCustomer = async (searchTerm: string) => {
+  //@ts-ignore
+  let response = await window.electronAPI.searchCustomer(searchTerm);
+
+
+  return renameIdField(response.data);
+};
+
+
+//dark
+export const colorsList = [
+  "rgb(30, 120, 80)", // Dark Green
+  "rgb(75, 45, 140)", // Dark Purple
+  "rgb(180, 120, 10)", // Dark Orange-Yellow
+  "rgb(180, 60, 40)", // Dark Red
+  "rgb(20, 110, 150)", // Dark Blue
+];

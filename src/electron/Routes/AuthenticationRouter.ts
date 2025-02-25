@@ -1,25 +1,21 @@
 import { ipcMain } from "electron";
-import Authendication from "../models/Authentication.js";
-
+import AuthendicationModel from "../models/AuthenticationModel.js";
 export function AuthenticationRouter() {
   // Create Account
   ipcMain.handle("create-account", async (_, data) => {
     try {
       const { username, password, adminPassword } = data;
-
       // Check if an administrator exists
-      const admin = await Authendication.findOne({
+      const admin = await AuthendicationModel.findOne({
         role: "administrator",
       });
-
       if (!admin) {
         // No admin exists → Create the first admin account
-        const newAdmin = await Authendication.create({
+        const newAdmin = await AuthendicationModel.create({
           username,
           password,
           role: "administrator",
         });
-
         return {
           status: 201,
           message: "Administrator account created successfully.",
@@ -29,7 +25,6 @@ export function AuthenticationRouter() {
           },
         };
       }
-
       // Validate Admin Password
       if (admin.password !== adminPassword) {
         return {
@@ -37,23 +32,20 @@ export function AuthenticationRouter() {
           message: "Invalid administrator password.",
         };
       }
-
       // Check if username already exists
-      const existingUser = await Authendication.findOne({ username });
+      const existingUser = await AuthendicationModel.findOne({ username });
       if (existingUser) {
         return {
           status: 409,
           message: "User already exists.",
         };
       }
-
       // Create new employee account
-      const newUser = await Authendication.create({
+      const newUser = await AuthendicationModel.create({
         username,
         password,
         role: "employee",
       });
-
       return {
         status: 201,
         message: "Employee account created successfully.",
@@ -71,22 +63,18 @@ export function AuthenticationRouter() {
       };
     }
   });
-
   // Login
   ipcMain.handle("login-api", async (_, data) => {
     try {
       const { username, password } = data;
-
       // Find user by username
-      const user = await Authendication.findOne({ username });
-
+      const user = await AuthendicationModel.findOne({ username });
       if (!user) {
         return {
           status: 404,
           message: "User not found.",
         };
       }
-
       // Check password (no encryption)
       if (user.password !== password) {
         return {
@@ -94,7 +82,6 @@ export function AuthenticationRouter() {
           message: "Incorrect password.",
         };
       }
-
       return {
         status: 200,
         message: "Login successful.",

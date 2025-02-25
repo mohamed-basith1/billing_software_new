@@ -14,7 +14,7 @@ import {
   selectCurrentTabValue,
   setItem,
 } from "../../pages/BillsPage/BillsSlice";
-import { calculateAmount } from "./utils";
+import { calculateAmount } from "../../utils/utils";
 
 const BillingSearch = () => {
   const dispatch = useDispatch();
@@ -72,7 +72,7 @@ const BillingSearch = () => {
               amount,
               item_name,
               createdAt,
-              purchased_rate
+              purchased_rate,
             } = billingSearch;
 
             let payload: any = {
@@ -84,7 +84,7 @@ const BillingSearch = () => {
               amount,
               item_name,
               createdAt,
-              purchased_rate
+              purchased_rate,
             };
             dispatch(setItem(payload));
             enterPressCount.current = 0; // Reset count after logging
@@ -154,7 +154,6 @@ const BillingSearch = () => {
 
         //@ts-ignore
         const results = await window.electronAPI.searchItem(sanitizedData);
-        // const results = await
 
         setSuggestions(results);
       } catch (error) {
@@ -165,7 +164,6 @@ const BillingSearch = () => {
     }
   };
 
-
   const handleSelectItem = (selectedItem: {
     item_name: string;
     code: string;
@@ -173,8 +171,8 @@ const BillingSearch = () => {
     qty: number;
     rate: number;
     amount: number;
-    createdAt:any;
-    purchased_rate:number
+    createdAt: any;
+    purchased_rate: number;
   }) => {
     dispatch(
       setBillingField({
@@ -281,7 +279,7 @@ const BillingSearch = () => {
         amount,
         item_name,
         createdAt,
-        purchased_rate
+        purchased_rate,
       }: any = billingSearch;
 
       // Check if all required fields are filled
@@ -311,7 +309,7 @@ const BillingSearch = () => {
           amount,
           item_name,
           createdAt,
-          purchased_rate
+          purchased_rate,
         };
         dispatch(setItem(payload));
         enterPressCount.current = 0; // Reset counter after logging
@@ -408,6 +406,10 @@ const BillingSearch = () => {
           value={billingSearch[field] || ""}
           inputRef={field === "qty" ? qtyRef : null}
           onKeyDown={field === "qty" ? handleQtyKeyDown : undefined}
+          InputProps={{
+            readOnly: field !== "qty", // Prevent typing in restricted fields
+          }}
+          tabIndex={field !== "qty" ? -1 : 0}
           onChange={(e) => {
             const newValue: any = ["code", "qty", "rate", "amount"].includes(
               field
@@ -442,9 +444,12 @@ const BillingSearch = () => {
                   value: updatedBillingSearch.amount,
                 })
               );
-             
             }
+
+
           }}
+
+
         />
       ))}
     </Box>

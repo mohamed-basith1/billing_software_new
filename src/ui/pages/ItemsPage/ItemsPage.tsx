@@ -12,7 +12,7 @@ interface Item {
   rate: string;
 }
 
-const columns: GridColDef[] = [
+export const columns: GridColDef[] = [
   {
     field: "name",
     headerName: "NAME",
@@ -35,13 +35,13 @@ const columns: GridColDef[] = [
   },
 ];
 
-const rows: Item[] = [
+export const rows: Item[] = [
   {
     id: 1,
     name: "Queen Size Bed",
     sku: "Item 1 sku",
     type: "Goods",
-    description: "Mid-century wooden double be...",
+    description: "Mid-century wooden double be.jhiushudhishdiuhsiuhdiuhsidhishdiuhsidhiushdiuhshduihsiudhsiudhiushdiuhsiudhishdiuhsdiud sdbiusd.",
     rate: "₹1681.00",
   },
   {

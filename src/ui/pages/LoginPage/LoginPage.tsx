@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import loginImage from "../../assets/Image/illustrate/login.png";
+import loginImage from "../../assets/Image/Illustrate/login.png";
 import { setAuthenticate, setUserName } from "./LoginSlice";
 import { toast } from "react-toastify";
 
@@ -42,7 +42,6 @@ export default function LoginPage() {
     if (username && password && adminPassword) {
       //@ts-ignore
       let response = await window.electronAPI.createAccount(sanitizedData);
-      console.log("");
       if (response.status === 201) {
         toast.success(`${response.message}`, { position: "bottom-left" });
         setCreateAccount(false);

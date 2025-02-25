@@ -1,50 +1,65 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
-import React from "react";
-import { useSelector, useDispatch } from "react-redux";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 import {
-  selectCurrentTabValue,
   selectBillValue,
-  setCustomerSelectModal,
+  selectCurrentTabValue,
+  setBillPriceDetails,
 } from "../../pages/BillsPage/BillsSlice";
-import { generateInvoicePDF } from "./utils";
-import NestedModal from "./CustomerModal";
+
+import { toast } from "react-toastify";
+import { setCustomerSelectModal } from "../../pages/CustomersPage/CustomersSlice";
 
 const BillingPrice = () => {
   const selectCurrentTab = useSelector(selectCurrentTabValue);
   const selectBill = useSelector(selectBillValue);
   const dispatch = useDispatch();
+  const [paymentMethod, setPaymentMethod] = useState<string | null>(
+    "Cash Paid"
+  );
+  const [discount, setDiscount] = useState<number>(0);
+  const [subAmount, setSubAmount] = useState<number>(0);
+  const [TotalAmount, setTotalAmount] = useState<number>(0);
 
-  const [selected, setSelected] = React.useState<string | null>("Cash Paid");
-  const [discount, setDiscount] = React.useState(0);
+  useEffect(() => {
+    const selectedBill =
+      selectBill.find((data: any) => data.bill_number === selectCurrentTab) ||
+      {};
 
-  const filteredBill =
-    selectBill
-      .find((data: any) => data.bill_number === selectCurrentTab)
-      ?.items.map((item: any, index: number) => ({
+    const updatedItems =
+      selectedBill.items?.map((item: any, index: number) => ({
         ...item,
         no: index + 1, // Adding index starting from 1
       })) || [];
 
-  const subAmount = filteredBill.reduce(
-    (total: any, item: any) => total + item.amount,
-    0
-  );
-  const TotalAmount = subAmount - discount;
+    const calculatedSubAmount = updatedItems.reduce(
+      (total: number, item: any) => total + item.amount,
+      0
+    );
+    setSubAmount(calculatedSubAmount);
+    setTotalAmount(calculatedSubAmount - discount);
+  }, [selectBill, selectCurrentTab, discount]);
 
-  console.log(
-    "item List",
-    filteredBill,
-    "subAmount",
-    subAmount,
-    "TotalAmount",
-    TotalAmount
-  );
+  useEffect(() => {
+    let payload: any = {
+      sub_amount: subAmount,
+      total_amount: TotalAmount,
+      discount: discount,
+      payment_method: paymentMethod,
+      paid:
+        paymentMethod === "Cash Paid" || paymentMethod === "UPI Paid"
+          ? true
+          : false,
+      balance: 0,
+    };
+    dispatch(setBillPriceDetails(payload));
+  }, [TotalAmount,paymentMethod]);
 
   const handleChange = (paymentType: string) => {
-    setSelected((prev) => (prev === paymentType ? null : paymentType)); // Toggle selection
+    setPaymentMethod((prev) => (prev === paymentType ? null : paymentType)); // Toggle selection
   };
 
   return (
@@ -138,7 +153,7 @@ const BillingPrice = () => {
               key={label}
               control={
                 <Checkbox
-                  checked={selected === label}
+                  checked={paymentMethod === label}
                   onChange={() => handleChange(label)}
                   size="small"
                   sx={{
@@ -161,13 +176,18 @@ const BillingPrice = () => {
           sx={{ bgcolor: "#1E1E2D" }}
           onClick={() => {
             //generateInvoicePDF(filteredBill, subAmount, discount, TotalAmount);
-            dispatch(setCustomerSelectModal(true));
+            if (Number(TotalAmount) !== 0) {
+              dispatch(setCustomerSelectModal(true));
+            } else {
+              toast.warning(`No items have been added to the bill`, {
+                position: "bottom-left",
+              });
+            }
           }}
         >
           Bill
         </Button>
       </Box>
-   
     </Box>
   );
 };

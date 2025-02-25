@@ -39,7 +39,7 @@ export default function CustomSidebar() {
                 ? `calc(100vw - ${drawerWidth}px)`
                 : `100vw`,
               height: "100vh",
-              p: isAuthenticated ? 1 : 0,
+              p: isAuthenticated ? 3 : 0,
               overflow: "auto",
               bgcolor: "#F7F7FE",
             }}
