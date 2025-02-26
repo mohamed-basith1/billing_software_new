@@ -13,6 +13,9 @@ export const calculateAmount = (
     case "gram":
       return qty * rate;
 
+    // case "gram":
+    //   return (qty / 1000) * rate; // Convert grams to Kg
+
     default:
       console.warn(`Unknown UOM: ${uom}`);
       return 0; // Return 0 as a fallback

@@ -7,6 +7,7 @@ interface Bill {
   itemsearch: string;
   uom: string;
   qty: number | null;
+  stock_qty: number | null;
   rate: number | null;
   amount: number | null;
   showSuggestions?: boolean;
@@ -37,6 +38,7 @@ const initialState: BillsState = {
       itemsearch: "",
       uom: "",
       qty: null,
+      stock_qty: null,
       rate: null,
       amount: null,
       showSuggestions: false,
@@ -74,6 +76,7 @@ const billsSlice = createSlice({
         itemsearch: "",
         uom: "",
         qty: null,
+        stock_qty: null,
         rate: null,
         amount: null,
         showSuggestions: false,
@@ -116,6 +119,7 @@ const billsSlice = createSlice({
         createdAt,
         purchased_rate,
         edited,
+        stock_qty,
       } = action.payload;
 
       // Find the bill with the given bill_number
@@ -123,7 +127,7 @@ const billsSlice = createSlice({
 
       if (bill) {
         // Check if the item already exists in the bill items
-        const existingItem = bill.items.find((item) => item.code === code);
+        const existingItem: any = bill.items.find((item) => item.code === code);
         const existingItemIndex = bill.items.findIndex(
           (item) => item.code === code
         );
@@ -139,12 +143,13 @@ const billsSlice = createSlice({
             createdAt,
             id: code,
             purchased_rate,
+            stock_qty,
           };
         }
         if (existingItem && edited === undefined) {
           // Update existing item's quantity and amount
-          existingItem.qty += qty;
-          existingItem.amount += amount;
+          existingItem.qty = Number(existingItem.qty) + Number(qty);
+          existingItem.amount = Number(existingItem.amount) + Number(amount);
         } else {
           if (edited === undefined) {
             // Add new item if it does not exist
@@ -158,6 +163,7 @@ const billsSlice = createSlice({
               createdAt,
               id: code,
               purchased_rate,
+              stock_qty,
             });
           }
         }
@@ -167,6 +173,7 @@ const billsSlice = createSlice({
         bill.itemsearch = "";
         bill.uom = "";
         bill.qty = null;
+        bill.stock_qty = null;
         bill.rate = null;
         bill.amount = null;
         bill.showSuggestions = false;

@@ -73,6 +73,12 @@ const BillingItems = () => {
     if (Number(newRow.qty) === 0 || Number(newRow.qty) < 0) {
       return { ...modifiedBill[0] };
     }
+
+    console.log(Number(newRow.qty), modifiedBill[0], "super");
+    if (Number(newRow.qty) > modifiedBill[0].stock_qty) {
+      alert("edited alert");
+      return { ...modifiedBill[0] };
+    }
     // Recalculate the amount when qty is edited
     const updatedAmount = calculateAmount(newRow.uom, newRow.qty, newRow.rate);
     const updatedRow: any = { ...newRow, amount: updatedAmount };

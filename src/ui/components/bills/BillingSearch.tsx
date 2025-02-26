@@ -59,7 +59,12 @@ const BillingSearch = () => {
       if (event.key === "Enter") {
         if (allFieldsFilled && billingSearch.qty > 0) {
           enterPressCount.current += 1;
-
+          if (billingSearch.qty > billingSearch.stock_qty) {
+            alert(
+              `Entered qty is more than stock qty we only have ${billingSearch.stock_qty}${billingSearch.uom} in store`
+            );
+            return;
+          }
           if (enterPressCount.current === 2) {
             // Log the billing details
 
@@ -73,6 +78,7 @@ const BillingSearch = () => {
               item_name,
               createdAt,
               purchased_rate,
+              stock_qty
             } = billingSearch;
 
             let payload: any = {
@@ -85,7 +91,9 @@ const BillingSearch = () => {
               item_name,
               createdAt,
               purchased_rate,
+              stock_qty
             };
+            console.log("payload setitem top",payload)
             dispatch(setItem(payload));
             enterPressCount.current = 0; // Reset count after logging
             if (inputRef.current) {
@@ -154,7 +162,7 @@ const BillingSearch = () => {
 
         //@ts-ignore
         const results = await window.electronAPI.searchItem(sanitizedData);
-
+        console.log("searchItem", results);
         setSuggestions(results);
       } catch (error) {
         console.error("Error fetching suggestions:", error);
@@ -173,6 +181,7 @@ const BillingSearch = () => {
     amount: number;
     createdAt: any;
     purchased_rate: number;
+    stock_qty: number;
   }) => {
     dispatch(
       setBillingField({
@@ -200,6 +209,13 @@ const BillingSearch = () => {
         bill_number: billingSearch.bill_number,
         field: "qty",
         value: selectedItem.qty,
+      })
+    );
+    dispatch(
+      setBillingField({
+        bill_number: billingSearch.bill_number,
+        field: "stock_qty",
+        value: selectedItem.stock_qty,
       })
     );
     dispatch(
@@ -286,8 +302,9 @@ const BillingSearch = () => {
         item_name,
         createdAt,
         purchased_rate,
+        stock_qty,
       }: any = billingSearch;
-
+      console.log("stock_qty", stock_qty);
       // Check if all required fields are filled
       const allFieldsFilled: boolean = Object.entries({
         bill_number,
@@ -313,6 +330,9 @@ const BillingSearch = () => {
       });
 
       if (enterPressCount.current === 2 && allFieldsFilled === true) {
+        if (qty > stock_qty) {
+          alert("entered qty is more than stock qty bottom");
+        }
         if (inputRef.current) {
           inputRef.current.focus();
         }
@@ -327,7 +347,10 @@ const BillingSearch = () => {
           item_name,
           createdAt,
           purchased_rate,
+          stock_qty
         };
+
+        console.log("payload setitem",payload)
         dispatch(setItem(payload));
         enterPressCount.current = 0; // Reset counter after logging
       } else if (enterPressCount.current === 2) {
