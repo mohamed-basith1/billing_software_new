@@ -15,6 +15,7 @@ import {
   setItem,
 } from "../../pages/BillsPage/BillsSlice";
 import { calculateAmount } from "../../utils/utils";
+import { toast } from "react-toastify";
 
 const BillingSearch = () => {
   const dispatch = useDispatch();
@@ -60,9 +61,11 @@ const BillingSearch = () => {
         if (allFieldsFilled && billingSearch.qty > 0) {
           enterPressCount.current += 1;
           if (billingSearch.qty > billingSearch.stock_qty) {
-            alert(
-              `Entered qty is more than stock qty we only have ${billingSearch.stock_qty}${billingSearch.uom} in store`
+            toast.warning(
+              `Entered quantity exceeds available stock. We only have ${billingSearch.stock_qty} ${billingSearch.uom} of ${billingSearch.item_name}`,
+              { position: "bottom-left" }
             );
+
             return;
           }
           if (enterPressCount.current === 2) {
@@ -78,7 +81,7 @@ const BillingSearch = () => {
               item_name,
               createdAt,
               purchased_rate,
-              stock_qty
+              stock_qty,
             } = billingSearch;
 
             let payload: any = {
@@ -91,9 +94,9 @@ const BillingSearch = () => {
               item_name,
               createdAt,
               purchased_rate,
-              stock_qty
+              stock_qty,
             };
-            console.log("payload setitem top",payload)
+            console.log("payload setitem top", payload);
             dispatch(setItem(payload));
             enterPressCount.current = 0; // Reset count after logging
             if (inputRef.current) {
@@ -331,7 +334,10 @@ const BillingSearch = () => {
 
       if (enterPressCount.current === 2 && allFieldsFilled === true) {
         if (qty > stock_qty) {
-          alert("entered qty is more than stock qty bottom");
+          toast.warning(
+            `Entered quantity exceeds available stock. We only have ${stock_qty} ${uom} of ${item_name}`,
+            { position: "bottom-left" }
+          );
         }
         if (inputRef.current) {
           inputRef.current.focus();
@@ -347,10 +353,10 @@ const BillingSearch = () => {
           item_name,
           createdAt,
           purchased_rate,
-          stock_qty
+          stock_qty,
         };
 
-        console.log("payload setitem",payload)
+        console.log("payload setitem", payload);
         dispatch(setItem(payload));
         enterPressCount.current = 0; // Reset counter after logging
       } else if (enterPressCount.current === 2) {
@@ -377,7 +383,9 @@ const BillingSearch = () => {
         label="Item Name or Code"
         id="item-name-field"
         size="small"
-        sx={{ width: "30%" }}
+        sx={{
+          width: "30%",
+        }}
         value={billingSearch.itemsearch || ""}
         onChange={handleItemChange}
         onKeyDown={handleKeyDown}
@@ -408,7 +416,9 @@ const BillingSearch = () => {
               >
                 <ListItemText
                   primary={`${item.item_name}`}
-                  sx={{ width: "30%" }}
+                  sx={{
+                    width: "30%",
+                  }}
                 />
                 <ListItemText
                   primary={`${item.code}`}
@@ -437,6 +447,7 @@ const BillingSearch = () => {
           size="small"
           sx={{
             width: "17.5%",
+
             pointerEvents: field === "qty" ? "auto" : "none",
           }}
           value={billingSearch[field] || ""}

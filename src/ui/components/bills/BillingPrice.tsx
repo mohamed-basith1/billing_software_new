@@ -79,7 +79,6 @@ const BillingPrice = () => {
         display: "flex",
         flexDirection: isMobile ? "column" : "row",
         justifyContent: "space-between",
-        gap: isMobile ? 2 : 0,
       }}
     >
       <Box sx={{ flex: 1 }}></Box>
@@ -90,7 +89,7 @@ const BillingPrice = () => {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          gap: 2,
+          gap: 1,
         }}
       >
         <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
