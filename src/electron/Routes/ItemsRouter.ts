@@ -55,17 +55,7 @@ export function ItemsRouter() {
       throw error;
     }
   });
-  ipcMain.handle("update-item", async (_, id, newData) => {
-    try {
-      const updatedItem = await Item.findByIdAndUpdate(id, newData, {
-        new: true,
-      });
-      return updatedItem ? JSON.parse(JSON.stringify(updatedItem)) : null;
-    } catch (error: any) {
-      console.error("Error updating data:", error);
-      throw error;
-    }
-  });
+
   ipcMain.handle("delete-item", async (_, id) => {
     try {
       const deletedItem = await Item.findByIdAndDelete(id);
