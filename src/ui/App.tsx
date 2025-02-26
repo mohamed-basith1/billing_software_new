@@ -12,6 +12,8 @@ import "./assets/fonts/fonts.css";
 import { CircularProgress } from "@mui/material";
 import { ToastContainer, toast } from "react-toastify";
 import { selectAuthenticate } from "./pages/LoginPage/LoginSlice.js";
+import { addData, sampleData } from "./utils/utils.js";
+
 // Lazy load components
 const BillsPage = lazy(() => import("./pages/BillsPage/BillsPage.js"));
 const ItemsPage = lazy(() => import("./pages/ItemsPage/ItemsPage.js"));
@@ -26,7 +28,7 @@ export default function CustomSidebar() {
   const storeData = useSelector((state) => state);
 
   let isAuthenticated = useSelector(selectAuthenticate);
-
+  // addData(sampleData);
   return (
     <Router>
       <Box sx={{ display: "flex", fontFamily: "Poppins !important" }}>

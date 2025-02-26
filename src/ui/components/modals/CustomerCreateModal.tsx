@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Button from "@mui/material/Button";
 import { useDispatch, useSelector } from "react-redux";
-import { Grid, TextField, Typography } from "@mui/material";
+import { Grid, IconButton, TextField, Typography } from "@mui/material";
 import {
   clearCustomerDetails,
   selectCustomerCreateModal,
@@ -12,16 +12,16 @@ import {
   setCustomerDetails,
 } from "../../pages/CustomersPage/CustomersSlice";
 import { toast } from "react-toastify";
+import CloseIcon from "@mui/icons-material/Close";
 
 export const style = {
   position: "absolute",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 400,
+
   bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
+
   pt: 2,
   px: 4,
   pb: 3,
@@ -68,31 +68,37 @@ const CustomerCreateModal = () => {
     <React.Fragment>
       <Modal
         open={customerCreateModal}
-        onClose={() => handleCloseCustomerCreateModal()}
-        aria-labelledby="child-modal-title"
-        aria-describedby="child-modal-description"
+        onClose={handleCloseCustomerCreateModal}
+        aria-labelledby="create-modal-title"
+        aria-describedby="create-modal-description"
         BackdropProps={{
           sx: {
-            backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
-            backdropFilter: "blur(2px)", // Blur effect
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            backdropFilter: "blur(2px)",
           },
         }}
       >
         <Box
           sx={{
             ...style,
-            background: "white",
-            width: "60%",
-            height: "50%",
+            width: 500,
+            p: 4,
             borderRadius: "8px",
-            border: "0px",
-            boxShadow: "none",
+            bgcolor: "white",
+            // boxShadow: 5,
             display: "flex",
             flexDirection: "column",
-            justifyContent: "space-between",
           }}
         >
-          <Typography sx={{ fontSize: "1.5rem" }}>
+          {/* Close Button */}
+          <IconButton
+            sx={{ position: "absolute", top: 8, right: 8 }}
+            onClick={handleCloseCustomerCreateModal}
+          >
+            <CloseIcon />
+          </IconButton>
+
+          <Typography sx={{ fontSize: "1.5rem", mb: 2 }}>
             Create New Customer
           </Typography>
 
@@ -138,7 +144,6 @@ const CustomerCreateModal = () => {
                   onChange={(e) => {
                     const { value } = e.target;
                     if (type === "number") {
-                      // Remove non-numeric characters and limit length
                       const sanitizedValue = value
                         .replace(/\D/g, "")
                         .slice(0, maxLength);
@@ -159,6 +164,7 @@ const CustomerCreateModal = () => {
               </Grid>
             ))}
           </Grid>
+
           <Box
             sx={{
               width: "100%",
@@ -166,13 +172,13 @@ const CustomerCreateModal = () => {
               justifyContent: "flex-end",
               gap: "10px",
               alignItems: "center",
+              mt: 2,
             }}
           >
-            
             <Button
               variant="outlined"
               sx={{ height: "2.2rem" }}
-              onClick={() => handleCloseCustomerCreateModal()}
+              onClick={handleCloseCustomerCreateModal}
             >
               Cancel
             </Button>
@@ -180,7 +186,7 @@ const CustomerCreateModal = () => {
             <Button
               variant="contained"
               sx={{ height: "2.2rem" }}
-              onClick={() => handleSubmitCustomerCreate()}
+              onClick={handleSubmitCustomerCreate}
             >
               Create
             </Button>

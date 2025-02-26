@@ -1,4 +1,10 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import React, { useEffect, useState } from "react";
@@ -12,6 +18,7 @@ import {
 
 import { toast } from "react-toastify";
 import { setCustomerSelectModal } from "../../pages/CustomersPage/CustomersSlice";
+import { useTheme } from "@emotion/react";
 
 const BillingPrice = () => {
   const selectCurrentTab = useSelector(selectCurrentTabValue);
@@ -23,6 +30,9 @@ const BillingPrice = () => {
   const [discount, setDiscount] = useState<number>(0);
   const [subAmount, setSubAmount] = useState<number>(0);
   const [TotalAmount, setTotalAmount] = useState<number>(0);
+
+  const theme: any = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
     const selectedBill =
@@ -56,7 +66,7 @@ const BillingPrice = () => {
       balance: 0,
     };
     dispatch(setBillPriceDetails(payload));
-  }, [TotalAmount,paymentMethod]);
+  }, [TotalAmount, paymentMethod]);
 
   const handleChange = (paymentType: string) => {
     setPaymentMethod((prev) => (prev === paymentType ? null : paymentType)); // Toggle selection
@@ -65,21 +75,25 @@ const BillingPrice = () => {
   return (
     <Box
       sx={{
-        height: "13rem",
+        height: "auto",
         display: "flex",
+        flexDirection: isMobile ? "column" : "row",
         justifyContent: "space-between",
+        gap: isMobile ? 2 : 0,
       }}
     >
-      <Box></Box>
+      <Box sx={{ flex: 1 }}></Box>
+
       <Box
         sx={{
-          width: "35%",
+          width: isMobile ? "100%" : "35%",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
+          gap: 2,
         }}
       >
-        <Box sx={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
           <Box
             sx={{
               display: "flex",
@@ -87,9 +101,10 @@ const BillingPrice = () => {
               justifyContent: "space-between",
             }}
           >
-            <Typography>Sub Total</Typography>{" "}
+            <Typography>Sub Total</Typography>
             <Typography>₹{subAmount}</Typography>
           </Box>
+
           <Box
             sx={{
               display: "flex",
@@ -102,10 +117,9 @@ const BillingPrice = () => {
 
             <Box
               sx={{
-                width: "25%",
-                height: "100%",
+                width: isMobile ? "40%" : "25%",
                 display: "flex",
-                gap: "5px",
+                gap: 1,
                 alignItems: "center",
               }}
             >
@@ -115,13 +129,13 @@ const BillingPrice = () => {
                 value={discount}
                 onChange={(e: any) => setDiscount(e.target.value)}
                 sx={{
-                  width: "100%", // Set width
+                  width: "100%",
                   "& .MuiInputBase-root": {
-                    height: "30px", // Controls the input field height
-                    padding: "1px", // Controls the padding inside input
+                    height: "30px",
+                    padding: "1px",
                   },
                   "& .MuiOutlinedInput-input": {
-                    padding: "10px", // Adjust text padding inside input
+                    padding: "10px",
                     textAlign: "right",
                   },
                 }}
@@ -132,7 +146,7 @@ const BillingPrice = () => {
 
         <Box sx={{ bgcolor: "lightgray", height: ".5px", width: "100%" }}></Box>
 
-        {/* Total price */}
+        {/* Total Price */}
         <Box
           sx={{
             display: "flex",
@@ -141,13 +155,20 @@ const BillingPrice = () => {
             alignItems: "center",
           }}
         >
-          <Typography>Total</Typography>{" "}
+          <Typography>Total</Typography>
           <Typography sx={{ fontSize: "1.2rem" }}>₹{TotalAmount}</Typography>
         </Box>
 
         <Box sx={{ bgcolor: "lightgray", height: ".5px", width: "100%" }}></Box>
-        {/* Paid By */}
-        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+
+        {/* Payment Methods */}
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, auto)",
+            gap: 1,
+          }}
+        >
           {["Cash Paid", "UPI Paid", "Credit Bill", "Self Use"].map((label) => (
             <FormControlLabel
               key={label}
@@ -157,15 +178,15 @@ const BillingPrice = () => {
                   onChange={() => handleChange(label)}
                   size="small"
                   sx={{
-                    color: "#1E1E2D", // Default color
-                    "&.Mui-checked": { color: "#1E1E2D" }, // Checked state color
+                    color: "#1E1E2D",
+                    "&.Mui-checked": { color: "#1E1E2D" },
                   }}
                 />
               }
               label={
                 <Typography sx={{ fontSize: "0.8rem" }}>{label}</Typography>
-              } // Small label
-              sx={{ marginRight: 0, padding: 0 }} // Remove extra spacing
+              }
+              sx={{ marginRight: 0, padding: 0 }}
             />
           ))}
         </Box>
@@ -173,9 +194,8 @@ const BillingPrice = () => {
         <Button
           fullWidth
           variant="contained"
-          sx={{ bgcolor: "#1E1E2D" }}
+          sx={{ bgcolor: "#1E1E2D", fontSize: isMobile ? "0.9rem" : "1rem" }}
           onClick={() => {
-            //generateInvoicePDF(filteredBill, subAmount, discount, TotalAmount);
             if (Number(TotalAmount) !== 0) {
               dispatch(setCustomerSelectModal(true));
             } else {

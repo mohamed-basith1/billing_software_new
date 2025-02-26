@@ -84,7 +84,7 @@ export function CustomersRouter() {
   // Get All Customers
   ipcMain.handle("get-customers", async () => {
     try {
-      const customers = await Customer.find();
+      const customers = await Customer.find().limit(15);
       return {
         status: 200,
         data: JSON.parse(JSON.stringify(customers)),

@@ -70,6 +70,9 @@ const BillingItems = () => {
   const gridRef = useRef<HTMLDivElement>(null);
 
   const handleProcessRowUpdate = (newRow: any) => {
+    if (Number(newRow.qty) === 0 || Number(newRow.qty) < 0) {
+      return { ...modifiedBill[0] };
+    }
     // Recalculate the amount when qty is edited
     const updatedAmount = calculateAmount(newRow.uom, newRow.qty, newRow.rate);
     const updatedRow: any = { ...newRow, amount: updatedAmount };

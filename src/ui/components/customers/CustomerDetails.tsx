@@ -189,6 +189,8 @@ const CustomerDetails = () => {
       sx={{
         height: "100%",
         width: "60%",
+        minWidth: "400px",
+        maxWidth: "900px",
         p: 2,
         borderRadius: "8px",
         border: ".1px solid lightgrey",
@@ -196,12 +198,18 @@ const CustomerDetails = () => {
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
+        "@media (max-width: 1024px)": {
+          width: "90%", // Adjust for smaller laptops
+        },
+        "@media (max-width: 768px)": {
+          width: "100%", // Adjust for tablets
+        },
       }}
     >
       <Typography sx={{ fontSize: "1.8rem", fontWeight: 400 }}>
         Customer Details
       </Typography>
-      {/* <Divider sx={{ borderColor: "lightgrey", height: ".1px", mt: 1 }} /> */}
+
       {selectedCustomer ? (
         <>
           <Box
@@ -213,7 +221,7 @@ const CustomerDetails = () => {
               flexDirection: "column",
             }}
           >
-            {/* //header name and email */}
+            {/* Header Name and Email */}
             <Box
               sx={{
                 display: "flex",
@@ -230,7 +238,6 @@ const CustomerDetails = () => {
                 }}
                 alt={selectedCustomer?.customerName}
               />
-
               <Box sx={{ width: "100%", pl: 2 }}>
                 <Typography
                   sx={{
@@ -260,12 +267,9 @@ const CustomerDetails = () => {
                   sx={{
                     height: "2.2rem",
                     bgcolor: "rgb(193,9,21)",
-
-                    "&:hover": {
-                      bgcolor: "rgb(193,9,21)",
-                    },
+                    "&:hover": { bgcolor: "rgb(193,9,21)" },
                     "&:focus, &:focus-visible, &.Mui-focusVisible": {
-                      outline: "none", // Removes focus outline
+                      outline: "none",
                     },
                   }}
                 >
@@ -274,48 +278,30 @@ const CustomerDetails = () => {
               </Box>
             </Box>
 
-            {/* address and other details */}
-            <Box sx={{ height: "100%", width: "100%", mt: 5 }}>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "30px",
-                }}
-              >
-                {customerDetails
-                  .reduce((rows: any, detail: any, index: number) => {
-                    if (index % 2 === 0) rows.push([]);
-                    rows[rows.length - 1].push(detail);
-                    return rows;
-                  }, [])
-                  .map((row: any, rowIndex: any) => (
-                    <Box
-                      key={rowIndex}
-                      sx={{ display: "flex", gap: "50px", width: "100%" }}
-                    >
-                      {row?.map((detail: any, i: any) => (
-                        <Box
-                          key={i}
-                          sx={{
-                            display: "flex",
-                            gap: "10px",
-                            width: "28%",
-                          }}
-                        >
-                          {detail.icon}
-                          <Box sx={{ width: "90%" }}>
-                            <Typography sx={{ fontWeight: 500, mb: 1 }}>
-                              {detail.label}
-                            </Typography>
-                            <Typography sx={{ fontSize: ".8rem" }}>
-                              {detail.value}
-                            </Typography>
-                          </Box>
-                        </Box>
-                      ))}
+            {/* Address & Other Details */}
+            <Box sx={{ width: "100%", mt: 5 }}>
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
+                {customerDetails.map((detail, i) => (
+                  <Box
+                    key={i}
+                    sx={{
+                      display: "flex",
+                      gap: "10px",
+                      minWidth: "45%",
+                      flex: "1 1 45%",
+                    }}
+                  >
+                    {detail.icon}
+                    <Box sx={{ width: "90%" }}>
+                      <Typography sx={{ fontWeight: 500, mb: 1 }}>
+                        {detail.label}
+                      </Typography>
+                      <Typography sx={{ fontSize: ".8rem" }}>
+                        {detail.value}
+                      </Typography>
                     </Box>
-                  ))}
+                  </Box>
+                ))}
               </Box>
             </Box>
           </Box>
@@ -328,12 +314,8 @@ const CustomerDetails = () => {
               columns={purchaseHistoryColumn}
               disableColumnMenu
               hideFooter
-              //   processRowUpdate={handleProcessRowUpdate}
               sx={{
-                "& .MuiDataGrid-columnHeader": {
-                  //   backgroundColor: "#1E1E2D !important", // Ensure each column header is colored
-                  color: "black",
-                },
+                "& .MuiDataGrid-columnHeader": { color: "black" },
                 border: "1px solid white",
               }}
             />

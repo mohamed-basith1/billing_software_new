@@ -57,7 +57,7 @@ const BillingSearch = () => {
         billingSearch.amount;
 
       if (event.key === "Enter") {
-        if (allFieldsFilled) {
+        if (allFieldsFilled && billingSearch.qty > 0) {
           enterPressCount.current += 1;
 
           if (enterPressCount.current === 2) {
@@ -267,9 +267,15 @@ const BillingSearch = () => {
   };
 
   const handleQtyKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const { qty, uom }: any = billingSearch;
+
+    // // Prevent entry if qty is 0
+    if (qty === 0 || qty === "0" || qty === null || qty === undefined) {
+      return;
+    }
+
     if (event.key === "Enter") {
       enterPressCount.current += 1;
-
       const {
         bill_number,
         code,
@@ -283,7 +289,7 @@ const BillingSearch = () => {
       }: any = billingSearch;
 
       // Check if all required fields are filled
-      const allFieldsFilled: any = Object.values({
+      const allFieldsFilled: boolean = Object.entries({
         bill_number,
         code,
         uom,
@@ -291,11 +297,22 @@ const BillingSearch = () => {
         rate,
         amount,
         item_name,
-      }).every(
-        (value) => value !== null && value !== undefined && value !== ""
-      );
+      }).every(([key, value]) => {
+        if (value === null || value === undefined || value === "") return false;
 
-      if (enterPressCount.current === 2 && allFieldsFilled) {
+        // Ensure numeric fields have valid positive values
+        const test = () => {
+          if (["qty", "rate", "amount"].includes(key)) {
+            const numValue = Number(value);
+            return !isNaN(numValue) && numValue > 0; // Reject negative values and NaN
+          }
+          return true; // Return true for non-numeric fields
+        };
+
+        return test();
+      });
+
+      if (enterPressCount.current === 2 && allFieldsFilled === true) {
         if (inputRef.current) {
           inputRef.current.focus();
         }
@@ -393,11 +410,7 @@ const BillingSearch = () => {
         <TextField
           key={field}
           label={field.toUpperCase()}
-          type={
-            ["code", "qty", "rate", "amount"].includes(field)
-              ? "number"
-              : "text"
-          }
+          type={["qty", "rate", "amount"].includes(field) ? "number" : "text"}
           size="small"
           sx={{
             width: "17.5%",
@@ -445,11 +458,7 @@ const BillingSearch = () => {
                 })
               );
             }
-
-
           }}
-
-
         />
       ))}
     </Box>

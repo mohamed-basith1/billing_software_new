@@ -54,25 +54,29 @@ export default function LoginPage() {
   return (
     <Box
       sx={{
-        height: "100%",
+        height: "100vh",
         width: "100%",
         display: "flex",
         gap: "20px",
         p: 2,
         boxSizing: "border-box",
         background: "white",
-        transition: "3s",
+        transition: "1s",
         position: "relative",
       }}
     >
+      {/* Left Section (Form) */}
       <Box
         sx={{
           width: "50%",
           height: "100%",
           bgcolor: "white",
-          borderRadius: "50px",
-          padding: "10rem 5rem 5rem 5rem",
+          borderRadius: "40px",
+          padding: { xs: "5rem 3rem", md: "8rem 4rem", lg: "10rem 5rem" },
           boxSizing: "border-box",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
         }}
       >
         <Typography
@@ -87,13 +91,7 @@ export default function LoginPage() {
         </Typography>
 
         {createAccount ? (
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              mt: 12,
-            }}
-          >
+          <Box sx={{ display: "flex", flexDirection: "column", mt: 6 }}>
             <Typography
               sx={{
                 fontSize: "1rem",
@@ -176,7 +174,7 @@ export default function LoginPage() {
                 mb: 1,
               }}
             >
-              Have an account ?{" "}
+              Have an account?{" "}
               <span
                 style={{ color: "#22b378", cursor: "pointer" }}
                 onClick={() => setCreateAccount(false)}
@@ -186,13 +184,7 @@ export default function LoginPage() {
             </Typography>
           </Box>
         ) : (
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              mt: 12,
-            }}
-          >
+          <Box sx={{ display: "flex", flexDirection: "column", mt: 6 }}>
             <Typography
               sx={{
                 fontSize: "1rem",
@@ -258,7 +250,7 @@ export default function LoginPage() {
                 mb: 1,
               }}
             >
-              Don't have an account ?{" "}
+              Don't have an account?{" "}
               <span
                 style={{ color: "#22b378", cursor: "pointer" }}
                 onClick={() => setCreateAccount(true)}
@@ -270,21 +262,28 @@ export default function LoginPage() {
         )}
       </Box>
 
+      {/* Right Section (Image) */}
       <Box
         sx={{
           width: "50%",
           height: "100%",
           bgcolor: "#1E1E2D",
-          borderRadius: "50px",
-          padding: "10rem 5rem",
+          borderRadius: "40px",
+          padding: { xs: "5rem 3rem", md: "8rem 4rem", lg: "10rem 5rem" },
           boxSizing: "border-box",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
         }}
       >
-        <Typography sx={{ fontSize: "1.8rem", fontWeight: 400 }}>
+        <Typography
+          sx={{ fontSize: "1.8rem", fontWeight: 400, color: "white" }}
+        >
           The simplest way to manage <br /> your business
         </Typography>
-
-        <Typography sx={{ fontSize: "0.8rem", fontWeight: 400, pt: 1 }}>
+        <Typography
+          sx={{ fontSize: "0.8rem", fontWeight: 400, pt: 1, color: "white" }}
+        >
           Enter your credentials to access your account
         </Typography>
         <Box
@@ -296,7 +295,16 @@ export default function LoginPage() {
             justifyContent: "center",
           }}
         >
-          <img src={loginImage} style={{ height: "90%" }} />
+          <img
+            src={loginImage}
+            style={{
+              maxHeight: "80%",
+              maxWidth: "100%",
+              objectFit: "contain",
+              borderRadius: "20px",
+            }}
+            alt="Login Illustration"
+          />
         </Box>
       </Box>
     </Box>

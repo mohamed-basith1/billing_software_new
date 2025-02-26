@@ -18,8 +18,6 @@ export const style = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 400,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
   boxShadow: 24,
   pt: 2,
   px: 4,
@@ -51,63 +49,78 @@ const DeleteModal = () => {
       <Modal
         open={customerDeleteModal}
         onClose={handleCloseDeleteModal}
-        aria-labelledby="parent-modal-title"
-        aria-describedby="parent-modal-description"
+        aria-labelledby="delete-modal-title"
+        aria-describedby="delete-modal-description"
         BackdropProps={{
           sx: {
             backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
-            backdropFilter: "blur(2px)", // Blur effect
+            backdropFilter: "blur(2px)", // Subtle blur effect
           },
         }}
       >
         <Box
           sx={{
+
             ...style,
-            width: "25%",
-            height: "27%",
-            borderRadius: "8px",
-            border: "0px",
+            width: 320,
+            p: 3,
+            borderRadius: "12px",
+            bgcolor: "white",
+            boxShadow: 4,
             display: "flex",
             flexDirection: "column",
-            justifyContent: "space-between",
             alignItems: "center",
+            textAlign: "center",
           }}
         >
-          <PersonRemoveRoundedIcon sx={{ fontSize: "3rem" }} />
-          <Typography sx={{ fontSize: "1.2rem", fontWeight: 400 }}>
-            Are you sure you want to <br /> delete this customer ?{" "}
+          <PersonRemoveRoundedIcon
+            sx={{ fontSize: "4rem", color: "rgb(193,9,21)", mb: 1 }}
+          />
+          <Typography
+            id="delete-modal-title"
+            sx={{ fontSize: "1.3rem", fontWeight: 500, color: "#1E1E2D" }}
+          >
+            Confirm Deletion
+          </Typography>
+          <Typography
+            id="delete-modal-description"
+            sx={{ fontSize: "0.95rem", color: "#555", mt: 1, mb: 3 }}
+          >
+            Are you sure you want to delete this customer? <br />
+            This action cannot be undone.
           </Typography>
           <Box
             sx={{
               display: "flex",
+              gap: 2,
               width: "100%",
-              justifyContent: "flex-end",
-              alignItems: "center",
-              gap: "10px",
+              justifyContent: "center",
             }}
           >
             <Button
               variant="outlined"
-              sx={{ height: "2.2rem" }}
-              onClick={() => handleCloseDeleteModal()}
+              onClick={handleCloseDeleteModal}
+              sx={{
+                height: "2.5rem",
+                width: "100px",
+                borderRadius: "8px",
+                color: "#555",
+                borderColor: "#bbb",
+                "&:hover": { bgcolor: "#f5f5f5" },
+              }}
             >
               Cancel
             </Button>
             <Button
               variant="contained"
-              onClick={() => handleCustomerDelete()}
+              onClick={handleCustomerDelete}
               sx={{
-                height: "2.2rem",
+                height: "2.5rem",
+                width: "100px",
+                borderRadius: "8px",
                 bgcolor: "rgb(193,9,21)",
-                "&:hover": {
-                  bgcolor: "rgb(193,9,21)",
-                  outline: "red", // Removes focus outline,
-                  border: "0px",
-                },
-                "&:focus, &:focus-visible, &.Mui-focusVisible": {
-                  outline: "red", // Removes focus outline
-                  border: "0px",
-                },
+                color: "white",
+                "&:hover": { bgcolor: "rgb(170, 7, 19)" },
               }}
             >
               Delete

@@ -52,7 +52,6 @@ const CustomersCreate = () => {
         height: "calc(100% - 3.5rem)",
         width: "100%",
         background: "white",
-        // boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
         border: ".1px solid lightgrey",
         borderRadius: "8px",
         p: 2,
@@ -60,6 +59,7 @@ const CustomersCreate = () => {
         flexDirection: "column",
         justifyContent: "space-between",
         mt: 3,
+        overflow: "hidden",
       }}
     >
       {/* Header Section */}
@@ -102,18 +102,25 @@ const CustomersCreate = () => {
       </Box>
 
       {/* Form Section */}
-      <Box sx={{ height: "calc(100% - 4rem)", width: "100%", display: "flex" }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" }, // Responsive layout
+          gap: 3,
+          height: "100%",
+        }}
+      >
         <Box
           sx={{
-            height: "100%",
-            width: "50%",
+            flexBasis: "50%",
+            flexGrow: 1,
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-evenly",
-            mt: 5,
+            mt: { xs: 2, md: 5 },
           }}
         >
-          <Grid container spacing={2} sx={{ height: "60%" }}>
+          <Grid container spacing={2}>
             {[
               { label: "Customer Name", key: "customerName" },
               { label: "Customer Address", key: "customerAddress" },
@@ -138,6 +145,8 @@ const CustomersCreate = () => {
                 maxLength: 10,
               },
               { label: "Customer Email", key: "customerEmail" },
+              // { label: "Company Name", key: "customerCompanyName" },
+              // { label: "Customer GST Number", key: "customerGSTNumber" },
             ].map(({ label, key, type, maxLength }) => (
               <Grid
                 item
@@ -155,7 +164,6 @@ const CustomersCreate = () => {
                   onChange={(e) => {
                     const { value } = e.target;
                     if (type === "number") {
-                      // Remove non-numeric characters and limit length
                       const sanitizedValue = value
                         .replace(/\D/g, "")
                         .slice(0, maxLength);
@@ -181,7 +189,7 @@ const CustomersCreate = () => {
           <Button
             variant="contained"
             fullWidth
-            sx={{ bgcolor: "#1E1E2D" }}
+            sx={{ bgcolor: "#1E1E2D", mt: 2 }}
             onClick={handleSubmit}
           >
             Create Customer
@@ -191,14 +199,22 @@ const CustomersCreate = () => {
         {/* Image Section */}
         <Box
           sx={{
-            height: "100%",
-            width: "50%",
+            flexBasis: "50%",
+            flexGrow: 1,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <img src={customerImage} style={{ height: "60%" }} />
+          <img
+            src={customerImage}
+            alt="Customer"
+            style={{
+              maxHeight: "60%",
+              maxWidth: "100%",
+              objectFit: "contain",
+            }}
+          />
         </Box>
       </Box>
     </Box>

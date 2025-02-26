@@ -7,6 +7,7 @@ const ItemSchema = new mongoose.Schema({
     purchased_rate: { type: Number, required: true },
     rate: { type: Number, required: true },
     amount: { type: Number, required: true },
+    stock_qty:{ type: Number, required: true },
 }, { timestamps: true } // Enable timestamps
 );
 // Convert MongoDB `_id` to `id` and remove unnecessary fields

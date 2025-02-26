@@ -21,9 +21,7 @@ export const style = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 400,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
+  // boxShadow: 24,
   pt: 2,
   px: 4,
   pb: 3,
@@ -74,30 +72,37 @@ const CustomerEditModal = () => {
       <Modal
         open={customerEditModal}
         onClose={handleCloaseCustomerEditModal}
-        aria-labelledby="child-modal-title"
-        aria-describedby="child-modal-description"
+        aria-labelledby="edit-modal-title"
+        aria-describedby="edit-modal-description"
         BackdropProps={{
           sx: {
             backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
-            backdropFilter: "blur(2px)", // Blur effect
+            backdropFilter: "blur(3px)", // Slight blur effect
           },
         }}
       >
         <Box
           sx={{
             ...style,
-            background: "white",
-            width: "60%",
-            height: "50%",
-            borderRadius: "8px",
-            border: "0px",
-            boxShadow: "none",
+            width: 500,
+            p: 4,
+            borderRadius: "12px",
+            bgcolor: "white",
+            boxShadow: 5,
             display: "flex",
             flexDirection: "column",
-            justifyContent: "space-between",
           }}
         >
-          <Typography sx={{ fontSize: "1.5rem" }}>
+          <Typography
+            id="edit-modal-title"
+            sx={{
+              fontSize: "1.4rem",
+              fontWeight: 500,
+              color: "#1E1E2D",
+              textAlign: "center",
+              mb: 5,
+            }}
+          >
             Edit Customer Details
           </Typography>
 
@@ -127,13 +132,7 @@ const CustomerEditModal = () => {
               },
               { label: "Customer Email", key: "customerEmail" },
             ].map(({ label, key, type, maxLength }) => (
-              <Grid
-                item
-                xs={12}
-                sm={6}
-                key={key}
-                sx={{ display: "flex", flexGrow: 1 }}
-              >
+              <Grid item xs={12} sm={6} key={key}>
                 <TextField
                   fullWidth
                   label={label}
@@ -143,7 +142,6 @@ const CustomerEditModal = () => {
                   onChange={(e) => {
                     const { value } = e.target;
                     if (type === "number") {
-                      // Remove non-numeric characters and limit length
                       const sanitizedValue = value
                         .replace(/\D/g, "")
                         .slice(0, maxLength);
@@ -153,7 +151,6 @@ const CustomerEditModal = () => {
                     }
                   }}
                   inputProps={type === "number" ? { maxLength } : {}}
-                  sx={{ height: "100%" }}
                   error={error && key === "customerName"}
                   helperText={
                     error && key === "customerName"
@@ -164,29 +161,33 @@ const CustomerEditModal = () => {
               </Grid>
             ))}
           </Grid>
+
           <Box
-            sx={{
-              width: "100%",
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "10px",
-              alignItems: "center",
-            }}
+            sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 3 }}
           >
             <Button
               variant="outlined"
-              sx={{ height: "2.2rem" }}
-              onClick={() => handleCloaseCustomerEditModal()}
+              onClick={handleCloaseCustomerEditModal}
+              sx={{
+                height: "2.5rem",
+                width: "100px",
+                borderRadius: "8px",
+                color: "#555",
+                borderColor: "#bbb",
+                "&:hover": { bgcolor: "#f5f5f5" },
+              }}
             >
               Cancel
             </Button>
-
             <Button
               variant="contained"
-              sx={{ height: "2.2rem" }}
-              onClick={() => handleEditSubmit()}
+              onClick={handleEditSubmit}
+              sx={{
+                height: "2.5rem",
+                width: "100px",
+              }}
             >
-              Edit
+              Save
             </Button>
           </Box>
         </Box>
