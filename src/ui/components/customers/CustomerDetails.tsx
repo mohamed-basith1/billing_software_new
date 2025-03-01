@@ -279,8 +279,18 @@ const CustomerDetails = () => {
             </Box>
 
             {/* Address & Other Details */}
-            <Box sx={{ width: "100%", mt: 5 }}>
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
+            <Box sx={{ width: "100%", mt: 2.5 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "20px",
+                  bgcolor: "#F7F7FE",
+                  p: 3,
+                  borderRadius: "8px",
+                  border: ".1px solid lightgrey",
+                }}
+              >
                 {customerDetails.map((detail, i) => (
                   <Box
                     key={i}
@@ -307,7 +317,13 @@ const CustomerDetails = () => {
           </Box>
 
           <Box
-            sx={{ height: "45%", width: "100%", display: "flex", mt: 3, pb: 3 }}
+            sx={{
+              height: "45%",
+              width: "100%",
+              display: "flex",
+              mt: 2.5,
+              pb: 3,
+            }}
           >
             <DataGrid
               rows={purchaseHistoryRow}

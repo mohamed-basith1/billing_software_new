@@ -33,7 +33,7 @@ export const drawerWidth = 240;
 const menuItems = [
   { text: "Bills", path: "/", icon: <ReceiptIcon /> },
   { text: "Customers", path: "/customers", icon: <PeopleIcon /> },
-  { text: "Products", path: "/items", icon: <InventoryIcon /> },
+  { text: "Items", path: "/items", icon: <InventoryIcon /> },
   { text: "Payments", path: "/payments", icon: <PaymentsIcon /> },
   { text: "Reports", path: "/reports", icon: <ReportIcon /> },
 ];
