@@ -178,13 +178,14 @@ const ItemsList = () => {
 
                   borderRadius: "8px",
                   color: "white",
+                  padding: 1.5,
                   transition: "background-color 0.3s ease",
                 }}
               >
                 {stat.label === "Total Items" ? (
                   <InventoryIcon
                     sx={{
-                      fontSize: itemsTab === 0 ? "2.5rem" : "1rem",
+                      fontSize: itemsTab === 0 ? "2.5rem" : "1.5rem",
                       color: "darkorange",
 
                       transition: "background-color 3s ease",
@@ -193,7 +194,7 @@ const ItemsList = () => {
                 ) : stat.label === "Low Stocks Items" ? (
                   <LayersIcon
                     sx={{
-                      fontSize: itemsTab === 1 ? "2.5rem" : "1rem",
+                      fontSize: itemsTab === 1 ? "2.5rem" : "1.5rem",
                       color: "rgb(20, 110, 150)",
                       transition: "background-color 3s ease",
                     }}
@@ -201,7 +202,7 @@ const ItemsList = () => {
                 ) : stat.label === "Total Items Price" ? (
                   <CurrencyRupeeIcon
                     sx={{
-                      fontSize: itemsTab === 3 ? "2.5rem" : "1rem",
+                      fontSize: itemsTab === 3 ? "2.5rem" : "1.5rem",
                       color: "rgba(50, 200, 120)",
                       transition: "background-color 3s ease",
                     }}
@@ -209,7 +210,7 @@ const ItemsList = () => {
                 ) : (
                   <EventBusyIcon
                     sx={{
-                      fontSize: itemsTab === 2 ? "2.5rem" : "1rem",
+                      fontSize: itemsTab === 2 ? "2.5rem" : "1.5rem",
                       color: "rgba(255,50,50)",
                       transition: "background-color 3s ease",
                     }}
@@ -226,11 +227,12 @@ const ItemsList = () => {
           </Grid>
         ))}
       </Grid>
+
       <Box
         display="flex"
         justifyContent="space-between"
         alignItems="center"
-        my={3}
+        my={2}
       >
         {itemsTab === 0 ? (
           <Typography sx={{ fontSize: "1.5rem", fontWeight: 500 }}>

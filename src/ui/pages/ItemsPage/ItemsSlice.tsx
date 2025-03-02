@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 const initialState: any = {
   currentTab: 0,
   itemsTab: 0,
+  itemsEntryTab:0
 };
 
 const itemsSlice = createSlice({
@@ -15,14 +16,18 @@ const itemsSlice = createSlice({
     setItemsTab: (state, action) => {
       state.itemsTab = action.payload;
     },
+    setItemsEntryTab: (state, action) => {
+      state.itemsEntryTab = action.payload;
+    },
   },
 });
 
 // Actions
-export const { setCurrentTab, setItemsTab } = itemsSlice.actions;
+export const { setCurrentTab, setItemsTab,setItemsEntryTab } = itemsSlice.actions;
 
 // Selectors
 
 export const selectCurrentTab = (state: any) => state.items.currentTab;
 export const selectItemsTab = (state: any) => state.items.itemsTab;
+export const selectItemsEntryTab = (state: any) => state.items.itemsEntryTab;
 export default itemsSlice.reducer;
