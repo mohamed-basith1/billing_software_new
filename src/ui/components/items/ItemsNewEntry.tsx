@@ -1,4 +1,9 @@
-import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  setField,
+  selectItems,
+  setClearItems,
+} from "../../pages/ItemsPage/ItemsSlice"; // Adjust the import path
 import {
   Box,
   Button,
@@ -12,68 +17,91 @@ import {
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { toast } from "react-toastify";
+import dayjs from "dayjs";
 
 const ItemsNewEntry = () => {
-  const [itemName, setItemName] = useState("");
-  const [itemUOM, setItemUOM] = useState("");
-  const [itemPurchasedQuantity, setItemPurchasedQuantity] = useState("");
-  const [perKgPurchasedPrice, setPerKgPurchasedPrice] = useState("");
-  const [marginPerUOM, setMarginPerUOM] = useState("");
-  const [sellingPricePerUOM, setSellingPricePerUOM] = useState("");
-  const [itemPurchasedPrice, setItemPurchasedPrice] = useState("");
-  const [expiryDate, setExpiryDate] = useState(null);
-  const [itemCode, setItemCode] = useState("");
-  const [lowStockReminder, setLowStockReminder] = useState("");
+  const dispatch = useDispatch();
+  const {
+    itemName,
+    itemUOM,
+    itemPurchasedQuantity,
+    perKgPurchasedPrice,
+    marginPerUOM,
+    sellingPricePerUOM,
+    itemPurchasedPrice,
+    expiryDate,
+    itemCode,
+    lowStockReminder,
+  } = useSelector(selectItems);
 
-  const handleChange = (field, value) => {
-    if (field === "itemPurchasedQuantity") {
-      setItemPurchasedQuantity(value);
-      if (value && perKgPurchasedPrice) {
-        setItemPurchasedPrice((value * perKgPurchasedPrice).toFixed(2));
-      }
-    } else if (field === "itemPurchasedPrice") {
-      setItemPurchasedPrice(value);
-      if (value && itemPurchasedQuantity) {
-        setPerKgPurchasedPrice((value / itemPurchasedQuantity).toFixed(2));
-      }
-    } else if (field === "perKgPurchasedPrice") {
-      setPerKgPurchasedPrice(value);
-      setSellingPricePerUOM(
-        (parseFloat(value || 0) + parseFloat(marginPerUOM || 0)).toFixed(2)
+  const handleChange = (field: string, value: any) => {
+    dispatch(setField({ field, value }));
+
+    if (field === "itemPurchasedQuantity" && perKgPurchasedPrice) {
+      dispatch(
+        setField({
+          field: "itemPurchasedPrice",
+          value: Number(value) * Number(perKgPurchasedPrice) || 0,
+        })
       );
-    } else if (field === "marginPerUOM") {
-      setMarginPerUOM(value);
-      setSellingPricePerUOM(
-        (parseFloat(perKgPurchasedPrice || 0) + parseFloat(value || 0)).toFixed(
-          2
-        )
+    } else if (field === "itemPurchasedPrice" && itemPurchasedQuantity) {
+      dispatch(
+        setField({
+          field: "perKgPurchasedPrice",
+          value: Number(value) / Number(itemPurchasedQuantity) || 0,
+        })
+      );
+    } else if (field === "perKgPurchasedPrice" && marginPerUOM) {
+      dispatch(
+        setField({
+          field: "sellingPricePerUOM",
+          value: (Number(value) + Number(marginPerUOM)).toFixed(2),
+        })
+      );
+    } else if (field === "marginPerUOM" && perKgPurchasedPrice) {
+      dispatch(
+        setField({
+          field: "sellingPricePerUOM",
+          value: (Number(perKgPurchasedPrice) + Number(value)).toFixed(2),
+        })
       );
     }
   };
 
+  const handleExpiryDateChange = (date: any) => {
+    if (date) {
+      const isoDate = dayjs(date).toISOString(); // Convert to ISO format
+      dispatch(setField({ field: "expiryDate", value: isoDate }));
+    }
+  };
+
   const validateForm = () => {
-    if (
-      !itemName.trim() ||
-      !itemCode.trim() ||
-      !itemUOM.trim() ||
-      !itemPurchasedQuantity.trim() ||
-      !itemPurchasedPrice.trim() ||
-      !perKgPurchasedPrice.trim() ||
-      !marginPerUOM.trim() ||
-      !sellingPricePerUOM.trim() ||
-      !expiryDate ||
-      !lowStockReminder.trim()
-    ) {
+    const fieldsToCheck = [
+      itemName,
+      itemCode,
+      itemUOM,
+      itemPurchasedQuantity,
+      itemPurchasedPrice,
+      perKgPurchasedPrice,
+      marginPerUOM,
+      sellingPricePerUOM,
+      expiryDate,
+      lowStockReminder,
+    ];
+
+    if (fieldsToCheck.some((field) => !String(field || "").trim())) {
       toast.error("All fields must be filled!");
       return false;
     }
     return true;
   };
 
-  const handleCreateItem = () => {
+  const handleCreateItem = async () => {
+    const capitalizeFirstLetter = (str) =>
+      str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
     if (validateForm()) {
       let itemPayload = {
-        item_name: itemName,
+        item_name: capitalizeFirstLetter(itemName),
         code: itemCode,
         uom: itemUOM,
         qty: 1,
@@ -85,9 +113,15 @@ const ItemsNewEntry = () => {
         low_stock_remainder: Number(lowStockReminder),
         item_expiry_date: expiryDate,
       };
-
-
-      toast.success("Item Created Successfully!");
+      const sanitizedData = JSON.parse(JSON.stringify(itemPayload)); // Removes undefined & BigInt
+      //@ts-ignore
+      let response = await window.electronAPI.insertItem(sanitizedData);
+      if (response.status !== 201) {
+        toast.error(`${response.message}`, { position: "bottom-left" });
+      } else {
+        dispatch(setClearItems());
+        toast.success(`${response.message}`, { position: "bottom-left" });
+      }
     }
   };
 
@@ -109,7 +143,7 @@ const ItemsNewEntry = () => {
               label="Item Name"
               variant="outlined"
               value={itemName}
-              onChange={(e) => setItemName(e.target.value)}
+              onChange={(e) => handleChange("itemName", e.target.value)}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -118,7 +152,7 @@ const ItemsNewEntry = () => {
               label="Item Code"
               variant="outlined"
               value={itemCode}
-              onChange={(e) => setItemCode(e.target.value)}
+              onChange={(e) => handleChange("itemCode", e.target.value)}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -126,9 +160,9 @@ const ItemsNewEntry = () => {
               <InputLabel>Item UOM</InputLabel>
               <Select
                 value={itemUOM}
-                onChange={(e) => setItemUOM(e.target.value)}
+                onChange={(e) => handleChange("itemUOM", e.target.value)}
               >
-                {["Kg", "Gram", "Liter", "Piece"].map((unit) => (
+                {["Kg", "gram", "liter", "piece"].map((unit) => (
                   <MenuItem key={unit} value={unit}>
                     {unit}
                   </MenuItem>
@@ -196,8 +230,8 @@ const ItemsNewEntry = () => {
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
                 label="Expiry Date"
-                value={expiryDate}
-                onChange={(newValue) => setExpiryDate(newValue)}
+                value={expiryDate ? dayjs(expiryDate) : null}
+                onChange={handleExpiryDateChange}
                 slotProps={{ textField: { fullWidth: true } }}
               />
             </LocalizationProvider>
@@ -209,7 +243,7 @@ const ItemsNewEntry = () => {
               variant="outlined"
               type="number"
               value={lowStockReminder}
-              onChange={(e) => setLowStockReminder(e.target.value)}
+              onChange={(e) => handleChange("lowStockReminder", e.target.value)}
             />
           </Grid>
         </Grid>

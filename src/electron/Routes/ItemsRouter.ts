@@ -12,7 +12,11 @@ export function ItemsRouter() {
       }
       // Insert the new item
       const item = await Item.create(data);
-      return JSON.parse(JSON.stringify(item)); // No need for .toObject()
+      return {
+        status: 201,
+        message: "Item Created Successfully!",
+        data: JSON.parse(JSON.stringify(item)),
+      };
     } catch (error: any) {
       console.error("Error inserting data:", error);
       throw error;

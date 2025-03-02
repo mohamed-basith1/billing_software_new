@@ -472,9 +472,11 @@ const BillingSearch = () => {
                 newValue,
                 billingSearch.rate
               );
+
+              console.log("amount uom", billingSearch.uom, amount);
               updatedBillingSearch.amount = amount;
             }
-
+            console.log("updatedBillingSearch", updatedBillingSearch);
             dispatch(
               setBillingField({
                 bill_number: billingSearch.bill_number,
