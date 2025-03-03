@@ -29,6 +29,7 @@ import {
   selectCurrentTabValue,
   setBillCustomerDetails,
   setClearBill,
+  setClearBillCustomerDetails,
 } from "../../pages/BillsPage/BillsSlice";
 import { toast } from "react-toastify";
 import { selectUserName } from "../../pages/LoginPage/LoginSlice";
@@ -40,13 +41,15 @@ const CustomerSelectModal = () => {
   const userName = useSelector(selectUserName);
   const selectBill = useSelector(selectBillValue);
   const customerSearchRef = React.useRef<HTMLInputElement>(null);
-
+  const selectedBill: any =
+    selectBill.find((data: any) => data.bill_number === selectCurrentTab) || {};
   React.useEffect(() => {
     customerSearchRef.current?.focus();
   }, []);
 
   const handleCloseCustomerSelectModal = () => {
     dispatch(setCustomerSelectModal(false));
+    dispatch(setClearBillCustomerDetails());
   };
   const handleSearch = async (searchTerm: any) => {
     let response = await handleSearchCustomer(searchTerm);
@@ -54,10 +57,6 @@ const CustomerSelectModal = () => {
   };
 
   const handleBillPrint = async () => {
-    const selectedBill: any =
-      selectBill.find((data: any) => data.bill_number === selectCurrentTab) ||
-      {};
-
     let payload: any = {
       customer_name: selectedBill.customer_name,
       customer_id: selectedBill.customer_id,
@@ -66,8 +65,9 @@ const CustomerSelectModal = () => {
       sub_amount: selectedBill.sub_amount,
       total_amount: selectedBill.total_amount,
       paid: selectedBill.paid,
+      amount_paid: 0,
       payment_method: selectedBill.payment_method,
-      balance: selectedBill.balance,
+      balance: selectedBill.total_amount,
       billed_by: userName,
     };
     //@ts-ignore
@@ -80,7 +80,7 @@ const CustomerSelectModal = () => {
       toast.success(`${response.message}`, { position: "bottom-left" });
     }
   };
-
+ console.log("selectedBill1",selectedBill);
   return (
     <Modal
       open={customerSelectModal}
@@ -205,6 +205,9 @@ const CustomerSelectModal = () => {
           <Button
             variant="contained"
             sx={{ height: "2.2rem", width: "6rem" }}
+            disabled={
+              selectedBill.customer_id === "" 
+            }
             onClick={() => handleBillPrint()}
           >
             Print bill

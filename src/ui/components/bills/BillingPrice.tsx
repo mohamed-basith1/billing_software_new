@@ -14,15 +14,18 @@ import {
   selectBillValue,
   selectCurrentTabValue,
   setBillPriceDetails,
+  setClearBill,
 } from "../../pages/BillsPage/BillsSlice";
 
 import { toast } from "react-toastify";
 import { setCustomerSelectModal } from "../../pages/CustomersPage/CustomersSlice";
 import { useTheme } from "@emotion/react";
+import { selectUserName } from "../../pages/LoginPage/LoginSlice";
 
 const BillingPrice = () => {
   const selectCurrentTab = useSelector(selectCurrentTabValue);
   const selectBill = useSelector(selectBillValue);
+  const userName = useSelector(selectUserName);
   const dispatch = useDispatch();
   const [paymentMethod, setPaymentMethod] = useState<string | null>(
     "Cash Paid"
@@ -71,7 +74,34 @@ const BillingPrice = () => {
   const handleChange = (paymentType: string) => {
     setPaymentMethod((prev) => (prev === paymentType ? null : paymentType)); // Toggle selection
   };
+  const handleBillPrint = async () => {
+    const selectedBill: any =
+      selectBill.find((data: any) => data.bill_number === selectCurrentTab) ||
+      {};
 
+    let payload: any = {
+      customer_name: selectedBill.customer_name,
+      customer_id: selectedBill.customer_id,
+      itemsList: selectedBill.items, // Embedding `ItemSchema`
+      discount: selectedBill.discount,
+      sub_amount: selectedBill.sub_amount,
+      total_amount: selectedBill.total_amount,
+      paid: selectedBill.paid,
+      amount_paid: selectedBill.total_amount,
+      payment_method: selectedBill.payment_method,
+      balance: 0,
+      billed_by: userName,
+    };
+    //@ts-ignore
+    let response = await window.electronAPI.createBill(payload);
+    if (response.status !== 201) {
+      toast.error(`${response.message}`, { position: "bottom-left" });
+    } else {
+      dispatch(setCustomerSelectModal(false));
+      dispatch(setClearBill());
+      toast.success(`${response.message}`, { position: "bottom-left" });
+    }
+  };
   return (
     <Box
       sx={{
@@ -196,7 +226,11 @@ const BillingPrice = () => {
           sx={{ bgcolor: "#1E1E2D", fontSize: isMobile ? "0.9rem" : "1rem" }}
           onClick={() => {
             if (Number(TotalAmount) !== 0) {
-              dispatch(setCustomerSelectModal(true));
+              if (paymentMethod === "Credit Bill") {
+                dispatch(setCustomerSelectModal(true));
+              } else {
+                handleBillPrint();
+              }
             } else {
               toast.warning(`No items have been added to the bill`, {
                 position: "bottom-left",

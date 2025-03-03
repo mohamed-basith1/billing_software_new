@@ -1,5 +1,8 @@
 import { ipcMain } from "electron";
+import moment from "moment";
 import Customer from "../models/CustomersModel.js";
+import BillsModel from "../models/BillsModel.js";
+
 export function CustomersRouter() {
   // Create Customer
   ipcMain.handle("create-customer", async (_, data) => {
@@ -184,6 +187,37 @@ export function CustomersRouter() {
       };
     } catch (error: any) {
       console.error("Error deleting customer:", error);
+      return {
+        status: 500,
+        message: "Internal server error.",
+        error: error.message,
+      };
+    }
+  });
+
+  // Get Customer Bill History
+  ipcMain.handle("get-customer-bill-history", async (_, customerId) => {
+    try {
+      const bills = await BillsModel.find({ customer_id: customerId });
+
+      const formattedBills = bills.map((bill) => ({
+        id: bill.createdAt,
+        customer_id: bill.customer_id,
+        total_amount: bill.total_amount,
+        amount_paid: bill.amount_paid,
+        paid: bill.paid,
+        balance: bill.balance,
+        bill_number: bill.bill_number,
+        createdAt: moment(bill.createdAt).format("DD/MM/YYYY"), // Formatting Date
+      }));
+
+      return {
+        status: 200,
+        data: formattedBills,
+        message: "Fetched customer bill history successfully.",
+      };
+    } catch (error: any) {
+      console.error("Error fetching customer bill history:", error);
       return {
         status: 500,
         message: "Internal server error.",

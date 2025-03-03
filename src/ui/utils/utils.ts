@@ -292,3 +292,8 @@ export const colorsList = [
   "rgb(180, 60, 40)", // Dark Red
   "rgb(20, 110, 150)", // Dark Blue
 ];
+
+
+export const getTotalAmount = <T>(bills: T[], key: keyof T): number => {
+  return bills.reduce((sum, bill) => sum + (bill[key] as number), 0);
+};

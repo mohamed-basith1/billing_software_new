@@ -182,21 +182,21 @@ const billsSlice = createSlice({
     },
     removeItem: (state, action) => {
       const { code } = action.payload;
-    
+
       // Find the bill with the given bill_number
       const bill = state.bills.find((b) => b.bill_number === state.currentTab);
-    
+
       if (bill) {
         // Find the index of the item with the given code
         const itemIndex = bill.items.findIndex((item) => item.code === code);
-    
+
         // If the item exists, remove it from the array
         if (itemIndex !== -1) {
           bill.items.splice(itemIndex, 1);
         }
       }
     },
-    
+
     setBillingField: <K extends keyof Bill>(
       state: BillsState,
       action: PayloadAction<{ bill_number: number; field: any; value: any }>
@@ -283,6 +283,18 @@ const billsSlice = createSlice({
         };
       }
     },
+    setClearBillCustomerDetails: (state) => {
+      const billIndex = state.bills.findIndex(
+        (b) => b.bill_number === state.currentTab
+      );
+      if (billIndex !== -1) {
+        state.bills[billIndex] = {
+          ...state.bills[billIndex],
+          customer_name: "",
+          customer_id: "",
+        };
+      }
+    },
   },
 });
 
@@ -296,7 +308,8 @@ export const {
   setBillPriceDetails,
   setBillCustomerDetails,
   setClearBill,
-  removeItem
+  setClearBillCustomerDetails,
+  removeItem,
 } = billsSlice.actions;
 
 // Selectors

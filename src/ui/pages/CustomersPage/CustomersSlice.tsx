@@ -13,6 +13,7 @@ const initialState: any = {
   id: "",
   currentTab: 0,
   customerSearch: "",
+  customerBillHistory: [],
   selectedCustomer: null,
   customerSelectModal: false,
   customerCreateModal: false,
@@ -59,10 +60,8 @@ const customersSlice = createSlice({
       state.customerSecondaryContact = "";
       state.customerEmail = "";
       state.customerId = "";
-   
     },
     setSelectedCustomer: (state, action: any) => {
-     
       if (action.payload.edit !== undefined) {
         const index = state.customersList.findIndex(
           (data: any) => data.id === action.payload.data.id
@@ -81,7 +80,6 @@ const customersSlice = createSlice({
       state.customerSelectModal = action.payload;
     },
     setCustomerCreateModal: (state, action) => {
-     
       state.customerCreateModal = action.payload;
     },
     setCustomerEditModal: (state, action) => {
@@ -90,16 +88,19 @@ const customersSlice = createSlice({
     setCustomerDeleteModal: (state, action) => {
       state.customerDeleteModal = action.payload;
     },
-    resetSelectedCustomerAfterDeletion:(state,action)=>{
-       state.selectedCustomer = null;
-       const index = state.customersList.findIndex(
+    resetSelectedCustomerAfterDeletion: (state, action) => {
+      state.selectedCustomer = null;
+      const index = state.customersList.findIndex(
         (data: any) => data.id === action.payload
       );
-      
+
       if (index !== -1) {
         state.customersList.splice(index, 1);
       }
-    }
+    },
+    setCustomerBillHistory: (state, action) => {
+      state.customerBillHistory = action.payload;
+    },
   },
 });
 
@@ -115,7 +116,8 @@ export const {
   setCustomerCreateModal,
   setCustomerDeleteModal,
   setCustomerEditModal,
-  resetSelectedCustomerAfterDeletion
+  resetSelectedCustomerAfterDeletion,
+  setCustomerBillHistory
 } = customersSlice.actions;
 
 // Selectors
@@ -137,5 +139,7 @@ export const selectCustomerEditModal = (state: any) =>
   state.customers.customerEditModal;
 export const selectCustomerDeleteModal = (state: any) =>
   state.customers.customerDeleteModal;
+export const selectCustomerBillHistory = (state: any) =>
+  state.customers.customerBillHistory;
 
 export default customersSlice.reducer;

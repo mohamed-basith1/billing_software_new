@@ -21,6 +21,7 @@ const BillSchema = new mongoose.Schema(
     sub_amount: { type: Number, required: true },
     total_amount: { type: Number, required: true },
     paid: { type: Boolean, required: true, default: false },
+    amount_paid: { type: Number, required: true },
     payment_method: { type: String, required: true },
     balance: { type: Number, required: true },
     billed_by: { type: String, required: true },
