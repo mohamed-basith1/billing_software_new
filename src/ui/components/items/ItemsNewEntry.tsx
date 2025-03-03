@@ -34,22 +34,27 @@ const ItemsNewEntry = () => {
     lowStockReminder,
   } = useSelector(selectItems);
 
-  const handleChange = (field: string, value: any) => {
+  const handleChange = (field, value) => {
     dispatch(setField({ field, value }));
 
     if (field === "itemPurchasedQuantity" && perKgPurchasedPrice) {
+      let calculatedPrice = Number(value) * Number(perKgPurchasedPrice) || 0;
+      if (itemUOM === "gram") {
+        calculatedPrice =
+          (Number(value) / 1000) * Number(perKgPurchasedPrice) || 0;
+      }
       dispatch(
-        setField({
-          field: "itemPurchasedPrice",
-          value: Number(value) * Number(perKgPurchasedPrice) || 0,
-        })
+        setField({ field: "itemPurchasedPrice", value: calculatedPrice })
       );
     } else if (field === "itemPurchasedPrice" && itemPurchasedQuantity) {
+      let calculatedPerKgPrice =
+        Number(value) / Number(itemPurchasedQuantity) || 0;
+      if (itemUOM === "gram") {
+        calculatedPerKgPrice =
+          (Number(value) * 1000) / Number(itemPurchasedQuantity) || 0;
+      }
       dispatch(
-        setField({
-          field: "perKgPurchasedPrice",
-          value: Number(value) / Number(itemPurchasedQuantity) || 0,
-        })
+        setField({ field: "perKgPurchasedPrice", value: calculatedPerKgPrice })
       );
     } else if (field === "perKgPurchasedPrice" && marginPerUOM) {
       dispatch(
@@ -67,7 +72,6 @@ const ItemsNewEntry = () => {
       );
     }
   };
-
   const handleExpiryDateChange = (date: any) => {
     if (date) {
       const isoDate = dayjs(date).toISOString(); // Convert to ISO format
@@ -104,7 +108,7 @@ const ItemsNewEntry = () => {
         item_name: capitalizeFirstLetter(itemName),
         code: itemCode,
         uom: itemUOM,
-        qty: 1,
+        qty: itemUOM === "gram" ? 1000 : 1,
         purchased_rate: Number(perKgPurchasedPrice),
         rate: Number(sellingPricePerUOM),
         amount: Number(sellingPricePerUOM),
