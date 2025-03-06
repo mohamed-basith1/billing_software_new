@@ -3,11 +3,26 @@ import Item from "../models/ItemsModel.js";
 export function ItemsRouter() {
   ipcMain.handle("insert-item", async (_, data) => {
     try {
+    
       // Check if an item with the same item_name or code exists
+      const normalizeString = (str) => str.replace(/\s+/g, "").toLowerCase();
+
       const existingItem = await Item.findOne({
-        $or: [{ item_name: data.item_name }, { code: data.code }],
+        $or: [
+          {
+            item_name: {
+              $regex: new RegExp(`^${normalizeString(data.item_name)}$`, "i"),
+            },
+          },
+          { code: data.code },
+        ],
       });
+      
       if (existingItem) {
+        return {
+          status: 404,
+          message: "Item already exists! Please use a different name and code.",
+        };
         throw new Error("Item with the same name or code already exists.");
       }
       // Insert the new item

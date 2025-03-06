@@ -135,7 +135,9 @@ const ItemsList = () => {
               onClick={() => dispatch(setItemsTab(stat.tab))}
               elevation={0}
               sx={{
-                backgroundColor: "white",
+                // backgroundColor: itemsTab === stat.tab ? "rgba(250, 160, 30, .4)" : "white",
+                // color: itemsTab === stat.tab ? "inherit" : "inherit",
+                bgcolor: "white",
                 color: "inherit",
                 height: "100%",
                 boxShadow: "0px",
@@ -155,7 +157,7 @@ const ItemsList = () => {
                   "& .MuiSvgIcon-root": {
                     // color:"rgb(30, 120, 80)" "#22b378",
                     fontSize:
-                      stat.label !== "Total Items Price" ? "2.5rem" : "auto",
+                      stat.label !== "Total Items Price" ? "3rem" : "auto",
                   },
                 },
 
@@ -185,7 +187,7 @@ const ItemsList = () => {
                 {stat.label === "Total Items" ? (
                   <InventoryIcon
                     sx={{
-                      fontSize: itemsTab === 0 ? "2.5rem" : "1.5rem",
+                      fontSize: itemsTab === 0 ? "3rem" : "1.5rem",
                       color: "darkorange",
 
                       transition: "background-color 3s ease",

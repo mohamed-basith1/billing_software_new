@@ -33,7 +33,6 @@ const ItemsNewEntry = () => {
     itemCode,
     lowStockReminder,
   } = useSelector(selectItems);
-
   const handleChange = (field, value) => {
     dispatch(setField({ field, value }));
 
@@ -46,32 +45,52 @@ const ItemsNewEntry = () => {
       dispatch(
         setField({ field: "itemPurchasedPrice", value: calculatedPrice })
       );
-    } else if (field === "itemPurchasedPrice" && itemPurchasedQuantity) {
+    }
+
+    if (field === "itemPurchasedPrice" && itemPurchasedQuantity) {
       let calculatedPerKgPrice =
         Number(value) / Number(itemPurchasedQuantity) || 0;
       if (itemUOM === "gram") {
         calculatedPerKgPrice =
           (Number(value) * 1000) / Number(itemPurchasedQuantity) || 0;
       }
+
       dispatch(
         setField({ field: "perKgPurchasedPrice", value: calculatedPerKgPrice })
       );
-    } else if (field === "perKgPurchasedPrice" && marginPerUOM) {
+
+      // ✅ Update selling price immediately when purchased price changes
+      if (marginPerUOM) {
+        dispatch(
+          setField({
+            field: "sellingPricePerUOM",
+            value: (
+              Number(calculatedPerKgPrice) + Number(marginPerUOM)
+            ).toFixed(2),
+          })
+        );
+      }
+    }
+
+    if (field === "perKgPurchasedPrice") {
       dispatch(
         setField({
           field: "sellingPricePerUOM",
-          value: (Number(value) + Number(marginPerUOM)).toFixed(2),
+          value: (Number(value) + Number(marginPerUOM || 0)).toFixed(2),
         })
       );
-    } else if (field === "marginPerUOM" && perKgPurchasedPrice) {
+    }
+
+    if (field === "marginPerUOM") {
       dispatch(
         setField({
           field: "sellingPricePerUOM",
-          value: (Number(perKgPurchasedPrice) + Number(value)).toFixed(2),
+          value: (Number(perKgPurchasedPrice || 0) + Number(value)).toFixed(2),
         })
       );
     }
   };
+
   const handleExpiryDateChange = (date: any) => {
     if (date) {
       const isoDate = dayjs(date).toISOString(); // Convert to ISO format
@@ -94,7 +113,7 @@ const ItemsNewEntry = () => {
     ];
 
     if (fieldsToCheck.some((field) => !String(field || "").trim())) {
-      toast.error("All fields must be filled!");
+      toast.error("All fields must be filled!", { position: "bottom-left" });
       return false;
     }
     return true;
@@ -161,10 +180,11 @@ const ItemsNewEntry = () => {
           </Grid>
           <Grid item xs={12} sm={6}>
             <FormControl fullWidth>
-              <InputLabel>Item UOM</InputLabel>
+              <InputLabel id="item-uom-label">Item UOM</InputLabel>
               <Select
                 value={itemUOM}
                 onChange={(e) => handleChange("itemUOM", e.target.value)}
+                label="Item UOM"
               >
                 {["Kg", "gram", "liter", "piece"].map((unit) => (
                   <MenuItem key={unit} value={unit}>
@@ -201,7 +221,9 @@ const ItemsNewEntry = () => {
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
-              label={`Per ${itemUOM || "Unit"} Purchased Price`}
+              label={`Per ${
+                itemUOM === "gram" ? "1000 gram" : itemUOM || "Unit"
+              } Purchased Price`}
               variant="outlined"
               type="number"
               value={perKgPurchasedPrice}
@@ -213,7 +235,9 @@ const ItemsNewEntry = () => {
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
-              label={`Margin Per (${itemUOM || "Unit"})`}
+              label={`Margin Per (${
+                itemUOM === "gram" ? "1000 gram" : itemUOM || "Unit" || "Unit"
+              })`}
               variant="outlined"
               type="number"
               value={marginPerUOM}
@@ -223,7 +247,9 @@ const ItemsNewEntry = () => {
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
-              label={`Selling Price Per (${itemUOM || "Unit"})`}
+              label={`Selling Price Per (${
+                itemUOM === "gram" ? "1000 gram" : itemUOM || "Unit" || "Unit"
+              })`}
               variant="outlined"
               type="number"
               value={sellingPricePerUOM}

@@ -14,6 +14,7 @@ const initialState: any = {
   expiryDate: "",
   itemCode: "",
   lowStockReminder: "",
+  itemSearch: "",
 };
 
 const itemsSlice = createSlice({
@@ -33,7 +34,9 @@ const itemsSlice = createSlice({
       const { field, value } = action.payload;
       state[field] = value;
     },
-
+    setItemsearch: (state, action) => {
+      state.itemSearch = action.payload;
+    },
     setClearItems: (state) => {
       state.itemName = "";
       state.itemUOM = "";
@@ -50,13 +53,20 @@ const itemsSlice = createSlice({
 });
 
 // Actions
-export const { setCurrentTab, setItemsTab, setItemsEntryTab, setField,setClearItems } =
-  itemsSlice.actions;
+export const {
+  setCurrentTab,
+  setItemsTab,
+  setItemsEntryTab,
+  setField,
+  setClearItems,
+  setItemsearch,
+} = itemsSlice.actions;
 
 // Selectors
 
 export const selectCurrentTab = (state: any) => state.items.currentTab;
 export const selectItemsTab = (state: any) => state.items.itemsTab;
 export const selectItemsEntryTab = (state: any) => state.items.itemsEntryTab;
+export const selectItemSearch = (state: any) => state.items.itemSearch;
 export const selectItems = (state: any) => state.items;
 export default itemsSlice.reducer;

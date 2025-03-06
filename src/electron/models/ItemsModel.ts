@@ -12,6 +12,7 @@ const ItemSchema = new mongoose.Schema(
     margin: { type: Number },
     low_stock_remainder: { type: Number },
     item_expiry_date: { type: String },
+    new_stock: { type: Array, default: [] },
   },
   { timestamps: true } // Enable timestamps
 );

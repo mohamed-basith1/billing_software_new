@@ -165,7 +165,7 @@ const BillingSearch = () => {
 
         //@ts-ignore
         const results = await window.electronAPI.searchItem(sanitizedData);
-        console.log("searchItem", results);
+     
         setSuggestions(results);
       } catch (error) {
         console.error("Error fetching suggestions:", error);
