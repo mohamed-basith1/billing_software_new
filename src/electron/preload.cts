@@ -4,7 +4,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
   // Items API
   getItem: () => ipcRenderer.invoke("get-item"),
   insertItem: (data) => ipcRenderer.invoke("insert-item", data),
-  updateItem: (id, newData) => ipcRenderer.invoke("update-data", id, newData),
+  updateItem: (id, newData) => ipcRenderer.invoke("update-item", id, newData),
   deleteItem: (id) => ipcRenderer.invoke("delete-item", id),
   searchItem: (id) => ipcRenderer.invoke("search-item", id),
 

@@ -3,7 +3,6 @@ import Item from "../models/ItemsModel.js";
 export function ItemsRouter() {
   ipcMain.handle("insert-item", async (_, data) => {
     try {
-    
       // Check if an item with the same item_name or code exists
       const normalizeString = (str) => str.replace(/\s+/g, "").toLowerCase();
 
@@ -17,7 +16,7 @@ export function ItemsRouter() {
           { code: data.code },
         ],
       });
-      
+
       if (existingItem) {
         return {
           status: 404,
@@ -63,17 +62,37 @@ export function ItemsRouter() {
       throw error;
     }
   });
-  ipcMain.handle("update-item", async (_, id, newData) => {
+
+  ipcMain.handle("update-item", async (_, id, newStockEntry) => {
     try {
-      const updatedItem = await Item.findByIdAndUpdate(id, newData, {
-        new: true,
-      });
-      return updatedItem ? JSON.parse(JSON.stringify(updatedItem)) : null;
+      const updatedItem = await Item.findByIdAndUpdate(
+        id,
+        {
+          $inc: { stock_qty: newStockEntry.stock_qty }, // Increment stock quantity
+          $push: {
+            new_stock: {
+              ...newStockEntry,
+              createdAt: new Date().toISOString(), // Add current date/time
+            },
+          },
+        },
+        { new: true }
+      );
+
+      return {
+        status: 200,
+        message: "New Stock Uploaded Successfully!",
+        data: updatedItem ? JSON.parse(JSON.stringify(updatedItem)) : null,
+      };
     } catch (error: any) {
       console.error("Error updating data:", error);
-      throw error;
+      return {
+        status: 500,
+        message: "Failed to update stock!",
+      };
     }
   });
+
 
   ipcMain.handle("delete-item", async (_, id) => {
     try {

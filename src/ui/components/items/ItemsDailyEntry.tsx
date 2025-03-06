@@ -10,6 +10,7 @@ import {
   Paper,
   Grid,
   Typography,
+  Button,
 } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
@@ -20,7 +21,8 @@ import {
 } from "../../pages/ItemsPage/ItemsSlice";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-
+import dayjs from "dayjs";
+import { toast } from "react-toastify";
 const itemsList = [
   {
     item_name: "Basmati Rice",
@@ -84,7 +86,7 @@ const ItemsDailyEntry = () => {
   const [selectedFlag, setSelectFlag] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState(null);
-  const [number, setNumber] = useState("");
+  const [uploadStock, setUplaodStock] = useState("");
   useEffect(() => {
     itemSearchRef.current?.focus();
     if (itemsearch === "") {
@@ -114,7 +116,32 @@ const ItemsDailyEntry = () => {
     }, 10);
     setSelectedItem(item);
   };
-// console.log("selected Item",selectedItem);
+
+  const handleUploadStockSubmit = async () => {
+    let newStockQtyAndExpiry = {
+      item_name: selectedItem.item_name,
+      code: selectedItem.code,
+      amount: selectedItem.amount,
+      purchased_rate: selectedItem.purchased_rate,
+      rate: selectedItem.rate,
+      uom: selectedItem.uom,
+      stock_qty: Number(uploadStock),
+      item_expiry_date: dayjs(selectedDate).toISOString(), // Keep expiry date
+    };
+
+    //@ts-ignore
+    let response: any = await window.electronAPI.updateItem(
+      selectedItem._id,
+      newStockQtyAndExpiry
+    );
+
+    if (response.status !== 200) {
+      toast.error(`${response.message}`, { position: "bottom-left" });
+    } else {
+      toast.success(`${response.message}`, { position: "bottom-left" });
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -271,7 +298,7 @@ const ItemsDailyEntry = () => {
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <Box
             sx={{
-              height: "35%",
+              height: "25%",
               width: "100%",
               p: 2,
               display: "flex",
@@ -282,8 +309,8 @@ const ItemsDailyEntry = () => {
               label="Enter Stock Upload Qty"
               type="number"
               variant="outlined"
-              value={number}
-              onChange={(e) => setNumber(e.target.value)}
+              value={uploadStock}
+              onChange={(e) => setUplaodStock(e.target.value)}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -297,10 +324,19 @@ const ItemsDailyEntry = () => {
               label="Select Expiry Date"
               sx={{ width: "48.5%" }}
               value={selectedDate}
-              onChange={(newDate) => setSelectedDate(newDate)}
-              renderInput={(params) => <TextField {...params} fullWidth />}
+              onChange={(newDate: any) => setSelectedDate(newDate)}
+              renderInput={(params: any) => <TextField {...params} fullWidth />}
             />
           </Box>
+          <Button
+            sx={{
+              opacity: !selectedDate || !uploadStock ? ".5" : "1",
+              pointerEvents: !selectedDate || !uploadStock ? "none" : "auot",
+            }}
+            onClick={() => handleUploadStockSubmit()}
+          >
+            Upload Stock
+          </Button>
         </LocalizationProvider>
       )}
     </Box>
