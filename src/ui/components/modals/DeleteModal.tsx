@@ -7,10 +7,9 @@ import {
   selectCustomerDeleteModal,
   selectCustomerDetails,
   setCustomerDeleteModal,
-  setSelectedCustomer,
 } from "../../pages/CustomersPage/CustomersSlice";
+import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
 
-import PersonRemoveRoundedIcon from "@mui/icons-material/PersonRemoveRounded";
 import { toast } from "react-toastify";
 export const style = {
   position: "absolute",
@@ -60,9 +59,8 @@ const DeleteModal = () => {
       >
         <Box
           sx={{
-
             ...style,
-            width: 320,
+            width: 520,
             p: 3,
             borderRadius: "12px",
             bgcolor: "white",
@@ -73,28 +71,63 @@ const DeleteModal = () => {
             textAlign: "center",
           }}
         >
-          <PersonRemoveRoundedIcon
-            sx={{ fontSize: "4rem", color: "rgb(193,9,21)", mb: 1 }}
-          />
-          <Typography
-            id="delete-modal-title"
-            sx={{ fontSize: "1.3rem", fontWeight: 500, color: "#1E1E2D" }}
-          >
-            Confirm Deletion
-          </Typography>
-          <Typography
-            id="delete-modal-description"
-            sx={{ fontSize: "0.95rem", color: "#555", mt: 1, mb: 3 }}
-          >
-            Are you sure you want to delete this customer? <br />
-            This action cannot be undone.
-          </Typography>
+          <Box sx={{ display: "flex" ,gap:"10px"}}>
+            <Box
+              sx={{
+                bgcolor: "rgb(193,9,21)",
+                height: "2.5rem",
+                width: "2.5rem",
+                borderRadius: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <WarningAmberRoundedIcon
+                sx={{ fontSize: "1.5rem", color: "white", mb: 1 }}
+              />
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+             
+              }}
+            >
+              <Typography
+                id="delete-modal-title"
+                sx={{
+                  fontSize: "1.3rem",
+                  fontWeight: 500,
+                  color: "#1E1E2D",
+                  textAlign: "start",
+                }}
+              >
+                Are you absolutely sure?
+              </Typography>
+              <Typography
+                id="delete-modal-description"
+                sx={{
+                  fontSize: "0.8rem",
+                  color: "#555",
+                  textAlign: "start",
+                  mt: 1,
+                }}
+              >
+                This action can not be undone. This will permanently delete
+                customer.
+              </Typography>
+            </Box>
+          </Box>
+
           <Box
             sx={{
               display: "flex",
               gap: 2,
               width: "100%",
-              justifyContent: "center",
+              justifyContent: "flex-end",
             }}
           >
             <Button

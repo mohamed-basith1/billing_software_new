@@ -59,8 +59,12 @@ const ItemsNewEntry = () => {
         setField({ field: "perKgPurchasedPrice", value: calculatedPerKgPrice })
       );
 
-      // ✅ Update selling price immediately when purchased price changes
-      if (marginPerUOM) {
+      // Update selling price only if it was calculated automatically before
+      if (
+        marginPerUOM &&
+        sellingPricePerUOM ===
+          (Number(perKgPurchasedPrice) + Number(marginPerUOM)).toFixed(2)
+      ) {
         dispatch(
           setField({
             field: "sellingPricePerUOM",
@@ -79,6 +83,27 @@ const ItemsNewEntry = () => {
           value: (Number(value) + Number(marginPerUOM || 0)).toFixed(2),
         })
       );
+    }
+
+    if (field === "sellingPrice") {
+      console.log("value", value);
+
+      dispatch(
+        setField({
+          field: "sellingPricePerUOM",
+          value: Number(value).toFixed(2),
+        })
+      );
+
+      // ✅ Update `marginPerUOM` when `sellingPricePerUOM` is manually changed
+      if (perKgPurchasedPrice) {
+        dispatch(
+          setField({
+            field: "marginPerUOM",
+            value: (Number(value) - Number(perKgPurchasedPrice)).toFixed(2),
+          })
+        );
+      }
     }
 
     if (field === "marginPerUOM") {
@@ -100,24 +125,47 @@ const ItemsNewEntry = () => {
 
   const validateForm = () => {
     const fieldsToCheck = [
-      itemName,
-      itemCode,
-      itemUOM,
-      itemPurchasedQuantity,
-      itemPurchasedPrice,
-      perKgPurchasedPrice,
-      marginPerUOM,
-      sellingPricePerUOM,
-      expiryDate,
-      lowStockReminder,
+        itemName,
+        itemCode,
+        itemUOM,
+        itemPurchasedQuantity,
+        itemPurchasedPrice,
+        perKgPurchasedPrice,
+        marginPerUOM,
+        sellingPricePerUOM,
+        expiryDate,
+        lowStockReminder,
     ];
 
     if (fieldsToCheck.some((field) => !String(field || "").trim())) {
-      toast.error("All fields must be filled!", { position: "bottom-left" });
-      return false;
+        toast.error("All fields must be filled!", { position: "bottom-left" });
+        return false;
     }
+
+    // ✅ Check if any numeric field is 0 or negative
+    const numericFields = {
+        "Purchased Quantity": itemPurchasedQuantity,
+        "Purchased Price": itemPurchasedPrice,
+        "Per Kg Purchased Price": perKgPurchasedPrice,
+        "Margin Per UOM": marginPerUOM,
+        "Selling Price Per UOM": sellingPricePerUOM,
+        "Low Stock Reminder": lowStockReminder,
+    };
+
+    for (const [fieldName, value] of Object.entries(numericFields)) {
+        const numValue = Number(value);
+        if (numValue === 0) {
+            toast.error(`${fieldName} cannot be zero!`, { position: "bottom-left" });
+            return false;
+        }
+        if (numValue < 0) {
+            toast.error(`${fieldName} cannot be negative!`, { position: "bottom-left" });
+            return false;
+        }
+    }
+
     return true;
-  };
+};
 
   const handleCreateItem = async () => {
     const capitalizeFirstLetter = (str) =>
@@ -227,6 +275,7 @@ const ItemsNewEntry = () => {
               variant="outlined"
               type="number"
               value={perKgPurchasedPrice}
+              disabled
               onChange={(e) =>
                 handleChange("perKgPurchasedPrice", e.target.value)
               }
@@ -253,7 +302,8 @@ const ItemsNewEntry = () => {
               variant="outlined"
               type="number"
               value={sellingPricePerUOM}
-              disabled
+              onChange={(e) => handleChange("sellingPrice", e.target.value)}
+              // disabled
             />
           </Grid>
           <Grid item xs={12} sm={6}>
