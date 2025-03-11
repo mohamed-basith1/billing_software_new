@@ -55,7 +55,6 @@ const ItemsTabs = () => {
       >
         <Tab label="Items" {...a11yProps(0)} />
         <Tab label="Items Entry" {...a11yProps(1)} />
-        <Tab label="Items Entry History" {...a11yProps(1)} />
       </Tabs>
     </Box>
   );

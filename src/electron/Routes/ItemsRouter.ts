@@ -93,7 +93,6 @@ export function ItemsRouter() {
     }
   });
 
-
   ipcMain.handle("delete-item", async (_, id) => {
     try {
       const deletedItem = await Item.findByIdAndDelete(id);
@@ -101,6 +100,114 @@ export function ItemsRouter() {
     } catch (error: any) {
       console.error("Error deleting data:", error);
       throw error;
+    }
+  });
+
+  ipcMain.handle("filter-items-by-date", async (_, createdAtFilter) => {
+    try {
+      if (!createdAtFilter) {
+        console.log("❌ Invalid date filter provided!");
+        return {
+          status: 400,
+          message: "Invalid date filter!",
+          data: null,
+        };
+      }
+
+      // Convert the input date to UTC format
+      const date = new Date(createdAtFilter);
+
+      // Define the start and end of the day in UTC
+      const startDate = new Date(
+        Date.UTC(
+          date.getUTCFullYear(),
+          date.getUTCMonth(),
+          date.getUTCDate(),
+          0,
+          0,
+          0,
+          0
+        )
+      );
+      const endDate = new Date(
+        Date.UTC(
+          date.getUTCFullYear(),
+          date.getUTCMonth(),
+          date.getUTCDate(),
+          23,
+          59,
+          59,
+          999
+        )
+      );
+
+      const query = {
+        "new_stock.createdAt": {
+          $gte: startDate.toISOString(), // Directly use the Date object
+          $lt: endDate.toISOString(),
+        },
+      };
+
+      // Fetch items from MongoDB
+      const items = await Item.find(query).lean();
+
+
+      if (!items.length) {
+        console.log("⚠️ No items found for the selected date.");
+        return {
+          status: 200,
+          message: "No items found for the selected date.",
+          data: [],
+        };
+      }
+
+      // Process and filter results
+      const filteredItems = items.flatMap((item) => {
+        const result: any = [];
+
+    
+
+        // Check if main document's createdAt is within range
+        const itemCreatedAt = new Date(item.createdAt);
+    
+        // Check if new_stock exists and filter stock items
+        if (Array.isArray(item.new_stock)) {
+          item.new_stock.forEach((stock) => {
+       
+            const stockCreatedAt = new Date(stock.createdAt);
+            if (stockCreatedAt >= startDate && stockCreatedAt < endDate) {
+              result.push({
+                item_name: stock.item_name,
+                code: stock.code,
+                amount: stock.amount,
+                purchased_rate: stock.purchased_rate,
+                rate: stock.rate,
+                uom: stock.uom,
+                stock_qty: stock.stock_qty,
+                item_expiry_date: stock.item_expiry_date,
+                createdAt: stock.createdAt,
+              });
+            }
+          });
+        }
+
+        return result;
+      });
+
+   
+
+      return {
+        status: 200,
+        message: "Filtered items retrieved successfully!",
+        data: filteredItems.length > 0 ? filteredItems?.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) : [],
+      };
+    } catch (error) {
+      console.error("❌ Error filtering items by date:", error);
+      return {
+        status: 500,
+        message: "Internal Server Error",
+        data: null,
+      };
     }
   });
 }

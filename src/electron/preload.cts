@@ -7,6 +7,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
   updateItem: (id, newData) => ipcRenderer.invoke("update-item", id, newData),
   deleteItem: (id) => ipcRenderer.invoke("delete-item", id),
   searchItem: (id) => ipcRenderer.invoke("search-item", id),
+  filterByData: (createdAtFilter) =>
+    ipcRenderer.invoke("filter-items-by-date", createdAtFilter),
 
   // Authentication API
   createAccount: (data) => ipcRenderer.invoke("create-account", data),

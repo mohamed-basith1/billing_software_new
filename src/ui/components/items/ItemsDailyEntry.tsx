@@ -16,7 +16,13 @@ import React, { useEffect, useRef, useState } from "react";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  selectFilterSearchItem,
   selectItemSearch,
+  setClearFilterData,
+  setClearItems,
+  setClearItemsearch,
+  setDateTigger,
+  setFilterSearchItem,
   setItemsearch,
 } from "../../pages/ItemsPage/ItemsSlice";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
@@ -79,14 +85,16 @@ const itemsList = [
 ];
 
 const ItemsDailyEntry = () => {
-  const itemsearch = useSelector(selectItemSearch);
   const itemSearchRef = useRef<HTMLInputElement>(null);
   const dispatch = useDispatch();
+  const itemsearch = useSelector(selectItemSearch);
+  const selectedItem = useSelector(selectFilterSearchItem);
+
   const [suggestions, setSuggestions] = useState<typeof itemsList>([]);
   const [selectedFlag, setSelectFlag] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [uploadStock, setUplaodStock] = useState("");
+
   useEffect(() => {
     itemSearchRef.current?.focus();
     if (itemsearch === "") {
@@ -105,6 +113,12 @@ const ItemsDailyEntry = () => {
     }
   }, [itemsearch]);
 
+  useEffect(() => {
+    return () => {
+      dispatch(setClearItemsearch());
+    };
+  }, []);
+
   const handleSelect = (item: any) => {
     dispatch(setItemsearch(item.item_name)); // Update search first
     setSelectFlag(true);
@@ -114,7 +128,7 @@ const ItemsDailyEntry = () => {
     setTimeout(() => {
       setSelectFlag(false);
     }, 10);
-    setSelectedItem(item);
+    dispatch(setFilterSearchItem(item));
   };
 
   const handleUploadStockSubmit = async () => {
@@ -138,6 +152,8 @@ const ItemsDailyEntry = () => {
     if (response.status !== 200) {
       toast.error(`${response.message}`, { position: "bottom-left" });
     } else {
+      dispatch(setClearFilterData());
+      dispatch(setDateTigger())
       toast.success(`${response.message}`, { position: "bottom-left" });
     }
   };

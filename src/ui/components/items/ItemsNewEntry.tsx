@@ -3,6 +3,7 @@ import {
   setField,
   selectItems,
   setClearItems,
+  setDateTigger,
 } from "../../pages/ItemsPage/ItemsSlice"; // Adjust the import path
 import {
   Box,
@@ -125,47 +126,51 @@ const ItemsNewEntry = () => {
 
   const validateForm = () => {
     const fieldsToCheck = [
-        itemName,
-        itemCode,
-        itemUOM,
-        itemPurchasedQuantity,
-        itemPurchasedPrice,
-        perKgPurchasedPrice,
-        marginPerUOM,
-        sellingPricePerUOM,
-        expiryDate,
-        lowStockReminder,
+      itemName,
+      itemCode,
+      itemUOM,
+      itemPurchasedQuantity,
+      itemPurchasedPrice,
+      perKgPurchasedPrice,
+      marginPerUOM,
+      sellingPricePerUOM,
+      expiryDate,
+      lowStockReminder,
     ];
 
     if (fieldsToCheck.some((field) => !String(field || "").trim())) {
-        toast.error("All fields must be filled!", { position: "bottom-left" });
-        return false;
+      toast.error("All fields must be filled!", { position: "bottom-left" });
+      return false;
     }
 
     // ✅ Check if any numeric field is 0 or negative
     const numericFields = {
-        "Purchased Quantity": itemPurchasedQuantity,
-        "Purchased Price": itemPurchasedPrice,
-        "Per Kg Purchased Price": perKgPurchasedPrice,
-        "Margin Per UOM": marginPerUOM,
-        "Selling Price Per UOM": sellingPricePerUOM,
-        "Low Stock Reminder": lowStockReminder,
+      "Purchased Quantity": itemPurchasedQuantity,
+      "Purchased Price": itemPurchasedPrice,
+      "Per Kg Purchased Price": perKgPurchasedPrice,
+      "Margin Per UOM": marginPerUOM,
+      "Selling Price Per UOM": sellingPricePerUOM,
+      "Low Stock Reminder": lowStockReminder,
     };
 
     for (const [fieldName, value] of Object.entries(numericFields)) {
-        const numValue = Number(value);
-        if (numValue === 0) {
-            toast.error(`${fieldName} cannot be zero!`, { position: "bottom-left" });
-            return false;
-        }
-        if (numValue < 0) {
-            toast.error(`${fieldName} cannot be negative!`, { position: "bottom-left" });
-            return false;
-        }
+      const numValue = Number(value);
+      if (numValue === 0) {
+        toast.error(`${fieldName} cannot be zero!`, {
+          position: "bottom-left",
+        });
+        return false;
+      }
+      if (numValue < 0) {
+        toast.error(`${fieldName} cannot be negative!`, {
+          position: "bottom-left",
+        });
+        return false;
+      }
     }
 
     return true;
-};
+  };
 
   const handleCreateItem = async () => {
     const capitalizeFirstLetter = (str) =>
@@ -183,6 +188,19 @@ const ItemsNewEntry = () => {
         margin: Number(marginPerUOM),
         low_stock_remainder: Number(lowStockReminder),
         item_expiry_date: expiryDate,
+        new_stock: [
+          {
+            item_name: capitalizeFirstLetter(itemName),
+            code: itemCode,
+            amount: Number(sellingPricePerUOM),
+            purchased_rate: Number(perKgPurchasedPrice),
+            rate: Number(sellingPricePerUOM),
+            uom: itemUOM,
+            stock_qty: Number(itemPurchasedQuantity),
+            item_expiry_date: expiryDate, // Keep expiry date
+            createdAt: new Date().toISOString(),
+          },
+        ],
       };
       const sanitizedData = JSON.parse(JSON.stringify(itemPayload)); // Removes undefined & BigInt
       //@ts-ignore
@@ -191,6 +209,7 @@ const ItemsNewEntry = () => {
         toast.error(`${response.message}`, { position: "bottom-left" });
       } else {
         dispatch(setClearItems());
+        dispatch(setDateTigger())
         toast.success(`${response.message}`, { position: "bottom-left" });
       }
     }

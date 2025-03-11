@@ -35,6 +35,7 @@ const CustomerEditModal = () => {
 
   const handleCloaseCustomerEditModal = () => {
     dispatch(setCustomerEditModal(false));
+    dispatch(clearCustomerDetails());
   };
 
   const handleChange = (field: any, value: any) => {

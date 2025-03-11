@@ -1,11 +1,12 @@
-import { Box, Typography } from "@mui/material";
-import { LocalizationProvider } from "@mui/x-date-pickers";
+import { Box, Button, TextField, Typography } from "@mui/material";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import customerImage from "../../assets/Image/Illustrate/customer.png";
 import { getGreeting } from "../../utils/utils";
 import WavingHandRoundedIcon from "@mui/icons-material/WavingHandRounded";
 
 import ItemsEntryTab from "../../components/items/ItemsEntryTab";
+import ItemEntryHistory from "../../components/items/ItemEntryHistory";
 
 const ItemsEntry = () => {
   return (
@@ -27,7 +28,7 @@ const ItemsEntry = () => {
         <Box
           sx={{
             height: "100%",
-            width: "50%",
+            width: "45%",
             bgcolor: "white",
             border: ".1px solid lightgrey",
             borderRadius: "8px",
@@ -63,23 +64,19 @@ const ItemsEntry = () => {
         {/* today data item entry  */}
         <Box
           sx={{
-            flexBasis: "50%",
-            flexGrow: 1,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            height: "100%",
+            width: "55%",
             bgcolor: "white",
+            border: ".1px solid lightgrey",
+            borderRadius: "8px",
+            p: 2,
+            display: "flex",
+            flexDirection: "column",
+            overflow: "hidden",
+            boxSizing: "border-box",
           }}
         >
-          <img
-            src={customerImage}
-            alt="Customer"
-            style={{
-              maxHeight: "60%",
-              maxWidth: "100%",
-              objectFit: "contain",
-            }}
-          />
+          <ItemEntryHistory />
         </Box>
       </Box>
     </LocalizationProvider>

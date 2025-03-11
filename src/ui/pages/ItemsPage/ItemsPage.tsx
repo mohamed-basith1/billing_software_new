@@ -27,9 +27,7 @@ export default function ItemsPage() {
         <ItemsList />
       ) : currentTab === 1 ? (
         <ItemsEntry />
-      ) : (
-        <ItemsEntryHistory />
-      )}
+      ) : null}
       {/* <CustomerEditModal />
       <DeleteModal /> */}
     </Box>
