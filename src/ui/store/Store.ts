@@ -4,13 +4,15 @@ import billsReducer from "../pages/BillsPage/BillsSlice";
 import LoginReducer from "../pages/LoginPage/LoginSlice";
 import CustomersReducer from "../pages/CustomersPage/CustomersSlice";
 import ItemsReducer from "../pages/ItemsPage/ItemsSlice";
+import PaymentsReducer from "../pages/PaymentsPage/PaymentsSlice";
 
 export const store = configureStore({
   reducer: {
     bills: billsReducer,
     login: LoginReducer,
     customers: CustomersReducer,
-    items:ItemsReducer
+    items: ItemsReducer,
+    payments: PaymentsReducer,
   },
 });
 

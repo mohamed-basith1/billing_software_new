@@ -29,8 +29,6 @@ const CustomersList = () => {
         <CustomerslistUI />
         {/* Right Container */}
         <CustomerDetails />
-
-       
       </Box>
     </Box>
   );

@@ -55,6 +55,7 @@ export function ItemsRouter() {
   });
   ipcMain.handle("get-item", async () => {
     try {
+      console.log("item list api");
       const items = await Item.find();
       return JSON.parse(JSON.stringify(items)); // No need for .toObject()
     } catch (error: any) {
@@ -62,6 +63,73 @@ export function ItemsRouter() {
       throw error;
     }
   });
+
+  ipcMain.handle("get-low-stock-item", async () => {
+    try {
+      console.log("item list api");
+      
+      // Fetch only items where stock_qty is lower than low_stock_remainder
+      const items = await Item.find({
+        $expr: { $lt: ["$stock_qty", "$low_stock_remainder"] },
+      });
+  
+      return JSON.parse(JSON.stringify(items)); // Convert Mongoose documents to plain objects
+    } catch (error: any) {
+      console.error("Error fetching data:", error);
+      throw error;
+    }
+  });
+  
+  ipcMain.handle("get-item-summary", async () => {
+    try {
+      const items: any = await Item.find();
+
+      const total_items = items.length;
+
+      const low_stock_item = items.filter(
+        (item) => item.stock_qty < item.low_stock_remainder
+      ).length;
+
+      const total_item_price = items.reduce((sum, item) => {
+        if (item.uom.toLowerCase() === "gram") {
+          return sum + (item.stock_qty / 1000) * item.amount; // Convert grams to kg
+        }
+        return sum + item.stock_qty * item.amount;
+      }, 0);
+
+      return {
+        status: 200,
+        data: { total_items, low_stock_item, total_item_price },
+      };
+    } catch (error: any) {
+      console.error("Error fetching data:", error);
+      throw error;
+    }
+  });
+
+  // ipcMain.handle("get-item-summary", async () => {
+  //   try {
+  //     const items:any = await Item.find();
+
+  //     const total_items = items.length;
+
+  //     const low_stock_item = items.filter(
+  //       (item) => item.stock_qty <= item.low_stock_remainder
+  //     ).length;
+
+  //     const total_item_price = items.reduce(
+  //       (sum, item) => sum + item.stock_qty * item.amount,
+  //       0
+  //     );
+  //     return {
+  //       status: 200,
+  //       data: { total_items, low_stock_item, total_item_price },
+  //     };
+  //   } catch (error: any) {
+  //     console.error("Error fetching data:", error);
+  //     throw error;
+  //   }
+  // });
 
   ipcMain.handle("update-item", async (_, id, newStockEntry) => {
     try {
@@ -151,7 +219,6 @@ export function ItemsRouter() {
       // Fetch items from MongoDB
       const items = await Item.find(query).lean();
 
-
       if (!items.length) {
         console.log("⚠️ No items found for the selected date.");
         return {
@@ -165,15 +232,12 @@ export function ItemsRouter() {
       const filteredItems = items.flatMap((item) => {
         const result: any = [];
 
-    
-
         // Check if main document's createdAt is within range
         const itemCreatedAt = new Date(item.createdAt);
-    
+
         // Check if new_stock exists and filter stock items
         if (Array.isArray(item.new_stock)) {
           item.new_stock.forEach((stock) => {
-       
             const stockCreatedAt = new Date(stock.createdAt);
             if (stockCreatedAt >= startDate && stockCreatedAt < endDate) {
               result.push({
@@ -194,12 +258,17 @@ export function ItemsRouter() {
         return result;
       });
 
-   
-
       return {
         status: 200,
         message: "Filtered items retrieved successfully!",
-        data: filteredItems.length > 0 ? filteredItems?.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) : [],
+        data:
+          filteredItems.length > 0
+            ? filteredItems?.sort(
+                (a, b) =>
+                  new Date(a.createdAt).getTime() -
+                  new Date(b.createdAt).getTime()
+              )
+            : [],
       };
     } catch (error) {
       console.error("❌ Error filtering items by date:", error);

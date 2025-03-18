@@ -62,11 +62,10 @@ const CustomerslistUI = () => {
     >
       <Box
         sx={{
-          height: "5rem",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          borderBottom: ".1px solid lightgrey",
+      
           // p: 2,
         }}
       >
@@ -114,7 +113,6 @@ const CustomerslistUI = () => {
           display: "flex",
           flexDirection: "column",
           overflow: "scroll",
-
         }}
       >
         {customersList?.map((data: any, index: any) => (

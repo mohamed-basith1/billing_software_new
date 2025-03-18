@@ -1,51 +1,28 @@
-import { Box, IconButton, InputAdornment, TextField } from "@mui/material";
-import { useEffect } from "react";
+import { Box, TextField, InputAdornment, IconButton } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectItemList, setItemList } from "../../pages/ItemsPage/ItemsSlice";
 
-export const columns = [
-  { field: "item_name", headerName: "ITEM NAME", flex: 2 },
-  { field: "code", headerName: "CODE", flex: 1 },
-  {
-    field: "purchased_rate",
-    headerName: "PURCHASED RATE",
-    flex: 1,
-  },
-  { field: "margin", headerName: "MARGIN", flex: 1 },
-  {
-    field: "amount",
-    headerName: "SELLING RATE",
-    flex: 1,
-  },
-  { field: "stock_qty", headerName: "STOCK QTY", flex: 1 },
-  { field: "uom", headerName: "UOM", flex: 1 },
-
-  {
-    field: "low_stock_remainder",
-    headerName: "LOW STOCK REMAINDER",
-    flex: 1,
-  },
-  {
-    field: "item_expiry_date",
-    headerName: "EXPIRY DATE",
-    flex: 1,
-    valueGetter: (params) => new Date(params).toLocaleDateString(),
-  },
-];
-const ItemsListTable = () => {
+import {
+  selectLowStockItemList,
+  setLowStockItemList,
+} from "../../pages/ItemsPage/ItemsSlice";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import { columns } from "./ItemsListTable";
+const ItemsLowStock = () => {
   const dispatch = useDispatch();
-  const ItemList = useSelector(selectItemList);
+  const lowStockItemList = useSelector(selectLowStockItemList);
   useEffect(() => {
-    const fetItemList = async () => {
+    const fetchLowStockItemList = async () => {
       //@ts-ignore
-      let response: any = await window.electronAPI.getItem();
-      dispatch(setItemList(response));
+      let response: any = await window.electronAPI.getLowStockItem();
+      console.log("low stock list",response);
+      dispatch(setLowStockItemList(response));
     };
 
-    fetItemList();
+    fetchLowStockItemList();
   }, []);
+  //getLowStockItem
   return (
     <Box
       sx={{
@@ -62,6 +39,7 @@ const ItemsListTable = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "flex-start",
+          borderBottom: ".1px solid lightgrey",
         }}
       >
         <TextField
@@ -103,7 +81,7 @@ const ItemsListTable = () => {
         sx={{ flexGrow: 1, maxHeight: "calc(100% - 6rem)", overflow: "auto" }}
       >
         <DataGrid
-          rows={ItemList}
+          rows={lowStockItemList}
           columns={columns}
           disableColumnMenu
           hideFooter
@@ -120,4 +98,4 @@ const ItemsListTable = () => {
   );
 };
 
-export default ItemsListTable;
+export default ItemsLowStock;

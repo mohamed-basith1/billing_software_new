@@ -3,10 +3,14 @@ import { contextBridge, ipcRenderer } from "electron";
 contextBridge.exposeInMainWorld("electronAPI", {
   // Items API
   getItem: () => ipcRenderer.invoke("get-item"),
+  getLowStockItem: () => ipcRenderer.invoke("get-low-stock-item"),
+
   insertItem: (data) => ipcRenderer.invoke("insert-item", data),
   updateItem: (id, newData) => ipcRenderer.invoke("update-item", id, newData),
   deleteItem: (id) => ipcRenderer.invoke("delete-item", id),
   searchItem: (id) => ipcRenderer.invoke("search-item", id),
+  itemSummary: () => ipcRenderer.invoke("get-item-summary"),
+
   filterByData: (createdAtFilter) =>
     ipcRenderer.invoke("filter-items-by-date", createdAtFilter),
 
@@ -27,7 +31,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
   // Bills API
   createBill: (data) => ipcRenderer.invoke("create-bill", data),
-  getBills: () => ipcRenderer.invoke("get-bills"),
+  getBills: (fromDate, toDate, payment_method) =>
+    ipcRenderer.invoke("get-bills", { fromDate, toDate, payment_method }),
   getBill: (id) => ipcRenderer.invoke("get-bill", id),
   updateBill: (id, updatedData) =>
     ipcRenderer.invoke("update-bill", { id, updatedData }),

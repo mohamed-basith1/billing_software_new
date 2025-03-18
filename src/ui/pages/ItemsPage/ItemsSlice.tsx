@@ -17,6 +17,8 @@ const initialState: any = {
   itemSearch: "",
   filterSearchItem: null,
   DateTrigger: false,
+  itemList: [],
+  lowStockItemList: [],
 };
 
 const itemsSlice = createSlice({
@@ -65,6 +67,12 @@ const itemsSlice = createSlice({
     setDateTigger: (state) => {
       state.DateTrigger = !state.DateTrigger;
     },
+    setItemList: (state, action) => {
+      state.itemList = action.payload;
+    },
+    setLowStockItemList: (state, action) => {
+      state.lowStockItemList = action.payload;
+    },
   },
 });
 
@@ -79,7 +87,9 @@ export const {
   setFilterSearchItem,
   setClearItemsearch,
   setClearFilterData,
-  setDateTigger
+  setDateTigger,
+  setItemList,
+  setLowStockItemList,
 } = itemsSlice.actions;
 
 // Selectors
@@ -89,7 +99,9 @@ export const selectItemsTab = (state: any) => state.items.itemsTab;
 export const selectItemsEntryTab = (state: any) => state.items.itemsEntryTab;
 export const selectItemSearch = (state: any) => state.items.itemSearch;
 export const selectDateTigger = (state: any) => state.items.DateTrigger;
-
+export const selectItemList = (state: any) => state.items.itemList;
+export const selectLowStockItemList = (state: any) =>
+  state.items.lowStockItemList;
 export const selectFilterSearchItem = (state: any) =>
   state.items.filterSearchItem;
 

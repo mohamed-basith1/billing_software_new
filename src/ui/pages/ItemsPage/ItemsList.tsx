@@ -1,109 +1,38 @@
-import React from "react";
-import {
-  Container,
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Avatar,
-  Button,
-} from "@mui/material";
+import { useEffect, useState } from "react";
+import { Grid, Card, CardContent, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import { blue, green, orange } from "@mui/material/colors";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import { getGreeting } from "../../utils/utils";
 import { useDispatch, useSelector } from "react-redux";
-import { selectUserName } from "../LoginPage/LoginSlice";
 import InventoryIcon from "@mui/icons-material/Inventory2Outlined";
 import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 import LayersIcon from "@mui/icons-material/Layers";
 import EventBusyIcon from "@mui/icons-material/EventBusy";
 import ItemsListTable from "../../components/items/ItemsListTable";
-import {
-  selectCurrentTab,
-  selectItemsTab,
-  setCurrentTab,
-  setItemsTab,
-} from "./ItemsSlice";
+import { selectItemsTab, setItemsTab } from "./ItemsSlice";
 
-const orders = [
-  {
-    id: "#QN0067",
-    date: "NOV 26, 2023",
-    customer: "Maulana",
-    service: "Delivery",
-    item: "American Style Burger",
-    qty: 1,
-    status: "NEW",
-    total: "$75.00",
-  },
-  {
-    id: "#QN0068",
-    date: "NOV 25, 2023",
-    customer: "Hanifa",
-    service: "Take Away",
-    item: "Sushi Platter",
-    qty: 2,
-    status: "NEW",
-    total: "$175.00",
-  },
-  {
-    id: "#QN0069",
-    date: "NOV 24, 2023",
-    customer: "Annisa",
-    service: "Delivery",
-    item: "Chicken Curry Katsu",
-    qty: 4,
-    status: "ON PROCESS",
-    total: "$375.00",
-  },
-  {
-    id: "#QN0070",
-    date: "NOV 23, 2023",
-    customer: "Iwan",
-    service: "Take Away",
-    item: "American Style Burger",
-    qty: 1,
-    status: "DONE",
-    total: "$85.00",
-  },
-  {
-    id: "#QN0071",
-    date: "NOV 22, 2023",
-    customer: "Dwi",
-    service: "Take Away",
-    item: "Sushi Platter",
-    qty: 4,
-    status: "NEW",
-    total: "$125.00",
-  },
-  {
-    id: "#QN0072",
-    date: "NOV 21, 2023",
-    customer: "Wahyu",
-    service: "Delivery",
-    item: "American Style Burger",
-    qty: 2,
-    status: "DONE",
-    total: "$60.00",
-  },
-];
+import ItemsLowStock from "../../components/items/ItemsLowStock";
 
 const ItemsList = () => {
   const dispatch = useDispatch();
-  const userName = useSelector(selectUserName);
-
   const itemsTab = useSelector(selectItemsTab);
+  const [itemSummary, setItemSummary] = useState({});
+  useEffect(() => {
+    const itemSummaryHandle = async () => {
+      //@ts-ignore
+      let response: any = await window.electronAPI.itemSummary();
+
+      if (response.status !== 200) {
+        // toast.error(`${response.message}`, { position: "bottom-left" });
+      } else {
+        setItemSummary(response?.data);
+        console.log(" response?.data", response?.data);
+      }
+    };
+    itemSummaryHandle();
+  }, []);
   return (
-    <Container
-      maxWidth="lg"
+    <Box
+      // maxWidth="lg"
       sx={{
         height: "calc(100% - 3.5rem)",
         width: "100%",
@@ -120,12 +49,22 @@ const ItemsList = () => {
     >
       <Grid container spacing={1.5} sx={{ my: 1 }}>
         {[
-          { label: "Total Items", value: 134, color: blue[500], tab: 0 },
-          { label: "Low Stocks Items", value: 113, color: green[500], tab: 1 },
+          {
+            label: "Total Items",
+            value: itemSummary?.total_items,
+            color: blue[500],
+            tab: 0,
+          },
+          {
+            label: "Low Stocks Items",
+            value: itemSummary?.low_stock_item,
+            color: green[500],
+            tab: 1,
+          },
           { label: "Expired Items", value: "$2,096", color: blue[700], tab: 2 },
           {
             label: "Total Items Price",
-            value: "₹2,096",
+            value: `₹${Math.round(itemSummary?.total_item_price)}`,
             color: orange[500],
             tab: 3,
           },
@@ -135,7 +74,7 @@ const ItemsList = () => {
               onClick={() => dispatch(setItemsTab(stat.tab))}
               elevation={0}
               sx={{
-                // backgroundColor: itemsTab === stat.tab ? "rgba(250, 160, 30, .4)" : "white",
+                backgroundColor: itemsTab === stat.tab ? "rgba(250, 160, 30, .4)" : "white",
                 // color: itemsTab === stat.tab ? "inherit" : "inherit",
                 bgcolor: "white",
                 color: "inherit",
@@ -229,34 +168,10 @@ const ItemsList = () => {
           </Grid>
         ))}
       </Grid>
-
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        my={2}
-      >
-        {itemsTab === 0 ? (
-          <Typography sx={{ fontSize: "1.5rem", fontWeight: 500 }}>
-            Items List
-          </Typography>
-        ) : itemsTab === 1 ? (
-          <Typography sx={{ fontSize: "1.5rem", fontWeight: 500 }}>
-            Low Stock List
-          </Typography>
-        ) : itemsTab === 2 ? (
-          <Typography sx={{ fontSize: "1.5rem", fontWeight: 500 }}>
-            Expired Item List
-          </Typography>
-        ) : (
-          <Typography sx={{ fontSize: "1.5rem", fontWeight: 500 }}>
-            Expired Item List
-          </Typography>
-        )}
+      <Box sx={{ height: "100%", width: "100%" }}>
+        {itemsTab === 0 ? <ItemsListTable /> : <ItemsLowStock />}
       </Box>
-
-      <ItemsListTable />
-    </Container>
+    </Box>
   );
 };
 

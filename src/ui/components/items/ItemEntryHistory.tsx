@@ -54,9 +54,9 @@ const ItemEntryHistory = () => {
       }
 
       if (!response.data || response.data.length === 0) {
-        toast.warning("No items found for the selected date.", {
-          position: "bottom-left",
-        });
+        // toast.warning("No items found for the selected date.", {
+        //   position: "bottom-left",
+        // });
         setEntryHistory([]);
         return;
       }

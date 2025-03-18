@@ -19,7 +19,6 @@ export const calculateAmount = (
   }
 };
 
-
 export const getGreeting = () => {
   const hour = new Date().getHours();
   if (hour < 12) return "Good Morning , ";
@@ -284,6 +283,22 @@ export const handleSearchCustomer = async (searchTerm: string) => {
   return renameIdField(response.data);
 };
 
+export const fetchBills = async (
+  fromDatePara: any,
+  toDatePara: any,
+  payment_method: any
+) => {
+  const toDate = toDatePara.toISOString();
+  // // Get 1 month ago UTC time
+  const fromDate = fromDatePara.toISOString();
+  //@ts-ignore
+  let response: any = await window.electronAPI.getBills(
+    fromDate,
+    toDate,
+    payment_method
+  );
+  return response;
+};
 //dark
 export const colorsList = [
   "rgb(30, 120, 80)", // Dark Green
@@ -292,7 +307,6 @@ export const colorsList = [
   "rgb(180, 60, 40)", // Dark Red
   "rgb(20, 110, 150)", // Dark Blue
 ];
-
 
 export const getTotalAmount = <T>(bills: T[], key: keyof T): number => {
   return bills.reduce((sum, bill) => sum + (bill[key] as number), 0);
