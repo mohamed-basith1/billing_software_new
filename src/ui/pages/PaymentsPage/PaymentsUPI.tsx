@@ -1,6 +1,7 @@
+import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
+import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
+import PublishedWithChangesIcon from "@mui/icons-material/PublishedWithChanges";
 import QrCode2Icon from "@mui/icons-material/QrCode2";
-import ReceiptIcon from "@mui/icons-material/ReceiptOutlined";
-import ReplayIcon from "@mui/icons-material/Replay";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import {
   Box,
@@ -10,42 +11,217 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { useEffect, useState } from "react";
-
 import dayjs from "dayjs";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchBills } from "../../utils/utils";
-import { selectUPIBillsList, setUPIBillsList } from "./PaymentsSlice";
+import { toast } from "react-toastify";
+import {
+  fetchBills,
+  filterTodayBills,
+  getTotalAmount,
+} from "../../utils/utils";
+import {
+  clearPaymentBillsDetail,
+  selectBillSearch,
+  selectFromDate,
+  selectSelectedBills,
+  selectTempRemoveItem,
+  selectToDate,
+  selectUPIBillsList,
+  setBillSearch,
+  setFromDate,
+  setItemRemove,
+  setPaymentChange,
+  setReturnItem,
+  setSelectedBills,
+  setToDate,
+  setUPIBillsList,
+  setnewReturnBill,
+} from "./PaymentsSlice";
 
 const PaymentsUPI = () => {
-  // State for From and To dates
-  const [fromDate, setFromDate] = useState(dayjs().subtract(1, "month"));
-  const [toDate, setToDate] = useState(dayjs());
+  const columns: GridColDef[] = [
+    {
+      field: "action",
+      headerName: "#",
+      flex: 0.5,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params: any) => {
+        return (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              width: "100%",
+              height: "100%",
+              outline: "none",
+              border: "none",
+              userSelect: "none", // Prevents text selection
+            }}
+            onMouseDown={(e) => e.stopPropagation()} // Prevents cell highlight
+            onClick={(e) => e.stopPropagation()} // Prevents cell focus
+          >
+            <IconButton
+              style={{ outline: "none", border: "none", padding: 0 }}
+              disabled={selectedBills.itemsList.length === 1 ? true : false}
+              onClick={(e) => {
+                e.stopPropagation(); // Stops focus from moving to the cell
+                dispatch(setItemRemove(params.row.code));
+              }}
+            >
+              <ClearRoundedIcon
+                sx={{
+                  color: "red",
+                  opacity: selectedBills.itemsList.length === 1 ? ".5" : "auto",
+                }}
+              />
+            </IconButton>
+          </div>
+        );
+      },
+    },
+
+    { field: "item_name", headerName: "ITEM NAME", flex: 3 },
+    {
+      field: "qty",
+      headerName: "QUANTITY",
+      flex: 1,
+      editable: true,
+      align: "right",
+      headerAlign: "right",
+    },
+    {
+      field: "uom",
+      headerName: "UOM",
+      flex: 1,
+      align: "right",
+      headerAlign: "right",
+    },
+    {
+      field: "rate",
+      headerName: "RATE",
+      flex: 1,
+      align: "right",
+      headerAlign: "right",
+      valueGetter: (params) => {
+        return params !== undefined ? `₹${params}` : " ₹0";
+      },
+    },
+    {
+      field: "amount",
+      headerName: "AMOUNT",
+      flex: 1,
+      align: "right",
+      headerAlign: "right",
+      valueGetter: (params) => {
+        return params !== undefined ? `₹${params}` : " ₹0";
+      },
+    },
+  ];
+
+  const fromDate = useSelector(selectFromDate);
+  const toDate = useSelector(selectToDate);
   const UPIBillsList = useSelector(selectUPIBillsList);
+  const selectedBills: any = useSelector(selectSelectedBills);
+  const tempRemoveItem: any = useSelector(selectTempRemoveItem);
+  const billSearch: any = useSelector(selectBillSearch);
   const dispatch: any = useDispatch();
-console.log("UPIBillsList",UPIBillsList);
+  console.log("fromDate", fromDate, toDate);
   useEffect(() => {
-    const getUPIBills = async () => {
-      let response: any = await fetchBills(
-        dayjs().subtract(1, "month"),
-        dayjs(),
+    dispatch(setFromDate(dayjs().subtract(1, "month")));
+    dispatch(setToDate(dayjs()));
+    getUPIBills();
+
+    return () => {
+      dispatch(clearPaymentBillsDetail());
+    };
+  }, []);
+
+  const getUPIBills = async () => {
+    let response: any = await fetchBills(
+      dayjs().subtract(1, "month"),
+      dayjs(),
+      "UPI Paid"
+    );
+    // Convert `_id` to string before dispatching
+    const serializedData = response.data.map((bill: any) => ({
+      ...bill,
+      // _id: bill._id.toString(),
+    }));
+console.log("serializedData",serializedData);
+    dispatch(setUPIBillsList(serializedData));
+  };
+  const handleBillSearch = async (billnumber: string) => {
+    // alert(`value ${billnumber}`)
+    if (billnumber) {
+      dispatch(setBillSearch(billnumber));
+      //@ts-ignore
+      let response: any = await window.electronAPI.getBillBySearch(
+        billnumber,
         "UPI Paid"
       );
-      // Convert `_id` to string before dispatching
-      const serializedData = response.data.map((bill: any) => ({
-        ...bill,
-        _id: bill._id.toString(),
-      }));
 
-      dispatch(setUPIBillsList(serializedData));
-    };
-    getUPIBills();
-  }, []);
+      if (response.status === 200) {
+        dispatch(setUPIBillsList(response.data));
+      }
+    } else {
+      dispatch(setBillSearch(billnumber));
+      getUPIBills();
+      // alert("empty");
+    }
+  };
   const handleDateChange = async () => {
     let response: any = await fetchBills(fromDate, toDate, "UPI Paid");
     dispatch(setUPIBillsList(response.data));
+  };
+  const handleReturnBill = async () => {
+    function updateBillAmounts(bill: any) {
+      let subAmount = 0;
+
+      // Calculate the subAmount based on qty * rate
+      bill.itemsList.forEach((item: any) => {
+        if (item.uom.toLowerCase() === "gram") {
+          subAmount += (item.qty / 1000) * item.rate;
+        } else {
+          subAmount += item.qty * item.rate;
+        }
+      });
+
+      // Return a new updated object
+      return {
+        ...bill,
+        sub_amount: parseFloat(subAmount.toFixed(2)),
+        total_amount: parseFloat((subAmount - (bill.discount || 0)).toFixed(2)),
+        amount_paid: parseFloat(subAmount.toFixed(2)), // Assuming full payment
+      };
+    }
+    console.log("selectedBills", selectedBills);
+    const updatedBill = updateBillAmounts(selectedBills);
+    console.log("updatedBill", updatedBill);
+    //@ts-ignore
+    let response: any = await window.electronAPI.returnBill(
+      updatedBill._id,
+      updatedBill,
+      tempRemoveItem
+    );
+    dispatch(setnewReturnBill(response.data));
+    toast.success(`${response.message}`, { position: "bottom-left" });
+    console.log("return bill response", response);
+  };
+  const handleChangePaymentMethod = async () => {
+    //@ts-ignore
+    let response: any = await window.electronAPI.updateBillPaymentMethod(
+      selectedBills._id,
+      "Cash Paid"
+    );
+
+    dispatch(setPaymentChange(response.data));
+    toast.success(`${response.message}`, { position: "bottom-left" });
   };
   return (
     <Box
@@ -54,12 +230,11 @@ console.log("UPIBillsList",UPIBillsList);
         width: "100%",
         background: "white",
         borderRadius: "8px",
-        p: 2,
+
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
         mt: 2,
-        // overflow: "hidden",
       }}
     >
       <Box
@@ -68,6 +243,8 @@ console.log("UPIBillsList",UPIBillsList);
           flexDirection: "row",
           height: "30%",
           gap: "10px",
+          p: 2,
+          borderBottom: ".1px solid lightgrey",
         }}
       >
         <Box
@@ -86,7 +263,7 @@ console.log("UPIBillsList",UPIBillsList);
               width: "100%",
               justifyContent: "space-between",
               height: "10%",
-              // bgcolor: "red",
+
               alignItems: "flex-start",
             }}
           >
@@ -98,7 +275,7 @@ console.log("UPIBillsList",UPIBillsList);
               }}
             >
               <TextField
-                placeholder="Bill Search"
+                placeholder="Bill Number"
                 variant="outlined"
                 sx={{
                   width: "20rem",
@@ -115,9 +292,10 @@ console.log("UPIBillsList",UPIBillsList);
                     borderRadius: "8px",
                   },
                 }}
-                value={""}
+                value={billSearch}
                 size="small"
-                onChange={(e) => console.log("")}
+                type="number"
+                onChange={(e) => handleBillSearch(e.target.value)}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -138,7 +316,7 @@ console.log("UPIBillsList",UPIBillsList);
                   <DatePicker
                     label="From"
                     value={fromDate}
-                    onChange={(newValue) => setFromDate(newValue)}
+                    onChange={(newValue) => dispatch(setFromDate(newValue))}
                     renderInput={(params) => (
                       <TextField {...params} fullWidth size="small" />
                     )}
@@ -149,7 +327,7 @@ console.log("UPIBillsList",UPIBillsList);
                   <DatePicker
                     label="To"
                     value={toDate}
-                    onChange={(newValue) => setToDate(newValue)}
+                    onChange={(newValue) => dispatch(setToDate(newValue))}
                     renderInput={(params) => (
                       <TextField {...params} fullWidth size="small" />
                     )}
@@ -166,12 +344,15 @@ console.log("UPIBillsList",UPIBillsList);
           <Box
             sx={{
               height: "60%",
-              // bgcolor: "#F7F7FE",
+
               borderRadius: "8px",
-              padding: "2rem",
+
               width: "100%",
               background:
-                "linear-gradient(133deg, rgba(247,247,254,1) 60%, rgba(34,179,120,1) 87%)",
+                // "linear-gradient(133deg, rgba(247,247,254,1) 60%, rgba(34,179,120,1) 87%)",
+                // "linear-gradient(133deg, rgba(247,247,254,1) 60%, rgba(155, 89, 182, 1) 87%)",
+
+                "linear-gradient(133deg, rgba(247,247,254,1) 60%, rgba(236,117,30,1) 72%, rgba(34,179,120,1) 90%)",
               my: 2,
               position: "relative",
               display: "flex",
@@ -179,9 +360,53 @@ console.log("UPIBillsList",UPIBillsList);
               alignItems: "center",
             }}
           >
-            <Box>Payment Summary</Box>
             <Box
-              sx={{ display: "flex", alignItems: "flex-start", gap: "10px" }}
+              sx={{
+                padding: "1.3rem",
+                height: "100%",
+                width: "60%",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+              }}
+            >
+              <Typography
+                sx={{ color: "grey", fontWeight: 600, fontSize: ".8rem" }}
+              >
+                {" "}
+                Payment Summary
+              </Typography>
+              <Box sx={{ display: "flex", gap: "60px" }}>
+                <Box>
+                  <Typography sx={{ color: "grey", fontSize: ".8rem" }}>
+                    Total UPI Received
+                  </Typography>
+                  <Typography sx={{ mt: 1 }}>
+                    {" "}
+                    ₹{getTotalAmount(UPIBillsList, "total_amount")}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography sx={{ color: "grey", fontSize: ".8rem" }}>
+                    Today UPI Received
+                  </Typography>
+                  <Typography sx={{ mt: 1 }}>
+                    ₹
+                    {getTotalAmount(
+                      filterTodayBills(UPIBillsList),
+                      "total_amount"
+                    )}
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "flex-start",
+                gap: "10px",
+                padding: "2rem",
+              }}
             >
               <QrCode2Icon
                 sx={{
@@ -209,7 +434,7 @@ console.log("UPIBillsList",UPIBillsList);
       {/* Bottom */}
       <Box
         sx={{
-          height: "68%",
+          height: "70%",
           width: "100%",
           display: "flex",
         }}
@@ -220,9 +445,6 @@ console.log("UPIBillsList",UPIBillsList);
             width: "30%",
             display: "flex",
             flexDirection: "column",
-            // overflow: "scroll",
-            // borderRight: ".1px solid lightgrey",
-            // gap: "10px",
           }}
         >
           <Box
@@ -232,19 +454,22 @@ console.log("UPIBillsList",UPIBillsList);
               display: "flex",
               flexDirection: "column",
               overflow: "scroll",
-              // borderRight: ".1px solid lightgrey",
-              // borderLeft: ".1px solid lightgrey",
+              borderRight: ".1px solid lightgrey",
             }}
           >
-            {UPIBillsList?.map((data) => {
+            {UPIBillsList?.map((data: any) => {
               return (
                 <Box
+                  onClick={() => dispatch(setSelectedBills(data))}
                   sx={{
-                    padding: "20px 5px",
+                    padding: "20px 15px",
                     width: "100%",
 
-                    // bgcolor: "#F7F7FE",
-                    // borderRadius: "8px",
+                    bgcolor:
+                      selectedBills?.bill_number === data.bill_number
+                        ? "#F7F7FE"
+                        : "white",
+
                     borderBottom: ".1px solid lightgrey",
                     display: "flex",
                     justifyContent: "space-between",
@@ -253,16 +478,23 @@ console.log("UPIBillsList",UPIBillsList);
                 >
                   <Box>
                     <Typography sx={{ fontWeight: 600 }}>
-                     {data.bill_number}
+                      {data.bill_number}
                     </Typography>
                     <Typography
                       sx={{ opacity: ".5", mt: 1, fontSize: ".8rem" }}
                     >
-                      Total Items {data.itemsList.length} - {data.createdAt.toLocaleDateString("en-GB")}
+                      Total Items {data.itemsList.length} -{" "}
+                      {data?.createdAt
+                        ? new Date(data.createdAt).toLocaleDateString("en-GB", {
+                            timeZone: "UTC",
+                          })
+                        : ""}
                     </Typography>
                   </Box>
                   <Box>
-                    <Typography sx={{ fontWeight: 600 }}>₹ {data.total_amount}</Typography>{" "}
+                    <Typography sx={{ fontWeight: 600 }}>
+                      ₹ {data.total_amount}
+                    </Typography>{" "}
                   </Box>
                 </Box>
               );
@@ -270,69 +502,345 @@ console.log("UPIBillsList",UPIBillsList);
           </Box>
         </Box>
 
-        <Box
-          sx={{
-            width: "70%",
-            height: "100%",
-            p: 1,
-            // bgcolor: "red",
-            boxSizing: "border-box",
-            overflow: "scroll",
-          }}
-        >
+        {Object.keys(selectedBills).length !== 0 ? (
           <Box
             sx={{
-              display: "flex",
-              width: "100%",
-              pl: 1,
-              gap: "10px",
-              justifyContent: "flex-end",
-              mb: 1,
+              width: "70%",
+              height: "100%",
+              boxSizing: "border-box",
+              overflow: "scroll",
             }}
           >
-            <Button sx={{ px: 3, height: "", bgcolor: "#22b378" }}>
-              RETURN <ReplayIcon sx={{ ml: 1 }} />
-            </Button>
-            <Button sx={{ px: 3, height: "", bgcolor: "#22b378" }}>
-              PRINT BILL <ReceiptIcon sx={{ ml: 1 }} />
-            </Button>
-          </Box>
-
-          <Box sx={{ bgcolor: "white", height: "100%", p: 5 }}>
             <Box
               sx={{
-                bgcolor: "white",
-                height: "100%",
-                p: 5,
-                boxShadow: " 1px 1px 5px 1px rgba(0,0,0,0.15)",
+                display: "flex",
+                width: "100%",
+                bgcolor: "#F7F7FE",
+                borderBottom: ".1px solid lightgrey",
+
+                boxShadow: "0px 11px 1px 0px rgba(0,0,0,0.15)",
+                justifyContent: "flex-start",
               }}
             >
               <Box
                 sx={{
-                  width: "100%",
+                  px: 2,
+                  py: 1,
                   display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
+                  alignItems: "center",
+                  gap: "10px",
+                  borderRight: ".1px solid lightgrey",
+                  cursor: "pointer",
+
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: "rgba(34, 179, 120, 0.2)",
+                    color: "#1E8449",
+                  },
+                  fontSize: ".7rem",
+                }}
+                onClick={() => handleChangePaymentMethod()}
+              >
+                <PublishedWithChangesIcon
+                  sx={{ fontSize: "1rem", color: "inherit" }}
+                />
+                CHANGE TO CASH BILL
+              </Box>
+
+              <Box
+                sx={{
+                  px: 2,
+                  py: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  borderRight: ".1px solid lightgrey",
+                  cursor: "pointer",
+
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: "rgba(52, 152, 219, 0.2)",
+                    color: "#217DBB",
+                  },
+                  fontSize: ".7rem",
                 }}
               >
-                <Box sx={{ display: "flex", flexDirection: "column" }}>
-                  <Typography>Order Date</Typography>
-                  <Typography sx={{ fontSize: ".7rem", color: "grey", mt: 1 }}>
-                    02/03/2025
-                  </Typography>
+                <FileDownloadOutlinedIcon
+                  sx={{ fontSize: "1rem", color: "inherit" }}
+                />
+                GENERATE INVOICE
+              </Box>
+            </Box>
+
+            <Box sx={{ bgcolor: "white", height: "100%" }}>
+              <Box
+                sx={{
+                  bgcolor: "white",
+
+                  py: 10,
+
+                  px: 8,
+                }}
+              >
+                <Box
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "flex-start",
+                    }}
+                  >
+                    <Typography>Order Date</Typography>
+                    <Typography
+                      sx={{ fontSize: ".7rem", color: "grey", mt: 1 }}
+                    >
+                      {selectedBills?.createdAt
+                        ? new Date(selectedBills.createdAt).toLocaleDateString(
+                            "en-GB",
+                            {
+                              timeZone: "UTC",
+                            }
+                          )
+                        : ""}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+
+                      justifyContent: "space-between",
+                      textAlign: "start",
+                      alignItems: "flex-end",
+                    }}
+                  >
+                    <Typography sx={{ fontSize: "3rem", lineHeight: 1.5 }}>
+                      INVOICE
+                    </Typography>
+                    <Typography
+                      sx={{ fontSize: ".7rem", color: "grey", fontWeight: 600 }}
+                    >
+                      BILL NUMBER - {selectedBills?.bill_number}
+                    </Typography>
+                  </Box>
                 </Box>
-                <Box sx={{ display: "flex", flexDirection: "column" }}>
-                  <Typography sx={{ fontSize: "2rem" }}>INVOICE</Typography>
-                  <Typography sx={{ fontSize: ".7rem", color: "grey" }}>
-                    BILL - 1
-                  </Typography>
+                <Box sx={{ mt: 5 }}>
+                  <DataGrid
+                    rows={
+                      selectedBills?.itemsList?.map((data) => ({
+                        ...data,
+                        id: data.code,
+                      })) || []
+                    }
+                    columns={columns}
+                    disableColumnMenu
+                    processRowUpdate={(newRow) => {
+                      console.log("newRow", newRow, UPIBillsList);
+
+                      let oldRow = UPIBillsList.find(
+                        (data: any) =>
+                          data.bill_number === selectedBills.bill_number
+                      )?.itemsList?.find(
+                        (data: any) => data.code === newRow.code
+                      );
+
+                      if (!/^\d*\.?\d+$/.test(newRow.qty)) {
+                        toast.warning(
+                          "Invalid quantity! Only numbers are allowed.",
+                          { position: "bottom-left" }
+                        );
+
+                        return oldRow;
+                      }
+
+                      let updatedQty = Number(newRow.qty);
+
+                      if (
+                        newRow.uom.toLowerCase() === "piece" &&
+                        !Number.isInteger(updatedQty)
+                      ) {
+                        toast.warning(
+                          "Quantity must be a whole number for items with UOM 'piece'.",
+                          { position: "bottom-left" }
+                        );
+
+                        return oldRow; // Revert to the old row
+                      }
+
+                      // Restriction: New quantity should not be more than the old quantity
+                      if (updatedQty > oldRow.qty) {
+                        toast.warning(
+                          `New quantity cannot be greater than the billed quantity (${oldRow.qty})`,
+                          { position: "bottom-left" }
+                        );
+
+                        return oldRow; // Revert to the old row
+                      }
+
+                      // Restriction: New quantity should be greater than zero
+                      if (updatedQty <= 0) {
+                        toast.warning("Quantity must be greater than zero", {
+                          position: "bottom-left",
+                        });
+
+                        return oldRow; // Revert to the old row
+                      }
+
+                      let updatedAmount = updatedQty * newRow.rate; // Default calculation
+
+                      if (newRow.uom.toLowerCase() === "gram") {
+                        updatedAmount = (updatedQty / 1000) * newRow.rate; // Adjust for grams
+                      }
+
+                      const updatedRow = {
+                        ...newRow,
+                        qty: updatedQty, // Ensure qty is a number
+                        amount: parseFloat(updatedAmount.toFixed(2)), // Round to 2 decimal places
+                      };
+
+                      dispatch(setReturnItem(updatedRow));
+                      return updatedRow; // Apply the valid changes
+                    }}
+                    hideFooter
+                    sx={{
+                      borderRadius: 0,
+                      "& .MuiDataGrid-columnHeader": {
+                        backgroundColor: "#1E1E2D !important", // Ensure each column header is colored
+                        color: "white",
+                        borderRadius: 0,
+                        pt: 0,
+                      },
+                    }}
+                  />
+                </Box>
+                <Box
+                  sx={{
+                    width: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-end",
+                    gap: "10px",
+                    mt: 3,
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: "30%",
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Typography sx={{ fontSize: ".7rem" }}>
+                      Sub Total{" "}
+                    </Typography>
+                    <Typography sx={{ fontSize: ".7rem" }}>
+                      {selectedBills?.itemsList?.reduce((sum, item) => {
+                        const quantity =
+                          item.uom === "gram" ? item.qty / 1000 : item.qty;
+                        return sum + quantity * item.rate;
+                      }, 0)}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      width: "30%",
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Typography sx={{ fontSize: ".7rem" }}>
+                      Discount{" "}
+                    </Typography>
+                    <Typography sx={{ fontSize: ".7rem" }}>
+                      {selectedBills?.discount}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      width: "30%",
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Typography sx={{ fontSize: ".7rem" }}>Total </Typography>
+                    <Typography sx={{ fontSize: ".7rem", fontWeight: 600 }}>
+                      ₹{" "}
+                      {selectedBills?.itemsList?.reduce((sum, item) => {
+                        const quantity =
+                          item.uom === "gram" ? item.qty / 1000 : item.qty;
+                        return sum + quantity * item.rate;
+                      }, 0)}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      width: "30%",
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Typography sx={{ fontSize: ".7rem" }}>
+                      Return Amount{" "}
+                    </Typography>
+                    <Typography sx={{ fontSize: ".7rem", fontWeight: 600 }}>
+                      ₹{" "}
+                      {Number(selectedBills?.total_amount) -
+                        selectedBills?.itemsList?.reduce((sum, item) => {
+                          const quantity =
+                            item.uom === "gram" ? item.qty / 1000 : item.qty;
+                          return sum + quantity * item.rate;
+                        }, 0)}
+                    </Typography>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      width: "30%",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mt: 3,
+                    }}
+                  >
+                    <Button
+                      sx={{
+                        height: "",
+                        opacity:
+                          selectedBills?.itemsList?.length === 0
+                            ? ".5"
+                            : "auto",
+                      }}
+                      fullWidth
+                      onClick={() => handleReturnBill()}
+                    >
+                      Bill again
+                    </Button>
+                  </Box>
                 </Box>
               </Box>
             </Box>
           </Box>
-        </Box>
-
-        
+        ) : (
+          <Box
+            sx={{
+              width: "70%",
+              height: "100%",
+              boxSizing: "border-box",
+              overflow: "scroll",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Typography>Select The Listed Bills</Typography>
+          </Box>
+        )}
       </Box>
     </Box>
   );

@@ -33,8 +33,22 @@ contextBridge.exposeInMainWorld("electronAPI", {
   createBill: (data) => ipcRenderer.invoke("create-bill", data),
   getBills: (fromDate, toDate, payment_method) =>
     ipcRenderer.invoke("get-bills", { fromDate, toDate, payment_method }),
-  getBill: (id) => ipcRenderer.invoke("get-bill", id),
+  getBillBySearch: (bill_number, payment_method) =>
+    ipcRenderer.invoke("get-bill-by-search", { bill_number, payment_method }),
+  returnBill: (id, updatedData, tempRemoveItem) =>
+    ipcRenderer.invoke("return-bill", { id, updatedData, tempRemoveItem }),
+
   updateBill: (id, updatedData) =>
     ipcRenderer.invoke("update-bill", { id, updatedData }),
+
+  payCreditBillBalance: (bill_number, received_amount) =>
+    ipcRenderer.invoke("pay-credit-bill-balance", {
+      bill_number,
+      received_amount,
+    }),
+
+  updateBillPaymentMethod: (id, payment_method) =>
+    ipcRenderer.invoke("update-bill-payment-method", { id, payment_method }),
+
   deleteBill: (id) => ipcRenderer.invoke("delete-bill", id),
 });

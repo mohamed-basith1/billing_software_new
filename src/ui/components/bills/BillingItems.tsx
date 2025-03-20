@@ -35,7 +35,7 @@ const BillingItems = () => {
   const columns: GridColDef[] = [
     {
       field: "action",
-      headerName: "",
+      headerName: "#",
       flex: 0.5,
       align: "center",
       headerAlign: "center",

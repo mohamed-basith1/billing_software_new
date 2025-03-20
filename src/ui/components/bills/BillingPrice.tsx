@@ -36,7 +36,7 @@ const BillingPrice = () => {
 
   const theme: any = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
+  console.log("paymentMethod", paymentMethod);
   useEffect(() => {
     const selectedBill =
       selectBill.find((data: any) => data.bill_number === selectCurrentTab) ||
@@ -223,7 +223,12 @@ const BillingPrice = () => {
         <Button
           fullWidth
           variant="contained"
-          sx={{ bgcolor: "#1E1E2D", fontSize: isMobile ? "0.9rem" : "1rem" }}
+          sx={{
+            bgcolor: "#1E1E2D",
+            fontSize: isMobile ? "0.9rem" : "1rem",
+            opacity: paymentMethod === null ? ".5" : "auto",
+            pointerEvents: paymentMethod === null ? "none" : "auto",
+          }}
           onClick={() => {
             if (Number(TotalAmount) !== 0) {
               if (paymentMethod === "Credit Bill") {

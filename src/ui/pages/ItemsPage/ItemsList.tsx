@@ -61,9 +61,9 @@ const ItemsList = () => {
             color: green[500],
             tab: 1,
           },
-          { label: "Expired Items", value: "$2,096", color: blue[700], tab: 2 },
+          // { label: "Expired Items", value: "$2,096", color: blue[700], tab: 2 },
           {
-            label: "Total Items Price",
+            label: "Total Stock Price",
             value: `₹${Math.round(itemSummary?.total_item_price)}`,
             color: orange[500],
             tab: 3,
@@ -74,9 +74,18 @@ const ItemsList = () => {
               onClick={() => dispatch(setItemsTab(stat.tab))}
               elevation={0}
               sx={{
-                backgroundColor: itemsTab === stat.tab ? "rgba(250, 160, 30, .4)" : "white",
-                // color: itemsTab === stat.tab ? "inherit" : "inherit",
-                bgcolor: "white",
+                background:
+                  itemsTab === stat.tab
+                    ? `linear-gradient(133deg, rgba(255,255,255,1) 88%, ${
+                        stat.tab === 0
+                          ? "darkorange"
+                          : stat.tab === 1
+                          ? "rgb(20, 110, 150)"
+                          : stat.tab === 2
+                          ? "rgba(255,50,50)"
+                          : "rgba(50, 200, 120)"
+                      } 87%)`
+                    : "white",
                 color: "inherit",
                 height: "100%",
                 boxShadow: "0px",
@@ -85,18 +94,20 @@ const ItemsList = () => {
                 display: "flex",
                 alignItems: "center",
                 p: 2.5,
-                cursor: stat.label !== "Total Items Price" ? "pointer" : "auto",
-                transition: "box-shadow 0.5s ease-in-out", // Ensure smooth transition in both directions
 
+                cursor: stat.label !== "Total Stock Price" ? "pointer" : "auto",
+                transition: "box-shadow 0.5s ease-in-out", // Ensure smooth transition in both directions
+                pointerEvents:
+                  stat.label !== "Total Stock Price" ? "auto" : "none",
                 "&:hover": {
                   boxShadow:
-                    stat.label !== "Total Items Price"
+                    stat.label !== "Total Stock Price"
                       ? "0px 1px 2px rgba(0,0,0,.3)"
                       : "auto",
                   "& .MuiSvgIcon-root": {
                     // color:"rgb(30, 120, 80)" "#22b378",
                     fontSize:
-                      stat.label !== "Total Items Price" ? "3rem" : "auto",
+                      stat.label !== "Total Stock Price" ? "3rem" : "auto",
                   },
                 },
 
@@ -109,7 +120,7 @@ const ItemsList = () => {
               <CardContent
                 sx={{
                   bgcolor:
-                    stat.label === "Total Items Price"
+                    stat.label === "Total Stock Price"
                       ? "rgba(50, 200, 120, .3)" // Brighter green
                       : stat.label === "Low Stocks Items"
                       ? "rgba(40, 180, 220, .3)" // Brighter blue
@@ -140,7 +151,7 @@ const ItemsList = () => {
                       transition: "background-color 3s ease",
                     }}
                   />
-                ) : stat.label === "Total Items Price" ? (
+                ) : stat.label === "Total Stock Price" ? (
                   <CurrencyRupeeIcon
                     sx={{
                       fontSize: itemsTab === 3 ? "2.5rem" : "1.5rem",

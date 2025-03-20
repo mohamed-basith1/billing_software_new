@@ -299,6 +299,31 @@ export const fetchBills = async (
   );
   return response;
 };
+
+export const aggregateItemsByCode=(data)=> {
+  const aggregated: any = {};
+
+  data.forEach((item: any) => {
+    const { code, qty, rate, uom } = item;
+
+    if (!aggregated[code]) {
+      aggregated[code] = { ...item, qty: 0 }; // Initialize qty to 0
+    }
+
+    aggregated[code].qty += qty; // Sum up qty
+  });
+
+  // Recalculate amount based on qty and rate
+  Object.values(aggregated).forEach((item: any) => {
+    if (item.uom === "gram") {
+      item.amount = (item.qty / 1000) * item.rate; // Convert grams to kg
+    } else {
+      item.amount = item.qty * item.rate;
+    }
+  });
+
+  return Object.values(aggregated);
+}
 //dark
 export const colorsList = [
   "rgb(30, 120, 80)", // Dark Green
@@ -311,3 +336,9 @@ export const colorsList = [
 export const getTotalAmount = <T>(bills: T[], key: keyof T): number => {
   return bills.reduce((sum, bill) => sum + (bill[key] as number), 0);
 };
+
+export const filterTodayBills=(bills:any)=> {
+  const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+
+  return bills.filter(bill => bill.createdAt.startsWith(today));
+}

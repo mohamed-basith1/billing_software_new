@@ -7,6 +7,8 @@ import PaymentsUPI from "./PaymentsUPI";
 import PaymentsCash from "./PaymentsCash";
 import PaymentsCredit from "./PaymentsCredit";
 
+import PayCreditBillModal from "../../components/modals/PayCreditBillModal";
+
 const PaymentsPage = () => {
   const currentTab = useSelector(selectCurrentPaymentsTab);
   return (
@@ -22,12 +24,13 @@ const PaymentsPage = () => {
       <PaymentsTabs />
 
       {currentTab === 0 ? (
-        <PaymentsUPI />
-      ) : currentTab === 1 ? (
         <PaymentsCash />
+      ) : currentTab === 1 ? (
+        <PaymentsUPI />
       ) : (
         <PaymentsCredit />
       )}
+      <PayCreditBillModal />
     </Box>
   );
 };
