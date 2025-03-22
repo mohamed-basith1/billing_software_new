@@ -72,7 +72,7 @@ export default function CustomSidebar() {
                     <Route path="/" element={<BillsPage />} />
                     <Route path="/customers" element={<CustomersPage />} />
                     <Route path="/items" element={<ItemsPage />} />
-                    <Route path="/payments" element={<PaymentsPage />} />
+                  <Route path="/payments" element={<PaymentsPage />} />
                     <Route path="/reports" element={<ReportsPage />} />
                   </>
                 )}

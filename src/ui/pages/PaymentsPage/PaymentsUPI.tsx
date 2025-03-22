@@ -1,6 +1,7 @@
 import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import PublishedWithChangesIcon from "@mui/icons-material/PublishedWithChanges";
+import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import QrCode2Icon from "@mui/icons-material/QrCode2";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import {
@@ -35,14 +36,17 @@ import {
   setFromDate,
   setItemRemove,
   setPaymentChange,
+  setReturnBillHistoryModal,
   setReturnItem,
   setSelectedBills,
   setToDate,
   setUPIBillsList,
   setnewReturnBill,
 } from "./PaymentsSlice";
+import { selectUserName } from "../LoginPage/LoginSlice";
 
 const PaymentsUPI = () => {
+  console.log("render in upi")
   const columns: GridColDef[] = [
     {
       field: "action",
@@ -130,8 +134,9 @@ const PaymentsUPI = () => {
   const selectedBills: any = useSelector(selectSelectedBills);
   const tempRemoveItem: any = useSelector(selectTempRemoveItem);
   const billSearch: any = useSelector(selectBillSearch);
+  const userName = useSelector(selectUserName);
   const dispatch: any = useDispatch();
-  console.log("fromDate", fromDate, toDate);
+  console.log("tempRemoveItem", tempRemoveItem, "selectedBills", selectedBills);
   useEffect(() => {
     dispatch(setFromDate(dayjs().subtract(1, "month")));
     dispatch(setToDate(dayjs()));
@@ -153,7 +158,7 @@ const PaymentsUPI = () => {
       ...bill,
       // _id: bill._id.toString(),
     }));
-console.log("serializedData",serializedData);
+    console.log("serializedData", serializedData);
     dispatch(setUPIBillsList(serializedData));
   };
   const handleBillSearch = async (billnumber: string) => {
@@ -180,33 +185,30 @@ console.log("serializedData",serializedData);
     dispatch(setUPIBillsList(response.data));
   };
   const handleReturnBill = async () => {
-    function updateBillAmounts(bill: any) {
-      let subAmount = 0;
+    let returnBillHistoryPayload = {
+      bill_number: selectedBills.bill_number,
+      previous_bill_amount: UPIBillsList?.find(
+        (data: any) => data.bill_number === selectedBills.bill_number
+      ).total_amount,
+      returned_items: tempRemoveItem,
+      returned_amount:
+        UPIBillsList.find(
+          (data: any) => data.bill_number === selectedBills.bill_number
+        )?.itemsList?.reduce((sum, item) => {
+          const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
+          return sum + quantity * item.rate;
+        }, 0) - Number(selectedBills?.total_amount),
+      returned_by: userName,
+    };
 
-      // Calculate the subAmount based on qty * rate
-      bill.itemsList.forEach((item: any) => {
-        if (item.uom.toLowerCase() === "gram") {
-          subAmount += (item.qty / 1000) * item.rate;
-        } else {
-          subAmount += item.qty * item.rate;
-        }
-      });
+    // createBillReturnHistory
+    // @ts-ignore
+    await window.electronAPI.createBillReturnHistory(returnBillHistoryPayload);
 
-      // Return a new updated object
-      return {
-        ...bill,
-        sub_amount: parseFloat(subAmount.toFixed(2)),
-        total_amount: parseFloat((subAmount - (bill.discount || 0)).toFixed(2)),
-        amount_paid: parseFloat(subAmount.toFixed(2)), // Assuming full payment
-      };
-    }
-    console.log("selectedBills", selectedBills);
-    const updatedBill = updateBillAmounts(selectedBills);
-    console.log("updatedBill", updatedBill);
     //@ts-ignore
     let response: any = await window.electronAPI.returnBill(
-      updatedBill._id,
-      updatedBill,
+      selectedBills._id,
+      selectedBills,
       tempRemoveItem
     );
     dispatch(setnewReturnBill(response.data));
@@ -570,6 +572,30 @@ console.log("serializedData",serializedData);
                 />
                 GENERATE INVOICE
               </Box>
+              <Box
+                sx={{
+                  px: 2,
+                  py: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  borderRight: ".1px solid lightgrey",
+                  cursor: "pointer",
+
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 215, 0, 0.2)", // Gold-like yellow
+                    color: "#9A7D0A", // Dark golden text
+                  },
+                  fontSize: ".7rem",
+                }}
+                onClick={() => dispatch(setReturnBillHistoryModal(true))}
+              >
+                <HistoryOutlinedIcon
+                  sx={{ fontSize: "1rem", color: "inherit" }}
+                />
+                RETURN BILL HISTORY
+              </Box>
             </Box>
 
             <Box sx={{ bgcolor: "white", height: "100%" }}>
@@ -741,11 +767,12 @@ console.log("serializedData",serializedData);
                       Sub Total{" "}
                     </Typography>
                     <Typography sx={{ fontSize: ".7rem" }}>
-                      {selectedBills?.itemsList?.reduce((sum, item) => {
+                      {selectedBills?.sub_amount}
+                      {/* {selectedBills?.itemsList?.reduce((sum, item) => {
                         const quantity =
                           item.uom === "gram" ? item.qty / 1000 : item.qty;
                         return sum + quantity * item.rate;
-                      }, 0)}
+                      }, 0)} */}
                     </Typography>
                   </Box>
                   <Box
@@ -771,12 +798,12 @@ console.log("serializedData",serializedData);
                   >
                     <Typography sx={{ fontSize: ".7rem" }}>Total </Typography>
                     <Typography sx={{ fontSize: ".7rem", fontWeight: 600 }}>
-                      ₹{" "}
-                      {selectedBills?.itemsList?.reduce((sum, item) => {
+                      ₹ {selectedBills?.total_amount}
+                      {/* {selectedBills?.itemsList?.reduce((sum, item) => {
                         const quantity =
                           item.uom === "gram" ? item.qty / 1000 : item.qty;
                         return sum + quantity * item.rate;
-                      }, 0)}
+                      }, 0)} */}
                     </Typography>
                   </Box>
                   <Box
@@ -791,12 +818,14 @@ console.log("serializedData",serializedData);
                     </Typography>
                     <Typography sx={{ fontSize: ".7rem", fontWeight: 600 }}>
                       ₹{" "}
-                      {Number(selectedBills?.total_amount) -
-                        selectedBills?.itemsList?.reduce((sum, item) => {
-                          const quantity =
-                            item.uom === "gram" ? item.qty / 1000 : item.qty;
-                          return sum + quantity * item.rate;
-                        }, 0)}
+                      {UPIBillsList.find(
+                        (data: any) =>
+                          data.bill_number === selectedBills.bill_number
+                      )?.itemsList?.reduce((sum, item) => {
+                        const quantity =
+                          item.uom === "gram" ? item.qty / 1000 : item.qty;
+                        return sum + quantity * item.rate;
+                      }, 0) - Number(selectedBills?.total_amount)}
                     </Typography>
                   </Box>
 

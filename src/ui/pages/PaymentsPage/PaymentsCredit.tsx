@@ -2,6 +2,7 @@ import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 
+import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import {
   Box,
@@ -39,6 +40,7 @@ import {
   setItemRemove,
   setPayCreditBalanceModal,
   setPaymentChange,
+  setReturnBillHistoryModal,
   setReturnItem,
   setSelectedBills,
   setToDate,
@@ -47,6 +49,7 @@ import {
 } from "./PaymentsSlice";
 
 const PaymentsCredit = () => {
+  console.log("render in credit")
   const columns: GridColDef[] = [
     {
       field: "action",
@@ -183,33 +186,33 @@ const PaymentsCredit = () => {
     dispatch(setUPIBillsList(response.data));
   };
   const handleReturnBill = async () => {
-    function updateBillAmounts(bill: any) {
-      let subAmount = 0;
+    // function updateBillAmounts(bill: any) {
+    //   let subAmount = 0;
 
-      // Calculate the subAmount based on qty * rate
-      bill.itemsList.forEach((item: any) => {
-        if (item.uom.toLowerCase() === "gram") {
-          subAmount += (item.qty / 1000) * item.rate;
-        } else {
-          subAmount += item.qty * item.rate;
-        }
-      });
+    //   // Calculate the subAmount based on qty * rate
+    //   bill.itemsList.forEach((item: any) => {
+    //     if (item.uom.toLowerCase() === "gram") {
+    //       subAmount += (item.qty / 1000) * item.rate;
+    //     } else {
+    //       subAmount += item.qty * item.rate;
+    //     }
+    //   });
 
-      // Return a new updated object
-      return {
-        ...bill,
-        sub_amount: parseFloat(subAmount.toFixed(2)),
-        total_amount: parseFloat((subAmount - (bill.discount || 0)).toFixed(2)),
-        balance: parseFloat((subAmount - bill.amount_paid).toFixed(2)), // Assuming full payment
-      };
-    }
-    console.log("selectedBills", selectedBills);
-    const updatedBill = updateBillAmounts(selectedBills);
-    console.log("updatedBill", updatedBill);
+    //   // Return a new updated object
+    //   return {
+    //     ...bill,
+    //     sub_amount: parseFloat(subAmount.toFixed(2)),
+    //     total_amount: parseFloat((subAmount - (bill.discount || 0)).toFixed(2)),
+    //     balance: parseFloat((subAmount - bill.amount_paid).toFixed(2)), // Assuming full payment
+    //   };
+    // }
+    // console.log("selectedBills", selectedBills);
+    // const updatedBill = updateBillAmounts(selectedBills);
+    // console.log("updatedBill", updatedBill);
     //@ts-ignore
     let response: any = await window.electronAPI.returnBill(
-      updatedBill._id,
-      updatedBill,
+      selectedBills._id,
+      selectedBills,
       tempRemoveItem
     );
     dispatch(setnewReturnBill(response.data));
@@ -226,6 +229,8 @@ const PaymentsCredit = () => {
     dispatch(setPaymentChange(response.data));
     toast.success(`${response.message}`, { position: "bottom-left" });
   };
+
+  console.log("selectedBills credit", selectedBills);
   return (
     <Box
       sx={{
@@ -575,7 +580,7 @@ const PaymentsCredit = () => {
                 <ReceiptLongOutlinedIcon
                   sx={{ fontSize: "1rem", color: "inherit" }}
                 />
-                Pay Credit Balance
+                PAY CREDIT BALANCE
               </Box>
 
               <Box
@@ -608,6 +613,30 @@ const PaymentsCredit = () => {
                   sx={{ fontSize: "1rem", color: "inherit" }}
                 />
                 GENERATE INVOICE
+              </Box>
+              <Box
+                sx={{
+                  px: 2,
+                  py: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  borderRight: ".1px solid lightgrey",
+                  cursor: "pointer",
+
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 215, 0, 0.2)", // Gold-like yellow
+                    color: "#9A7D0A", // Dark golden text
+                  },
+                  fontSize: ".7rem",
+                }}
+                onClick={() => dispatch(setReturnBillHistoryModal(true))}
+              >
+                <HistoryOutlinedIcon
+                  sx={{ fontSize: "1rem", color: "inherit" }}
+                />
+                RETURN BILL HISTORY
               </Box>
             </Box>
 
@@ -780,11 +809,12 @@ const PaymentsCredit = () => {
                       Sub Total{" "}
                     </Typography>
                     <Typography sx={{ fontSize: ".7rem" }}>
-                      {selectedBills?.itemsList?.reduce((sum, item) => {
+                      {selectedBills?.sub_amount}
+                      {/* {selectedBills?.itemsList?.reduce((sum, item) => {
                         const quantity =
                           item.uom === "gram" ? item.qty / 1000 : item.qty;
                         return sum + quantity * item.rate;
-                      }, 0)}
+                      }, 0)} */}
                     </Typography>
                   </Box>
                   <Box
@@ -810,12 +840,12 @@ const PaymentsCredit = () => {
                   >
                     <Typography sx={{ fontSize: ".7rem" }}>Total </Typography>
                     <Typography sx={{ fontSize: ".7rem", fontWeight: 600 }}>
-                      ₹{" "}
-                      {selectedBills?.itemsList?.reduce((sum, item) => {
+                      ₹ {selectedBills?.total_amount}
+                      {/* {selectedBills?.itemsList?.reduce((sum, item) => {
                         const quantity =
                           item.uom === "gram" ? item.qty / 1000 : item.qty;
                         return sum + quantity * item.rate;
-                      }, 0)}
+                      }, 0)} */}
                     </Typography>
                   </Box>
 
@@ -856,14 +886,15 @@ const PaymentsCredit = () => {
                         color: "rgb(193,9,21)",
                       }}
                     >
-                      ₹ {selectedBills?.itemsList?.reduce((sum, item) => {
+                      ₹{" "}
+                      {selectedBills?.itemsList?.reduce((sum, item) => {
                         const quantity =
                           item.uom === "gram" ? item.qty / 1000 : item.qty;
                         return sum + quantity * item.rate;
                       }, 0) - selectedBills?.amount_paid}
                     </Typography>
                   </Box>
-                  <Box
+                  {/* <Box
                     sx={{
                       width: "30%",
                       display: "flex",
@@ -875,19 +906,21 @@ const PaymentsCredit = () => {
                     </Typography>
                     <Typography sx={{ fontSize: ".7rem", fontWeight: 600 }}>
                       ₹{" "}
-
-
-                      {selectedBills.paid?Math.max(
-                        0,
-                        Number(selectedBills?.amount_paid) -
-                          selectedBills?.itemsList?.reduce((sum, item) => {
-                            const quantity =
-                              item.uom === "gram" ? item.qty / 1000 : item.qty;
-                            return sum + quantity * item.rate;
-                          }, 0)
-                      ):0}
+                      {selectedBills.paid
+                        ? Math.max(
+                            0,
+                            Number(selectedBills?.amount_paid) -
+                              selectedBills?.itemsList?.reduce((sum, item) => {
+                                const quantity =
+                                  item.uom === "gram"
+                                    ? item.qty / 1000
+                                    : item.qty;
+                                return sum + quantity * item.rate;
+                              }, 0)
+                          )
+                        : 0}
                     </Typography>
-                  </Box>
+                  </Box> */}
 
                   <Box
                     sx={{

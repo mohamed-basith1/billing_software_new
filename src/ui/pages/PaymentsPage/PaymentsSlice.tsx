@@ -12,6 +12,8 @@ const initialState: any = {
   toDate: null,
   payCreditBalance: 0,
   payCreditBalanceModal: false,
+  returnBillHistoryModal: false,
+  returnBillHistoryList: [],
 };
 
 const paymentSlice = createSlice({
@@ -32,16 +34,36 @@ const paymentSlice = createSlice({
       console.log("remove code", action.payload);
       const codeToRemove = action.payload;
 
+      if (!state.selectedBills) return; // Prevent errors if `selectedBills` is undefined
+
+      // Aggregate removed items by code
       state.tempRemoveItem = aggregateItemsByCode([
         ...state.tempRemoveItem,
         ...state.selectedBills.itemsList.filter(
           (item) => item.code === codeToRemove
         ),
       ]);
-      state.selectedBills.itemsList = state.selectedBills.itemsList.filter(
+
+      // Filter out the removed item
+      const updatedItems = state.selectedBills.itemsList.filter(
         (item) => item.code !== codeToRemove
       );
+
+      // Calculate new total amount
+      const totalAmount = updatedItems.reduce((sum, item) => {
+        const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
+        return sum + quantity * item.rate;
+      }, 0);
+
+      console.log("Total amount after reduce:", totalAmount);
+
+      // Update state correctly
+      state.selectedBills.itemsList = updatedItems;
+      state.selectedBills.sub_amount = totalAmount;
+      state.selectedBills.total_amount =
+        totalAmount - (state.selectedBills.discount || 0);
     },
+
     setReturnItem: (state, action) => {
       const index = state.selectedBills.itemsList.findIndex(
         (item) => item.code === action.payload.code
@@ -60,6 +82,22 @@ const paymentSlice = createSlice({
 
         // Update the item in selectedBills
         state.selectedBills.itemsList[index] = action.payload;
+
+        let removeSelectedItem = [
+          ...state.selectedBills.itemsList.filter(
+            (data: any) => data.code !== action.payload.code
+          ),
+          action.payload,
+        ];
+        const totalAmount = removeSelectedItem.reduce((sum, item) => {
+          const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
+          return sum + quantity * item.rate;
+        }, 0);
+
+        state.selectedBills.sub_amount = totalAmount;
+        state.selectedBills.total_amount =
+          totalAmount - (state.selectedBills.discount || 0);
+
         let tempRemoveItemData = [
           ...state.tempRemoveItem,
           { ...action.payload, qty: qtyDifference },
@@ -102,6 +140,15 @@ const paymentSlice = createSlice({
       state.payCreditBalanceModal = action.payload;
       state.payCreditBalance = 0;
     },
+    setReturnBillHistoryModal: (state, action) => {
+      state.returnBillHistoryModal = action.payload;
+    },
+    setReturnBillHistoryList: (state, action) => {
+
+      console.log("Action action.payload",action.payload)
+      state.returnBillHistoryList = action.payload;
+    },
+
     clearPaymentBillsDetail: (state) => {
       state.UPIBillsList = [];
       state.selectedBills = {};
@@ -130,6 +177,8 @@ export const {
   clearPaymentBillsDetail,
   setPayCreditBalance,
   setPayCreditBalanceModal,
+  setReturnBillHistoryModal,
+  setReturnBillHistoryList,
 } = paymentSlice.actions;
 
 // Selectors
@@ -146,5 +195,9 @@ export const selectPayCreditBalance = (state: any) =>
   state.payments.payCreditBalance;
 export const selectPayCreditBalanceModal = (state: any) =>
   state.payments.payCreditBalanceModal;
+export const selectReturnBillHistoryModal = (state: any) =>
+  state.payments.returnBillHistoryModal;
+export const selectReturnBillHistoryList = (state: any) =>
+  state.payments.returnBillHistoryList;
 
 export default paymentSlice.reducer;

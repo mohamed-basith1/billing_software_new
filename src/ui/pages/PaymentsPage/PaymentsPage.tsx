@@ -8,9 +8,11 @@ import PaymentsCash from "./PaymentsCash";
 import PaymentsCredit from "./PaymentsCredit";
 
 import PayCreditBillModal from "../../components/modals/PayCreditBillModal";
+import ReturnBillHistoryModal from "../../components/modals/ReturnBillModal";
 
 const PaymentsPage = () => {
   const currentTab = useSelector(selectCurrentPaymentsTab);
+  console.log("render in payment")
   return (
     <Box
       sx={{
@@ -22,7 +24,9 @@ const PaymentsPage = () => {
       }}
     >
       <PaymentsTabs />
-
+      {/* <PaymentsCash /> */}
+      {/* <PaymentsUPI /> */}
+      {/* <PaymentsCredit /> */}
       {currentTab === 0 ? (
         <PaymentsCash />
       ) : currentTab === 1 ? (
@@ -31,8 +35,9 @@ const PaymentsPage = () => {
         <PaymentsCredit />
       )}
       <PayCreditBillModal />
+      <ReturnBillHistoryModal/>
     </Box>
   );
 };
 
-export default PaymentsPage;
+export default React.memo(PaymentsPage);

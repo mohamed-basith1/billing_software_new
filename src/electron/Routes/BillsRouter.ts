@@ -1,5 +1,6 @@
 import { ipcMain } from "electron";
 import BillsModel from "../models/BillsModel.js";
+import ReturnBillsHistoryModel from "../models/ReturnBillsHistoryModel.js";
 import Item from "../models/ItemsModel.js";
 export function BillsRouter() {
   // Create Bill
@@ -163,7 +164,7 @@ export function BillsRouter() {
         return {
           status: 200,
           message: "Bill updated successfully, and stock quantities adjusted.",
-          data: bill,
+          data: JSON.parse(JSON.stringify(bill)),
         };
       } catch (error: any) {
         console.error("Error updating bill:", error);
@@ -344,3 +345,56 @@ export function BillsRouter() {
     }
   });
 }
+
+ipcMain.handle("create-return-bill-history", async (_, data) => {
+  try {
+    console.log("Creating return bill:", data);
+
+    const newReturnBill = new ReturnBillsHistoryModel(data);
+    await newReturnBill.save();
+
+    return {
+      status: 201,
+      message: "Return bill created successfully.",
+      data: newReturnBill.toObject(), // FIXED
+    };
+  } catch (error: any) {
+    console.error("Error creating return bill:", error);
+    return {
+      status: 500,
+      message: "Internal server error.",
+      error: error.message,
+    };
+  }
+});
+
+
+ipcMain.handle("get-return-bills-history", async (_, { bill_number }) => {
+  try {
+    console.log("Fetching return bills for:", bill_number);
+
+    const returnBills = await ReturnBillsHistoryModel.find({
+      bill_number,
+    }).lean();
+
+    if (!returnBills.length) {
+      return {
+        status: 404,
+        message: "No return bills found for this bill number.",
+      };
+    }
+
+    return {
+      status: 200,
+      message: "Return bills fetched successfully.",
+      data: JSON.parse(JSON.stringify(returnBills)),
+    };
+  } catch (error: any) {
+    console.error("Error fetching return bills:", error);
+    return {
+      status: 500,
+      message: "Internal server error.",
+      error: error.message,
+    };
+  }
+});
