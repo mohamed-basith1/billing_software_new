@@ -37,6 +37,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.invoke("get-bill-by-search", { bill_number, payment_method }),
   returnBill: (id, updatedData, tempRemoveItem) =>
     ipcRenderer.invoke("return-bill", { id, updatedData, tempRemoveItem }),
+  returnPendingAmount: (id, returnPendingAmount) =>
+    ipcRenderer.invoke("return-pending-amount", { id, returnPendingAmount }),
 
   updateBill: (id, updatedData) =>
     ipcRenderer.invoke("update-bill", { id, updatedData }),

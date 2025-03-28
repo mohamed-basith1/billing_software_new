@@ -4,6 +4,8 @@ import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import RepeatOutlinedIcon from "@mui/icons-material/RepeatOutlined";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import {
   Box,
   Button,
@@ -29,6 +31,7 @@ import {
 } from "../../utils/utils";
 import {
   clearPaymentBillsDetail,
+  clearReturnBillDetail,
   selectBillSearch,
   selectFromDate,
   selectSelectedBills,
@@ -47,9 +50,10 @@ import {
   setUPIBillsList,
   setnewReturnBill,
 } from "./PaymentsSlice";
+import { selectUserName } from "../LoginPage/LoginSlice";
 
 const PaymentsCredit = () => {
-  console.log("render in credit")
+  console.log("render in credit");
   const columns: GridColDef[] = [
     {
       field: "action",
@@ -138,6 +142,7 @@ const PaymentsCredit = () => {
   const tempRemoveItem: any = useSelector(selectTempRemoveItem);
   const billSearch: any = useSelector(selectBillSearch);
   const dispatch: any = useDispatch();
+  const userName = useSelector(selectUserName);
   console.log("UPIBillsList", UPIBillsList);
   useEffect(() => {
     dispatch(setFromDate(dayjs().subtract(1, "month")));
@@ -186,29 +191,47 @@ const PaymentsCredit = () => {
     dispatch(setUPIBillsList(response.data));
   };
   const handleReturnBill = async () => {
-    // function updateBillAmounts(bill: any) {
-    //   let subAmount = 0;
+    let UPIBillsListSelectedBill = UPIBillsList?.find(
+      (data: any) => data.bill_number === selectedBills.bill_number
+    );
 
-    //   // Calculate the subAmount based on qty * rate
-    //   bill.itemsList.forEach((item: any) => {
-    //     if (item.uom.toLowerCase() === "gram") {
-    //       subAmount += (item.qty / 1000) * item.rate;
-    //     } else {
-    //       subAmount += item.qty * item.rate;
-    //     }
-    //   });
+    console.log(
+      "selectedBills sjdijsdi",
+      selectedBills,
+      "UPIBillsList",
+      UPIBillsListSelectedBill
+    );
+    let returnBillHistoryPayload = {
+      bill_number: selectedBills.bill_number,
+      previous_bill_amount: UPIBillsListSelectedBill.total_amount,
+      returned_items: tempRemoveItem,
+      returned_amount: Math.max(
+        selectedBills?.amount_paid -
+          selectedBills?.itemsList?.reduce((sum, item) => {
+            const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
+            return sum + quantity * item.rate;
+          }, 0),
+        0
+      ),
 
-    //   // Return a new updated object
-    //   return {
-    //     ...bill,
-    //     sub_amount: parseFloat(subAmount.toFixed(2)),
-    //     total_amount: parseFloat((subAmount - (bill.discount || 0)).toFixed(2)),
-    //     balance: parseFloat((subAmount - bill.amount_paid).toFixed(2)), // Assuming full payment
-    //   };
-    // }
-    // console.log("selectedBills", selectedBills);
-    // const updatedBill = updateBillAmounts(selectedBills);
-    // console.log("updatedBill", updatedBill);
+      returned_by: userName,
+    };
+
+    console.log("returnBillHistoryPayload", returnBillHistoryPayload);
+    // createBillReturnHistory
+
+    if (
+      UPIBillsList?.find(
+        (data: any) => data.bill_number === selectedBills.bill_number
+      ).total_amount !== selectedBills?.total_amount
+    ) {
+      // @ts-ignore
+      await window.electronAPI.createBillReturnHistory(
+        returnBillHistoryPayload
+      );
+    }
+
+    console.log("selectedBills return bill", selectedBills);
     //@ts-ignore
     let response: any = await window.electronAPI.returnBill(
       selectedBills._id,
@@ -217,20 +240,24 @@ const PaymentsCredit = () => {
     );
     dispatch(setnewReturnBill(response.data));
     toast.success(`${response.message}`, { position: "bottom-left" });
+    dispatch(clearReturnBillDetail());
     console.log("return bill response", response);
   };
-  const handleChangePaymentMethod = async () => {
+
+  const handleReturnPendingAmount = async () => {
     //@ts-ignore
-    let response: any = await window.electronAPI.updateBillPaymentMethod(
+    let response: any = await window.electronAPI.returnPendingAmount(
       selectedBills._id,
-      "Cash Paid"
+      selectedBills.return_amount
     );
 
-    dispatch(setPaymentChange(response.data));
-    toast.success(`${response.message}`, { position: "bottom-left" });
+    console.log("response", response);
+    dispatch(setnewReturnBill(response.data));
+    dispatch(setSelectedBills(response.data));
   };
 
   console.log("selectedBills credit", selectedBills);
+
   return (
     <Box
       sx={{
@@ -386,7 +413,13 @@ const PaymentsCredit = () => {
               </Typography>
               <Box sx={{ display: "flex", gap: "60px" }}>
                 <Box>
-                  <Typography sx={{ color: "grey", fontSize: ".8rem" }}>
+                  <Typography
+                    sx={{
+                      color: "grey",
+                      fontSize: ".8rem",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
                     Total Credit Payments
                   </Typography>
                   <Typography sx={{ mt: 1 }}>
@@ -396,7 +429,13 @@ const PaymentsCredit = () => {
                 </Box>
 
                 <Box>
-                  <Typography sx={{ color: "grey", fontSize: ".8rem" }}>
+                  <Typography
+                    sx={{
+                      color: "grey",
+                      fontSize: ".8rem",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
                     Total Payments Received
                   </Typography>
                   <Typography sx={{ mt: 1 }}>
@@ -404,11 +443,32 @@ const PaymentsCredit = () => {
                   </Typography>
                 </Box>
                 <Box>
-                  <Typography sx={{ color: "grey", fontSize: ".8rem" }}>
+                  <Typography
+                    sx={{
+                      color: "grey",
+                      fontSize: ".8rem",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
                     Total Due Amount
                   </Typography>
                   <Typography sx={{ mt: 1 }}>
                     ₹{getTotalAmount(UPIBillsList, "balance")}
+                  </Typography>
+                </Box>
+
+                <Box>
+                  <Typography
+                    sx={{
+                      color: "grey",
+                      fontSize: ".8rem",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    Return Pending Amount
+                  </Typography>
+                  <Typography sx={{ mt: 1 }}>
+                    ₹{getTotalAmount(UPIBillsList, "return_amount")}
                   </Typography>
                 </Box>
               </Box>
@@ -531,6 +591,13 @@ const PaymentsCredit = () => {
                         ? "NOT PAID"
                         : "PARTIALLY PAID"}
                     </Typography>{" "}
+                    {data.return_amount > 0 ? (
+                      <Typography
+                        sx={{ fontWeight: 600, color: "rgb(193,9,21)" }}
+                      >
+                        ₹ {data.return_amount}
+                      </Typography>
+                    ) : null}
                   </Box>
                 </Box>
               );
@@ -553,9 +620,10 @@ const PaymentsCredit = () => {
                 width: "100%",
                 bgcolor: "#F7F7FE",
                 borderBottom: ".1px solid lightgrey",
-
                 boxShadow: "0px 11px 1px 0px rgba(0,0,0,0.15)",
                 justifyContent: "flex-start",
+                overflowX: "auto", // Enable horizontal scrolling
+                whiteSpace: "nowrap", // Prevent wrapping
               }}
             >
               <Box
@@ -638,6 +706,53 @@ const PaymentsCredit = () => {
                 />
                 RETURN BILL HISTORY
               </Box>
+              <Box
+                sx={{
+                  px: 2,
+                  py: 1,
+                  display: selectedBills.return_amount > 0 ? "flex" : "none",
+                  alignItems: "center",
+                  gap: "10px",
+                  borderRight: ".1px solid lightgrey",
+                  cursor: "pointer",
+
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: "rgba(156, 39, 176, .2)", //
+                    color: "#6A1B9A", // Deep purple text for contrast
+                  },
+                  fontSize: ".7rem",
+                }}
+                onClick={() => handleReturnPendingAmount()}
+              >
+                <RepeatOutlinedIcon
+                  sx={{ fontSize: "1rem", color: "inherit" }}
+                />
+                RETURN AMOUNT TRANSFORED
+              </Box>
+              <Box
+                sx={{
+                  px: 2,
+                  py: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  borderRight: ".1px solid lightgrey",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: "rgba(220, 53, 69, 0.2)", // Light red background
+                    color: "#C82333", // Deep red text for contrast
+                  },
+                  fontSize: ".7rem",
+                }}
+                onClick={() => dispatch(setReturnBillHistoryModal(true))}
+              >
+                <DeleteOutlineOutlinedIcon
+                  sx={{ fontSize: "1rem", color: "inherit" }}
+                />
+                DELETE
+              </Box>
             </Box>
 
             <Box sx={{ bgcolor: "white", height: "100%" }}>
@@ -677,6 +792,12 @@ const PaymentsCredit = () => {
                             }
                           )
                         : ""}
+                    </Typography>
+                    <Typography sx={{ mt: 2 }}>Customer Name</Typography>
+                    <Typography
+                      sx={{ fontSize: ".7rem", color: "grey", mt: 1 }}
+                    >
+                      {selectedBills?.customer_name}
                     </Typography>
                   </Box>
                   <Box
@@ -886,15 +1007,10 @@ const PaymentsCredit = () => {
                         color: "rgb(193,9,21)",
                       }}
                     >
-                      ₹{" "}
-                      {selectedBills?.itemsList?.reduce((sum, item) => {
-                        const quantity =
-                          item.uom === "gram" ? item.qty / 1000 : item.qty;
-                        return sum + quantity * item.rate;
-                      }, 0) - selectedBills?.amount_paid}
+                      ₹ {selectedBills?.balance}
                     </Typography>
                   </Box>
-                  {/* <Box
+                  <Box
                     sx={{
                       width: "30%",
                       display: "flex",
@@ -905,22 +1021,9 @@ const PaymentsCredit = () => {
                       Return Amount{" "}
                     </Typography>
                     <Typography sx={{ fontSize: ".7rem", fontWeight: 600 }}>
-                      ₹{" "}
-                      {selectedBills.paid
-                        ? Math.max(
-                            0,
-                            Number(selectedBills?.amount_paid) -
-                              selectedBills?.itemsList?.reduce((sum, item) => {
-                                const quantity =
-                                  item.uom === "gram"
-                                    ? item.qty / 1000
-                                    : item.qty;
-                                return sum + quantity * item.rate;
-                              }, 0)
-                          )
-                        : 0}
+                      ₹ {selectedBills?.return_amount}
                     </Typography>
-                  </Box> */}
+                  </Box>
 
                   <Box
                     sx={{

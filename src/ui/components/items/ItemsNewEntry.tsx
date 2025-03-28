@@ -64,14 +64,12 @@ const ItemsNewEntry = () => {
       if (
         marginPerUOM &&
         sellingPricePerUOM ===
-          (Number(perKgPurchasedPrice) + Number(marginPerUOM)).toFixed(2)
+          Number(perKgPurchasedPrice) + Number(marginPerUOM)
       ) {
         dispatch(
           setField({
             field: "sellingPricePerUOM",
-            value: (
-              Number(calculatedPerKgPrice) + Number(marginPerUOM)
-            ).toFixed(2),
+            value: Number(calculatedPerKgPrice) + Number(marginPerUOM),
           })
         );
       }
@@ -81,18 +79,18 @@ const ItemsNewEntry = () => {
       dispatch(
         setField({
           field: "sellingPricePerUOM",
-          value: (Number(value) + Number(marginPerUOM || 0)).toFixed(2),
+          value: Number(value) + Number(marginPerUOM || 0),
         })
       );
     }
 
     if (field === "sellingPrice") {
-      console.log("value", value);
+      console.log("value selling price", value);
 
       dispatch(
         setField({
           field: "sellingPricePerUOM",
-          value: Number(value).toFixed(2),
+          value: Number(value),
         })
       );
 
@@ -101,7 +99,7 @@ const ItemsNewEntry = () => {
         dispatch(
           setField({
             field: "marginPerUOM",
-            value: (Number(value) - Number(perKgPurchasedPrice)).toFixed(2),
+            value: Number(value) - Number(perKgPurchasedPrice),
           })
         );
       }
@@ -111,7 +109,7 @@ const ItemsNewEntry = () => {
       dispatch(
         setField({
           field: "sellingPricePerUOM",
-          value: (Number(perKgPurchasedPrice || 0) + Number(value)).toFixed(2),
+          value: Number(perKgPurchasedPrice || 0) + Number(value),
         })
       );
     }
@@ -209,7 +207,7 @@ const ItemsNewEntry = () => {
         toast.error(`${response.message}`, { position: "bottom-left" });
       } else {
         dispatch(setClearItems());
-        dispatch(setDateTigger())
+        dispatch(setDateTigger());
         toast.success(`${response.message}`, { position: "bottom-left" });
       }
     }

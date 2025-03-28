@@ -26,6 +26,7 @@ import {
 } from "../../utils/utils";
 import {
   clearPaymentBillsDetail,
+  clearReturnBillDetail,
   selectBillSearch,
   selectFromDate,
   selectSelectedBills,
@@ -46,7 +47,7 @@ import {
 import { selectUserName } from "../LoginPage/LoginSlice";
 
 const PaymentsUPI = () => {
-  console.log("render in upi")
+  console.log("render in upi");
   const columns: GridColDef[] = [
     {
       field: "action",
@@ -201,6 +202,7 @@ const PaymentsUPI = () => {
       returned_by: userName,
     };
 
+    console.log("returnBillHistoryPayload", returnBillHistoryPayload);
     // createBillReturnHistory
     // @ts-ignore
     await window.electronAPI.createBillReturnHistory(returnBillHistoryPayload);
@@ -213,6 +215,7 @@ const PaymentsUPI = () => {
     );
     dispatch(setnewReturnBill(response.data));
     toast.success(`${response.message}`, { position: "bottom-left" });
+    dispatch(clearReturnBillDetail())
     console.log("return bill response", response);
   };
   const handleChangePaymentMethod = async () => {

@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const ReturnBillsHistorySchema = new mongoose.Schema(
   {
-    bill_number: { type: String},
+    bill_number: { type: String,unique: false},
     returned_items: [],
     previous_bill_amount: { type: Number, required: true },
     returned_amount: { type: Number, required: true },

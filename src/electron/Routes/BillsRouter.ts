@@ -211,6 +211,51 @@ export function BillsRouter() {
       }
     }
   );
+
+  ipcMain.handle(
+    "return-pending-amount",
+    async (_, { id, returnPendingAmount }) => {
+
+      try {
+        // Prepare updated data with return_amount set to 0 and amount_paid set to returnPendingAmount
+        const updatedData = {
+          return_amount: 0,
+          amount_paid: returnPendingAmount,
+        };
+
+        // Update the bill using findOneAndUpdate, ensuring other fields remain unchanged
+        const bill = await BillsModel.findOneAndUpdate(
+          { _id: id },
+          { $set: updatedData }, // Update only the fields you want
+          {
+            new: true, // Ensure we return the updated document
+            upsert: false, // Do not create a new one if missing
+          }
+        ).lean(); // Convert to plain JavaScript object
+
+        if (!bill) {
+          return {
+            status: 404,
+            message: "Bill not found.",
+          };
+        }
+
+        return {
+          status: 200,
+          message: "Bill updated successfully, and stock quantities adjusted.",
+          data: JSON.parse(JSON.stringify(bill)),
+        };
+      } catch (error: any) {
+        console.error("Error updating bill:", error);
+        return {
+          status: 500,
+          message: "Internal server error.",
+          error: error.message,
+        };
+      }
+    }
+  );
+
   // Update Bill
   ipcMain.handle("update-bill", async (_, { id, updatedData }) => {
     try {
@@ -367,7 +412,6 @@ ipcMain.handle("create-return-bill-history", async (_, data) => {
     };
   }
 });
-
 
 ipcMain.handle("get-return-bills-history", async (_, { bill_number }) => {
   try {

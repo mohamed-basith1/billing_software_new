@@ -56,12 +56,31 @@ const paymentSlice = createSlice({
       }, 0);
 
       console.log("Total amount after reduce:", totalAmount);
+      let total_amount = totalAmount - (state.selectedBills.discount || 0);
+      let balance_amount = totalAmount - state.selectedBills.amount_paid;
 
+      console.log(
+        "balance_amount checking",
+        balance_amount,
+        state.selectedBills.amount_paid
+      );
       // Update state correctly
       state.selectedBills.itemsList = updatedItems;
       state.selectedBills.sub_amount = totalAmount;
-      state.selectedBills.total_amount =
-        totalAmount - (state.selectedBills.discount || 0);
+      state.selectedBills.total_amount = total_amount;
+      state.selectedBills.return_amount = Math.max(
+        state.selectedBills?.amount_paid -
+          updatedItems?.reduce((sum, item) => {
+            const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
+            return sum + quantity * item.rate;
+          }, 0),
+        0
+      );
+      state.selectedBills.balance = balance_amount < 0 ? 0 : balance_amount;
+      state.selectedBills.paid =
+        state.selectedBills.amount_paid >= state.selectedBills.total_amount
+          ? true
+          : false;
     },
 
     setReturnItem: (state, action) => {
@@ -93,16 +112,39 @@ const paymentSlice = createSlice({
           const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
           return sum + quantity * item.rate;
         }, 0);
-
+        let total_amount = totalAmount - (state.selectedBills.discount || 0);
+        let balance_amount = totalAmount - state.selectedBills.amount_paid;
+        console.log(
+          "balance_amount checking",
+          balance_amount,
+          state.selectedBills.amount_paid
+        );
         state.selectedBills.sub_amount = totalAmount;
-        state.selectedBills.total_amount =
-          totalAmount - (state.selectedBills.discount || 0);
+        state.selectedBills.total_amount = total_amount;
+        state.selectedBills.return_amount = Math.max(
+          state.selectedBills?.amount_paid -
+            state.selectedBills?.itemsList?.reduce((sum, item) => {
+              const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
+              return sum + quantity * item.rate;
+            }, 0),
+          0
+        );
+        state.selectedBills.balance = balance_amount < 0 ? 0 : balance_amount;
+        state.selectedBills.paid =
+          state.selectedBills.amount_paid >= state.selectedBills.total_amount
+            ? true
+            : false;
 
         let tempRemoveItemData = [
           ...state.tempRemoveItem,
           { ...action.payload, qty: qtyDifference },
         ];
-
+        console.log(
+          "tempRemoveItemData",
+          tempRemoveItemData,
+          "aggregateItemsByCode(tempRemoveItemData)",
+          aggregateItemsByCode(tempRemoveItemData)
+        );
         state.tempRemoveItem = aggregateItemsByCode(tempRemoveItemData);
       }
     },
@@ -144,8 +186,7 @@ const paymentSlice = createSlice({
       state.returnBillHistoryModal = action.payload;
     },
     setReturnBillHistoryList: (state, action) => {
-
-      console.log("Action action.payload",action.payload)
+      console.log("Action action.payload", action.payload);
       state.returnBillHistoryList = action.payload;
     },
 
@@ -157,6 +198,10 @@ const paymentSlice = createSlice({
       state.fromDate = null;
       state.toDate = null;
       state.payCreditBalance = 0;
+    },
+    clearReturnBillDetail: (state) => {
+      state.tempRemoveItem = [];
+      state.billSearch = "";
     },
   },
 });
@@ -179,6 +224,7 @@ export const {
   setPayCreditBalanceModal,
   setReturnBillHistoryModal,
   setReturnBillHistoryList,
+  clearReturnBillDetail,
 } = paymentSlice.actions;
 
 // Selectors

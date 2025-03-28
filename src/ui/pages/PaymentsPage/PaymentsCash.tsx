@@ -27,6 +27,7 @@ import {
 } from "../../utils/utils";
 import {
   clearPaymentBillsDetail,
+  clearReturnBillDetail,
   selectBillSearch,
   selectFromDate,
   selectSelectedBills,
@@ -46,6 +47,7 @@ import {
 } from "./PaymentsSlice";
 
 import { batch } from "react-redux";
+import { selectUserName } from "../LoginPage/LoginSlice";
 
 const PaymentsCash = () => {
   console.log("render in cash");
@@ -137,6 +139,7 @@ const PaymentsCash = () => {
   const tempRemoveItem: any = useSelector(selectTempRemoveItem);
   const billSearch: any = useSelector(selectBillSearch);
   const dispatch: any = useDispatch();
+  const userName = useSelector(selectUserName);
   console.log("fromDate", fromDate, toDate);
 
   useEffect(() => {
@@ -202,6 +205,29 @@ const PaymentsCash = () => {
     dispatch(setUPIBillsList(response.data));
   };
   const handleReturnBill = async () => {
+
+
+    let returnBillHistoryPayload = {
+      bill_number: selectedBills.bill_number,
+      previous_bill_amount: UPIBillsList?.find(
+        (data: any) => data.bill_number === selectedBills.bill_number
+      ).total_amount,
+      returned_items: tempRemoveItem,
+      returned_amount:
+        UPIBillsList.find(
+          (data: any) => data.bill_number === selectedBills.bill_number
+        )?.itemsList?.reduce((sum, item) => {
+          const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
+          return sum + quantity * item.rate;
+        }, 0) - Number(selectedBills?.total_amount),
+      returned_by: userName,
+    };
+
+    console.log("returnBillHistoryPayload", returnBillHistoryPayload);
+    // createBillReturnHistory
+    // @ts-ignore
+    await window.electronAPI.createBillReturnHistory(returnBillHistoryPayload);
+
     //@ts-ignore
     let response: any = await window.electronAPI.returnBill(
       selectedBills._id,
@@ -210,6 +236,7 @@ const PaymentsCash = () => {
     );
     dispatch(setnewReturnBill(response.data));
     toast.success(`${response.message}`, { position: "bottom-left" });
+    dispatch(clearReturnBillDetail())
     console.log("return bill response", response);
   };
   const handleChangePaymentMethod = async () => {
