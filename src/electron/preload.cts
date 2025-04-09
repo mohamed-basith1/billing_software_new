@@ -59,4 +59,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.invoke("create-return-bill-history", data),
   getReturnBillsHistory: (bill_number) =>
     ipcRenderer.invoke("get-return-bills-history", { bill_number }),
+
+  //dashboard
+  getDashboardData: (fromDate, toDate) =>
+    ipcRenderer.invoke("get-dashboard-data", { fromDate, toDate }),
 });

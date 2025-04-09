@@ -158,16 +158,11 @@ const PaymentsCash = () => {
     };
   }, []);
   
-  // useEffect(() => {
-  //   dispatch(setFromDate(dayjs().subtract(1, "month")));
-  //   dispatch(setToDate(dayjs()));
-  //   getUPIBills();
-  //   return () => {
-  //     dispatch(clearPaymentBillsDetail());
-  //   };
-  // }, []);
+
 
   const getUPIBills = async () => {
+
+    
     let response: any = await fetchBills(
       dayjs().subtract(1, "month"),
       dayjs(),

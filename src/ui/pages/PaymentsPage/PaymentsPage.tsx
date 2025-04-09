@@ -24,9 +24,7 @@ const PaymentsPage = () => {
       }}
     >
       <PaymentsTabs />
-      {/* <PaymentsCash /> */}
-      {/* <PaymentsUPI /> */}
-      {/* <PaymentsCredit /> */}
+ 
       {currentTab === 0 ? (
         <PaymentsCash />
       ) : currentTab === 1 ? (

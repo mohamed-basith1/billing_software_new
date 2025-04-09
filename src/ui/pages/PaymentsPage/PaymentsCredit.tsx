@@ -248,7 +248,7 @@ const PaymentsCredit = () => {
     //@ts-ignore
     let response: any = await window.electronAPI.returnPendingAmount(
       selectedBills._id,
-      selectedBills.return_amount
+      selectedBills.total_amount
     );
 
     console.log("response", response);

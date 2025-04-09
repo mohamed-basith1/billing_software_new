@@ -215,7 +215,6 @@ export function BillsRouter() {
   ipcMain.handle(
     "return-pending-amount",
     async (_, { id, returnPendingAmount }) => {
-
       try {
         // Prepare updated data with return_amount set to 0 and amount_paid set to returnPendingAmount
         const updatedData = {
@@ -441,4 +440,181 @@ ipcMain.handle("get-return-bills-history", async (_, { bill_number }) => {
       error: error.message,
     };
   }
+});
+
+ipcMain.handle("get-dashboard-data", async (_event, { fromDate, toDate }) => {
+  console.log(
+    "fromData",
+    fromDate,
+    toDate,
+    "====>",
+    new Date(fromDate).setUTCHours(0, 0, 0, 0),
+    "shiushd=>",
+    new Date(toDate).setUTCHours(23, 59, 59, 999)
+  );
+
+  // Construct the query object dynamically
+  const query: any = {
+    createdAt: {
+      $gte: new Date(fromDate).setUTCHours(0, 0, 0, 0),
+      $lte: new Date(toDate).setUTCHours(23, 59, 59, 999),
+    },
+  };
+
+  const bills = await BillsModel.find(query).lean(); // Use lean() for better performance
+
+  let totalRevenue = 0;
+  let totalProfit = 0;
+
+  // finding revenue and profit by Iterate over each bill
+  bills.forEach((bill) => {
+    // Iterate over each item in the bill
+    bill.itemsList.forEach((item) => {
+      let itemRevenue = 0;
+      let itemProfit = 0;
+
+      // Calculate revenue and profit based on unit of measurement (uom)
+      if (item.uom === "gram") {
+        itemRevenue = (item.rate / 1000) * item.qty;
+        itemProfit = ((item.rate - item.purchased_rate) / 1000) * item.qty;
+      } else {
+        itemRevenue = item.rate * item.qty;
+        itemProfit = (item.rate - item.purchased_rate) * item.qty;
+      }
+
+      // Accumulate totals
+      totalRevenue += itemRevenue;
+      totalProfit += itemProfit;
+    });
+  });
+
+  // Aggregate revenue by date
+  const revenueByDate = bills.reduce((acc, bill) => {
+    const date = new Date(bill.createdAt).toLocaleDateString("en-GB"); // Format: dd/mm/yyyy
+    const amount = bill.total_amount;
+
+    if (acc[date]) {
+      acc[date] += amount;
+    } else {
+      acc[date] = amount;
+    }
+
+    return acc;
+  }, {});
+
+  // Convert the aggregated object into an array of { date, amount } objects
+  const revenueByDateArray = Object.keys(revenueByDate).map((date) => ({
+    date,
+    amount: revenueByDate[date],
+  }));
+
+  // Sort the array by date
+  revenueByDateArray.sort((a, b) => {
+    const [dayA, monthA, yearA] = a.date.split("/").map(Number);
+    const [dayB, monthB, yearB] = b.date.split("/").map(Number);
+    return (
+      new Date(yearA, monthA - 1, dayA).getTime() -
+      new Date(yearB, monthB - 1, dayB).getTime()
+    );
+  });
+
+  // top selling product
+  const productMap = new Map();
+
+  bills.forEach((bill) => {
+    bill.itemsList.forEach((item) => {
+      const key = item.item_name;
+
+      let adjustedQty = item.qty;
+      if (item.uom === "gram") {
+        adjustedQty = item.qty / 1000;
+      }
+
+      const itemRevenue =
+        item.uom === "gram"
+          ? (item.rate / 1000) * item.qty
+          : item.rate * item.qty;
+
+      if (!productMap.has(key)) {
+        productMap.set(key, {
+          sales: 0,
+          revenue: 0,
+        });
+      }
+
+      const existing = productMap.get(key);
+      existing.sales += adjustedQty;
+      existing.revenue += itemRevenue;
+    });
+  });
+
+  const topProducts = [...productMap.entries()]
+    .sort((a, b) => b[1].sales - a[1].sales)
+    .slice(0, 10)
+    .map(([name, data], index) => ({
+      id: index + 1,
+      name,
+      sales: Math.round(data.sales),
+      revenue: Math.round(data.revenue),
+      rank: index + 1,
+    }));
+
+  //top customer
+
+  const customerMap = new Map();
+
+  bills.forEach((bill) => {
+    if (bill.payment_method === "Credit Bill") {
+      const name = bill.customer_name || "Unknown";
+      if (!customerMap.has(name)) {
+        customerMap.set(name, { customer: name, amount: 0 });
+      }
+      customerMap.get(name).amount += bill.total_amount;
+    }
+  });
+
+  const topCustomers = [...customerMap.values()]
+    .sort((a, b) => b.amount - a.amount)
+    .slice(0, 10)
+    .map((customer, index) => ({
+      id: index + 1,
+      name: customer.customer,
+      amount: customer.amount,
+      rank: index + 1,
+    }));
+
+  //payment summary
+
+  const methodMap = new Map();
+
+  bills.forEach((bill) => {
+    const method = bill.payment_method || "Unknown";
+    if (!methodMap.has(method)) {
+      methodMap.set(method, 0);
+    }
+    methodMap.set(method, methodMap.get(method) + bill.total_amount);
+  });
+
+  const paymentSummary = [...methodMap.entries()].map(([name, value]) => ({
+    name,
+    value,
+  }));
+
+  let data = {
+    totalRevenue,
+    totalProfit,
+    totalorder: bills.length,
+    salegraphdata: revenueByDateArray,
+    topsellingproduct: topProducts,
+    topcustomer: topCustomers,
+    paymentSummary,
+  };
+
+  console.log("dashboard data", data);
+  return {
+    status: 200,
+    message: "Bill updated successfully, and stock quantities adjusted.",
+
+    data: JSON.parse(JSON.stringify(data)),
+  };
 });

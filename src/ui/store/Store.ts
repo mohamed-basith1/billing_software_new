@@ -5,6 +5,7 @@ import LoginReducer from "../pages/LoginPage/LoginSlice";
 import CustomersReducer from "../pages/CustomersPage/CustomersSlice";
 import ItemsReducer from "../pages/ItemsPage/ItemsSlice";
 import PaymentsReducer from "../pages/PaymentsPage/PaymentsSlice";
+import ReportsReducer from "../pages/ReportPage/ReportsSlice"
 
 export const store = configureStore({
   reducer: {
@@ -13,6 +14,7 @@ export const store = configureStore({
     customers: CustomersReducer,
     items: ItemsReducer,
     payments: PaymentsReducer,
+    reports:ReportsReducer
   },
 });
 

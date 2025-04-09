@@ -19,6 +19,15 @@ export const calculateAmount = (
   }
 };
 
+
+
+export const getDaysDifference = (startDate, endDate) => {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const diffTime = Math.abs(end - start);
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convert milliseconds to days
+};
+
 export const getGreeting = () => {
   const hour = new Date().getHours();
   if (hour < 12) return "Good Morning , ";

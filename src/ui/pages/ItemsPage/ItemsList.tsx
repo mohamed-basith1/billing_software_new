@@ -74,13 +74,15 @@ const ItemsList = () => {
               onClick={() => dispatch(setItemsTab(stat.tab))}
               elevation={0}
               sx={{
+                borderLeft: `4px solid rgba(250, 160, 30, .5)`,
+
                 background:
                   itemsTab === stat.tab
-                    ? `linear-gradient(133deg, rgba(255,255,255,1) 88%, ${
+                    ? `linear-gradient(100deg, rgba(255,255,255,1) 60%, ${
                         stat.tab === 0
-                          ? "darkorange"
+                          ? "rgba(250, 160, 30, .5)"
                           : stat.tab === 1
-                          ? "rgb(20, 110, 150)"
+                          ? "rgba(20, 110, 150,.5)"
                           : stat.tab === 2
                           ? "rgba(255,50,50)"
                           : "rgba(50, 200, 120)"
@@ -104,11 +106,11 @@ const ItemsList = () => {
                     stat.label !== "Total Stock Price"
                       ? "0px 1px 2px rgba(0,0,0,.3)"
                       : "auto",
-                  "& .MuiSvgIcon-root": {
-                    // color:"rgb(30, 120, 80)" "#22b378",
-                    fontSize:
-                      stat.label !== "Total Stock Price" ? "3rem" : "auto",
-                  },
+                  // "& .MuiSvgIcon-root": {
+
+                  //   fontSize:
+                  //     stat.label !== "Total Stock Price" ? "3rem" : "auto",
+                  // },
                 },
 
                 "& .MuiSvgIcon-root": {
