@@ -5,7 +5,7 @@ import EmojiEventsIcon from "@mui/icons-material/EmojiEvents"; // Crown icon
 const columns = [
   {
     field: "rank",
-    headerName: "No",
+    headerName: "NO",
     flex: 1,
     renderCell: (params) => {
       let iconColor = "";
@@ -60,7 +60,7 @@ const columns = [
   },
   {
     field: "name",
-    headerName: "Product",
+    headerName: "PRODUCT",
     flex: 2,
     renderCell: (params) => (
       <span style={{ fontWeight: 500 }}>{params.value}</span>
@@ -68,14 +68,14 @@ const columns = [
   },
   {
     field: "sales",
-    headerName: "Sold",
+    headerName: "SOLD",
     flex: 1,
     align: "right",
     headerAlign: "right",
   },
   {
     field: "revenue",
-    headerName: "Revenue",
+    headerName: "REVENUE",
     flex: 2,
     align: "right",
     headerAlign: "right",

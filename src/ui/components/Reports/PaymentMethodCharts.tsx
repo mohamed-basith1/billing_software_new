@@ -7,7 +7,7 @@ import {
   Tooltip,
 } from "recharts";
 
-const COLORS = ["#f6ad55", "rgba(34,179,120,1)", "rgba(155, 89, 182, 1)"]; // Green, Amber, Blue
+const COLORS = [ "rgba(155, 89, 182, 1)","#f6ad55","rgba(34,179,120,1)", ]; // Green, Amber, Blue
 
 const PaymentMethodCharts = ({ paymentSummary }: any) => {
   return (

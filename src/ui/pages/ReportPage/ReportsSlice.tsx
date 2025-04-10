@@ -5,6 +5,10 @@ const initialState: any = {
   fromDate: null,
   toDate: null,
   dashboardData: [],
+  transactionData: [],
+  AddTransactionModal: false,
+  transactionHistoryTab: 0,
+  transactionAmountTakeTab: 0,
 };
 
 const reportSlice = createSlice({
@@ -23,7 +27,18 @@ const reportSlice = createSlice({
     setDashboardData: (state, action) => {
       state.dashboardData = action.payload;
     },
-    
+    setTransactionData: (state, action) => {
+      state.transactionData = action.payload;
+    },
+    setTransactionHistoryTab: (state, action) => {
+      state.transactionHistoryTab = action.payload;
+    },
+    setTransactionAmountTakeTab: (state, action) => {
+      state.transactionAmountTakeTab = action.payload;
+    },
+    setAddTransactionModal: (state, action) => {
+      state.AddTransactionModal = action.payload;
+    },
   },
 });
 
@@ -33,6 +48,10 @@ export const {
   setReportsFromDate,
   setReportsToDate,
   setDashboardData,
+  setTransactionData,
+  setTransactionHistoryTab,
+  setTransactionAmountTakeTab,
+  setAddTransactionModal,
 } = reportSlice.actions;
 
 // Selectors
@@ -41,5 +60,14 @@ export const selectCurrentReportsTab = (state: any) =>
 export const selectReportsFromDate = (state: any) => state.reports.fromDate;
 export const selectReportsToDate = (state: any) => state.reports.toDate;
 export const selectDashboardData = (state: any) => state.reports.dashboardData;
+export const selectTransactionData = (state: any) =>
+  state.reports.transactionData;
+
+export const selectTransactionHistoryTab = (state: any) =>
+  state.reports.transactionHistoryTab;
+export const selectTransactionAmountTakeTab = (state: any) =>
+  state.reports.transactionAmountTakeTab;
+export const selectAddTransactionModal = (state: any) =>
+  state.reports.AddTransactionModal;
 
 export default reportSlice.reducer;

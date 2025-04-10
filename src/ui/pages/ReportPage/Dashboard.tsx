@@ -12,10 +12,11 @@ import {
   setReportsToDate,
 } from "./ReportsSlice";
 import SalesGraph from "../../components/Reports/SalesGraph";
-
+import WavingHandOutlinedIcon from "@mui/icons-material/WavingHandOutlined";
 import PaymentMethodCharts from "../../components/Reports/PaymentMethodCharts";
+import CurrencyRupeeOutlinedIcon from "@mui/icons-material/CurrencyRupeeOutlined";
+
 import {
-  AttachMoney as RevenueIcon,
   TrendingUp as ProfitIcon,
   ShoppingCart as OrdersIcon,
 } from "@mui/icons-material";
@@ -25,7 +26,7 @@ import TopSellingProducts from "../../components/Reports/TopSellingProducts";
 import TopCustomer from "../../components/Reports/TopCustomer";
 import dayjs from "dayjs";
 
-const AnimatedCounter = ({ value, isCurrency = false }) => {
+export const AnimatedCounter = ({ value, isCurrency = false }) => {
   const [displayValue, setDisplayValue] = useState(0);
   const duration = 500; // Animation duration in ms
   const startTime = useRef(null);
@@ -88,20 +89,6 @@ const Dashboard = () => {
     getDashboardHandler();
   }, []);
 
-  // const getDashboardData = async () => {
-  //   // // Get 1 month ago UTC time
-  //   const fromDateFormat = fromDate?.toISOString();
-  //   const toDateFormat = toDate?.toISOString();
-
-  //   //@ts-ignore
-  //   let response: any = await window.electronAPI.getDashboardData(
-  //     fromDateFormat,
-  //     toDateFormat
-  //   );
-  //   console.log("response", response.data);
-  //   dispatch(setDashboardData(response.data));
-  // };
-
   const getDashboardData = async () => {
     if (!fromDate || !toDate) {
       console.warn("Date range not set yet");
@@ -150,11 +137,19 @@ const Dashboard = () => {
           height: { xs: "auto", md: "3.5rem" },
         }}
       >
-        {" "}
-        <Typography>
-          {getGreeting().charAt(0).toUpperCase() + getGreeting().slice(1)}
-          {user.charAt(0).toUpperCase() + user.slice(1)}
-        </Typography>
+        <Box>
+          <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
+            <Typography sx={{ fontSize: "1.3rem" }}>Hello,</Typography>
+            <WavingHandOutlinedIcon
+              sx={{ fontSize: "1.3rem", color: "green" }}
+            />
+            <Typography sx={{ fontSize: "1.3rem", fontWeight: 600 }}>
+              {/* {getGreeting().charAt(0).toUpperCase() + getGreeting().slice(1)} */}
+              {user.charAt(0).toUpperCase() + user.slice(1)}
+            </Typography>
+          </Box>
+          <Typography>Let's grow your business</Typography>
+        </Box>
         <Box sx={{ display: "flex", flexDirection: "row", gap: "10px" }}>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DatePicker
@@ -216,7 +211,7 @@ const Dashboard = () => {
               {
                 name: "Total Revenue",
                 amount: dashboard?.totalRevenue ? dashboard?.totalRevenue : 0,
-                icon: <RevenueIcon fontSize="large" />,
+                icon: <CurrencyRupeeOutlinedIcon fontSize="large" />,
                 bgColor: "rgba(34, 179, 120, 0.2)", // Green
                 color: "#22b378",
               },
@@ -239,6 +234,9 @@ const Dashboard = () => {
                 key={item.name}
                 sx={{
                   flex: "1 1 200px",
+
+                  // background:
+                  // `linear-gradient(90deg, ${item.bgColor} 60%, rgba(255,255,255,1) 87%)`,
                   bgcolor: item.bgColor,
                   p: 3,
                   borderRadius: 2,
