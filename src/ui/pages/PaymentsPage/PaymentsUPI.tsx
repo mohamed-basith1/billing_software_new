@@ -45,8 +45,12 @@ import {
   setnewReturnBill,
 } from "./PaymentsSlice";
 import { selectUserName } from "../LoginPage/LoginSlice";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 
 const PaymentsUPI = () => {
+  dayjs.extend(utc);
+  dayjs.extend(timezone);
   console.log("render in upi");
   const columns: GridColDef[] = [
     {
@@ -139,8 +143,9 @@ const PaymentsUPI = () => {
   const dispatch: any = useDispatch();
   console.log("tempRemoveItem", tempRemoveItem, "selectedBills", selectedBills);
   useEffect(() => {
-    dispatch(setFromDate(dayjs().subtract(1, "month")));
-    dispatch(setToDate(dayjs()));
+    dispatch(setFromDate(dayjs().tz("Asia/Kolkata").subtract(1, "month")));
+    dispatch(setToDate(dayjs().tz("Asia/Kolkata")));
+
     getUPIBills();
 
     return () => {
@@ -150,8 +155,8 @@ const PaymentsUPI = () => {
 
   const getUPIBills = async () => {
     let response: any = await fetchBills(
-      dayjs().subtract(1, "month"),
-      dayjs(),
+      dayjs().subtract(1, "month").tz("Asia/Kolkata"),
+      dayjs().tz("Asia/Kolkata"),
       "UPI Paid"
     );
     // Convert `_id` to string before dispatching
@@ -215,7 +220,7 @@ const PaymentsUPI = () => {
     );
     dispatch(setnewReturnBill(response.data));
     toast.success(`${response.message}`, { position: "bottom-left" });
-    dispatch(clearReturnBillDetail())
+    dispatch(clearReturnBillDetail());
     console.log("return bill response", response);
   };
   const handleChangePaymentMethod = async () => {
@@ -321,7 +326,9 @@ const PaymentsUPI = () => {
                   <DatePicker
                     label="From"
                     value={fromDate}
-                    onChange={(newValue) => dispatch(setFromDate(newValue))}
+                    onChange={(newValue) =>
+                      dispatch(setFromDate(dayjs(newValue).tz("Asia/Kolkata")))
+                    }
                     renderInput={(params) => (
                       <TextField {...params} fullWidth size="small" />
                     )}
@@ -332,7 +339,9 @@ const PaymentsUPI = () => {
                   <DatePicker
                     label="To"
                     value={toDate}
-                    onChange={(newValue) => dispatch(setToDate(newValue))}
+                    onChange={(newValue) =>
+                      dispatch(setToDate(dayjs(newValue).tz("Asia/Kolkata")))
+                    }
                     renderInput={(params) => (
                       <TextField {...params} fullWidth size="small" />
                     )}

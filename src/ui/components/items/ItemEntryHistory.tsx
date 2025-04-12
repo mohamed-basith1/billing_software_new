@@ -10,8 +10,7 @@ import utc from "dayjs/plugin/utc";
 import { DataGrid } from "@mui/x-data-grid";
 import { selectDateTigger } from "../../pages/ItemsPage/ItemsSlice";
 import { useSelector } from "react-redux";
-
-dayjs.extend(utc);
+import timezone from "dayjs/plugin/timezone";
 
 const columns = [
   { field: "code", headerName: "CODE", flex: 3 },
@@ -28,8 +27,12 @@ const columns = [
 ];
 
 const ItemEntryHistory = () => {
+  dayjs.extend(utc);
+  dayjs.extend(timezone);
   const [entryHistory, setEntryHistory] = useState<any[]>([]);
-  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
+  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(
+    dayjs().tz("Asia/Kolkata")
+  );
   const gridRef = useRef<HTMLDivElement | null>(null);
 
   const dateTigger = useSelector(selectDateTigger); // Unused, consider removing it if not needed
@@ -38,7 +41,8 @@ const ItemEntryHistory = () => {
   const handleDateChange = async (date: Dayjs | null) => {
     if (!date) return;
 
-    const formattedDate = date
+    const formattedDate = dayjs(date)
+      .tz("Asia/Kolkata")
       .startOf("day")
       .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
     console.log("📅 Selected Date (UTC):", formattedDate);
@@ -54,9 +58,6 @@ const ItemEntryHistory = () => {
       }
 
       if (!response.data || response.data.length === 0) {
-        // toast.warning("No items found for the selected date.", {
-        //   position: "bottom-left",
-        // });
         setEntryHistory([]);
         return;
       }

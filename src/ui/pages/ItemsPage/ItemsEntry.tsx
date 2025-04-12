@@ -19,7 +19,7 @@ const ItemsEntry = () => {
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
-          mt: 3,
+          mt: 2,
           overflow: "hidden",
           gap: "20px",
         }}
@@ -30,7 +30,7 @@ const ItemsEntry = () => {
             height: "100%",
             width: "45%",
             bgcolor: "white",
-            border: ".1px solid lightgrey",
+            // border: ".1px solid lightgrey",
             borderRadius: "8px",
             p: 2,
             display: "flex",

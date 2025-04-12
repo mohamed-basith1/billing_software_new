@@ -48,8 +48,13 @@ import {
 
 import { batch } from "react-redux";
 import { selectUserName } from "../LoginPage/LoginSlice";
+import utc from "dayjs/plugin/utc";
 
+import timezone from "dayjs/plugin/timezone";
 const PaymentsCash = () => {
+  dayjs.extend(utc);
+  dayjs.extend(timezone);
+
   console.log("render in cash");
   const columns: GridColDef[] = [
     {
@@ -144,28 +149,24 @@ const PaymentsCash = () => {
 
   useEffect(() => {
     dispatch((dispatch, getState) => {
-      dispatch(setFromDate(dayjs().subtract(1, "month")));
-      dispatch(setToDate(dayjs()));
-  
+      dispatch(setFromDate(dayjs().tz("Asia/Kolkata").subtract(1, "month")));
+      dispatch(setToDate(dayjs().tz("Asia/Kolkata")));
+
       // Call getUPIBills after Redux state is updated
       setTimeout(() => {
         getUPIBills();
       }, 0);
     });
-  
+
     return () => {
       dispatch(clearPaymentBillsDetail());
     };
   }, []);
-  
-
 
   const getUPIBills = async () => {
-
-    
     let response: any = await fetchBills(
-      dayjs().subtract(1, "month"),
-      dayjs(),
+      dayjs().subtract(1, "month").tz("Asia/Kolkata"),
+      dayjs().tz("Asia/Kolkata"),
       "Cash Paid"
     );
     // Convert `_id` to string before dispatching
@@ -200,8 +201,6 @@ const PaymentsCash = () => {
     dispatch(setUPIBillsList(response.data));
   };
   const handleReturnBill = async () => {
-
-
     let returnBillHistoryPayload = {
       bill_number: selectedBills.bill_number,
       previous_bill_amount: UPIBillsList?.find(
@@ -231,7 +230,7 @@ const PaymentsCash = () => {
     );
     dispatch(setnewReturnBill(response.data));
     toast.success(`${response.message}`, { position: "bottom-left" });
-    dispatch(clearReturnBillDetail())
+    dispatch(clearReturnBillDetail());
     console.log("return bill response", response);
   };
   const handleChangePaymentMethod = async () => {
@@ -338,7 +337,9 @@ const PaymentsCash = () => {
                   <DatePicker
                     label="From"
                     value={fromDate}
-                    onChange={(newValue) => dispatch(setFromDate(newValue))}
+                    onChange={(newValue) =>
+                      dispatch(setFromDate(dayjs(newValue).tz("Asia/Kolkata")))
+                    }
                     renderInput={(params) => (
                       <TextField {...params} fullWidth size="small" />
                     )}
@@ -349,7 +350,9 @@ const PaymentsCash = () => {
                   <DatePicker
                     label="To"
                     value={toDate}
-                    onChange={(newValue) => dispatch(setToDate(newValue))}
+                    onChange={(newValue) =>
+                      dispatch(setToDate(dayjs(newValue).tz("Asia/Kolkata")))
+                    }
                     renderInput={(params) => (
                       <TextField {...params} fullWidth size="small" />
                     )}

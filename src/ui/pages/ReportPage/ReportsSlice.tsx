@@ -6,9 +6,16 @@ const initialState: any = {
   toDate: null,
   dashboardData: [],
   transactionData: [],
+  transactionSummary: {
+    amount_available: 0,
+    upi_balance: 0,
+    cash_balance: 0,
+    total_outstanding: 0,
+  },
   AddTransactionModal: false,
   transactionHistoryTab: 0,
   transactionAmountTakeTab: 0,
+  submitLoader: false,
 };
 
 const reportSlice = createSlice({
@@ -33,11 +40,17 @@ const reportSlice = createSlice({
     setTransactionHistoryTab: (state, action) => {
       state.transactionHistoryTab = action.payload;
     },
+    setTransactionSummary: (state, action) => {
+      state.transactionSummary = action.payload;
+    },
     setTransactionAmountTakeTab: (state, action) => {
       state.transactionAmountTakeTab = action.payload;
     },
     setAddTransactionModal: (state, action) => {
       state.AddTransactionModal = action.payload;
+    },
+    setSubmitLoader: (state, action) => {
+      state.submitLoader = action.payload;
     },
   },
 });
@@ -52,6 +65,8 @@ export const {
   setTransactionHistoryTab,
   setTransactionAmountTakeTab,
   setAddTransactionModal,
+  setSubmitLoader,
+  setTransactionSummary,
 } = reportSlice.actions;
 
 // Selectors
@@ -69,5 +84,8 @@ export const selectTransactionAmountTakeTab = (state: any) =>
   state.reports.transactionAmountTakeTab;
 export const selectAddTransactionModal = (state: any) =>
   state.reports.AddTransactionModal;
+export const selectSubmitLoader = (state: any) => state.reports.submitLoader;
+export const selectTransactionSummary = (state: any) =>
+  state.reports.transactionSummary;
 
 export default reportSlice.reducer;

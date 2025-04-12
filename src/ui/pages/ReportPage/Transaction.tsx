@@ -1,49 +1,37 @@
-import { Box, Button, Tab, Tabs, TextField, Typography } from "@mui/material";
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import React, { useEffect } from "react";
-import PaymentMethodCharts from "../../components/Reports/PaymentMethodCharts";
-import SalesGraph from "../../components/Reports/SalesGraph";
-import TopCustomer from "../../components/Reports/TopCustomer";
-import TopSellingProducts from "../../components/Reports/TopSellingProducts";
-import { getGreeting, getDaysDifference } from "../../utils/utils";
+import { Box, Button, Tab, Tabs, Typography } from "@mui/material";
+import { useEffect } from "react";
 import {
-  selectDashboardData,
-  selectReportsFromDate,
-  selectReportsToDate,
   selectTransactionHistoryTab,
+  selectTransactionSummary,
   setAddTransactionModal,
-  setDashboardData,
-  setReportsFromDate,
-  setReportsToDate,
   setTransactionHistoryTab,
+  setTransactionSummary,
 } from "./ReportsSlice";
-import dayjs from "dayjs";
 import { useDispatch, useSelector } from "react-redux";
-import { selectUserName } from "../LoginPage/LoginSlice";
 import { AnimatedCounter } from "./Dashboard";
 import CurrencyRupeeOutlinedIcon from "@mui/icons-material/CurrencyRupeeOutlined";
 import AddCardOutlinedIcon from "@mui/icons-material/AddCardOutlined";
-import {
-  TrendingUp as ProfitIcon,
-  ShoppingCart as OrdersIcon,
-} from "@mui/icons-material";
 import TransactionList from "../../components/Reports/TransactionList";
 import { a11yProps } from "./ReportsTabs";
 import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined";
-import LocalAtmOutlinedIcon from "@mui/icons-material/LocalAtmOutlined";
-import AccountBalanceOutlinedIcon from "@mui/icons-material/AccountBalanceOutlined";
-import CreditCardOutlinedIcon from "@mui/icons-material/CreditCardOutlined";
 import QrCodeScannerOutlinedIcon from "@mui/icons-material/QrCodeScannerOutlined";
-import AmountTaking from "../../components/Reports/AmountTaking";
 import AddTransactionModal from "../../components/modals/AddTransactionModal";
+import CustomizedMenus from "../../components/Reports/TransactionFilter";
 const Transaction = () => {
   const dispatch = useDispatch();
 
-  const dashboard = useSelector(selectDashboardData);
-
   const transactionHistoryTab = useSelector(selectTransactionHistoryTab);
-  console.log("transactionHistoryTab", transactionHistoryTab);
+  const transactionSummary = useSelector(selectTransactionSummary);
+
+  useEffect(() => {
+    const getTransactionSummaryHandler = async () => {
+      //@ts-ignore
+      let response = await window.electronAPI.getTransactionSummary();
+      dispatch(setTransactionSummary(response.data));
+    };
+
+    getTransactionSummaryHandler();
+  }, []);
   return (
     <Box
       sx={{
@@ -66,19 +54,19 @@ const Transaction = () => {
         sx={{
           flex: 1,
           display: "flex",
-          gap: 2,
+          // gap: 2,
           overflow: "hidden",
           flexDirection: "column",
+          justifyContent: "space-between",
         }}
       >
-        {/* Left Column (70%) */}
+        {/* Top Column (30%) */}
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
             gap: 2,
             width: "100%",
-            height: "100%",
           }}
         >
           {/* Stats Row */}
@@ -93,7 +81,7 @@ const Transaction = () => {
             {[
               {
                 name: "Amount Available",
-                amount: dashboard?.totalRevenue ? dashboard?.totalRevenue : 0,
+                amount: transactionSummary.amount_available,
                 icon: <AccountBalanceWalletOutlinedIcon fontSize="large" />, // UPI icon
                 bgColor: "rgba(103, 58, 183, 0.2)", // Purple
                 color: "#673ab7",
@@ -101,7 +89,7 @@ const Transaction = () => {
               },
               {
                 name: "Total Outstanding",
-                amount: dashboard?.totalProfit ? dashboard?.totalProfit : 0,
+                amount: transactionSummary.total_outstanding,
                 icon: <AddCardOutlinedIcon fontSize="large" />,
                 bgColor: "rgba(233, 30, 99, 0.2)", // Pink (Accent)
                 color: "#e91e63",
@@ -109,7 +97,7 @@ const Transaction = () => {
               },
               {
                 name: "UPI Balance",
-                amount: dashboard?.totalProfit ? dashboard?.totalProfit : 0,
+                amount: transactionSummary.upi_balance,
                 icon: <QrCodeScannerOutlinedIcon fontSize="large" />,
                 bgColor: "rgba(255, 152, 0, 0.2)",
                 color: "#ff9800", // Full color
@@ -117,7 +105,7 @@ const Transaction = () => {
               },
               {
                 name: "Cash Balance",
-                amount: dashboard?.totalProfit ? dashboard?.totalProfit : 0,
+                amount: transactionSummary.cash_balance,
                 icon: <CurrencyRupeeOutlinedIcon fontSize="large" />,
                 bgColor: "rgba(34, 179, 120, 0.2)", // Green
                 color: "#22b378",
@@ -188,14 +176,12 @@ const Transaction = () => {
           </Box>
         </Box>
 
-        {/* Right Column (30%) */}
+        {/* Bottom Column (70%) */}
         <Box
           sx={{
             width: "100%",
             display: "flex",
-
-            gap: 2,
-            height: "100%",
+            flex: 1,
           }}
         >
           {/* Chart Container */}
@@ -204,29 +190,27 @@ const Transaction = () => {
               flex: 1,
               display: "flex",
               flexDirection: "column",
-              // gap: 2,
-              overflow: "auto",
+
+              justifyContent: "flex-start",
             }}
           >
             <Tabs
               value={transactionHistoryTab}
-              onChange={(e,value) => dispatch(setTransactionHistoryTab(value))}
+              onChange={(e, value) => dispatch(setTransactionHistoryTab(value))}
               aria-label="basic tabs example"
             >
-              <Tab label="History" {...a11yProps(0)} />
+              <Tab label="Transaction" {...a11yProps(0)} />
               <Tab label="Salary" {...a11yProps(1)} />
-              <Tab label="Others" {...a11yProps(2)} />
 
               <div
                 style={{
                   marginLeft: "auto", // Pushes it to the right
-
                   display: "flex",
                   alignItems: "center",
                   gap: 10,
                 }}
               >
-                <Typography>Filter</Typography>
+                <CustomizedMenus />
                 <Button
                   sx={{ height: "1rem", p: 2 }}
                   onClick={() => dispatch(setAddTransactionModal(true))}
@@ -235,23 +219,13 @@ const Transaction = () => {
                 </Button>
               </div>
             </Tabs>
-            <Box
-              sx={{
-                borderRadius: 1,
-                minHeight: "10rem",
-                // mt: 2,
-                fontWeight: 600,
-              }}
-            >
-              {/* High Value Customers */}
-              <TransactionList />
-            </Box>
-          </Box>
 
-          {/* <AmountTaking /> */}
-          <AddTransactionModal />
+            {/* High Value Customers */}
+            <TransactionList />
+          </Box>
         </Box>
       </Box>
+      <AddTransactionModal />
     </Box>
   );
 };

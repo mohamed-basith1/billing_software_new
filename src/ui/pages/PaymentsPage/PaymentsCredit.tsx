@@ -51,8 +51,12 @@ import {
   setnewReturnBill,
 } from "./PaymentsSlice";
 import { selectUserName } from "../LoginPage/LoginSlice";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 
 const PaymentsCredit = () => {
+  dayjs.extend(utc);
+  dayjs.extend(timezone);
   console.log("render in credit");
   const columns: GridColDef[] = [
     {
@@ -145,8 +149,9 @@ const PaymentsCredit = () => {
   const userName = useSelector(selectUserName);
   console.log("UPIBillsList", UPIBillsList);
   useEffect(() => {
-    dispatch(setFromDate(dayjs().subtract(1, "month")));
-    dispatch(setToDate(dayjs()));
+    dispatch(setFromDate(dayjs().tz("Asia/Kolkata").subtract(1, "month")));
+    dispatch(setToDate(dayjs().tz("Asia/Kolkata")));
+
     getUPIBills();
     return () => {
       dispatch(clearPaymentBillsDetail());
@@ -155,8 +160,8 @@ const PaymentsCredit = () => {
 
   const getUPIBills = async () => {
     let response: any = await fetchBills(
-      dayjs().subtract(1, "month"),
-      dayjs(),
+      dayjs().subtract(1, "month").tz("Asia/Kolkata"),
+      dayjs().tz("Asia/Kolkata"),
       "Credit Bill"
     );
     // Convert `_id` to string before dispatching
@@ -351,7 +356,9 @@ const PaymentsCredit = () => {
                   <DatePicker
                     label="From"
                     value={fromDate}
-                    onChange={(newValue) => dispatch(setFromDate(newValue))}
+                    onChange={(newValue) =>
+                      dispatch(setFromDate(dayjs(newValue).tz("Asia/Kolkata")))
+                    }
                     renderInput={(params) => (
                       <TextField {...params} fullWidth size="small" />
                     )}
@@ -362,7 +369,9 @@ const PaymentsCredit = () => {
                   <DatePicker
                     label="To"
                     value={toDate}
-                    onChange={(newValue) => dispatch(setToDate(newValue))}
+                    onChange={(newValue) =>
+                      dispatch(setToDate(dayjs(newValue).tz("Asia/Kolkata")))
+                    }
                     renderInput={(params) => (
                       <TextField {...params} fullWidth size="small" />
                     )}

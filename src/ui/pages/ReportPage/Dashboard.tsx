@@ -234,9 +234,6 @@ const Dashboard = () => {
                 key={item.name}
                 sx={{
                   flex: "1 1 200px",
-
-                  // background:
-                  // `linear-gradient(90deg, ${item.bgColor} 60%, rgba(255,255,255,1) 87%)`,
                   bgcolor: item.bgColor,
                   p: 3,
                   borderRadius: 2,

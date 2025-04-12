@@ -67,19 +67,19 @@ export function ItemsRouter() {
   ipcMain.handle("get-low-stock-item", async () => {
     try {
       console.log("item list api");
-      
+
       // Fetch only items where stock_qty is lower than low_stock_remainder
       const items = await Item.find({
         $expr: { $lt: ["$stock_qty", "$low_stock_remainder"] },
       });
-  
+
       return JSON.parse(JSON.stringify(items)); // Convert Mongoose documents to plain objects
     } catch (error: any) {
       console.error("Error fetching data:", error);
       throw error;
     }
   });
-  
+
   ipcMain.handle("get-item-summary", async () => {
     try {
       const items: any = await Item.find();
@@ -106,30 +106,6 @@ export function ItemsRouter() {
       throw error;
     }
   });
-
-  // ipcMain.handle("get-item-summary", async () => {
-  //   try {
-  //     const items:any = await Item.find();
-
-  //     const total_items = items.length;
-
-  //     const low_stock_item = items.filter(
-  //       (item) => item.stock_qty <= item.low_stock_remainder
-  //     ).length;
-
-  //     const total_item_price = items.reduce(
-  //       (sum, item) => sum + item.stock_qty * item.amount,
-  //       0
-  //     );
-  //     return {
-  //       status: 200,
-  //       data: { total_items, low_stock_item, total_item_price },
-  //     };
-  //   } catch (error: any) {
-  //     console.error("Error fetching data:", error);
-  //     throw error;
-  //   }
-  // });
 
   ipcMain.handle("update-item", async (_, id, newStockEntry) => {
     try {
@@ -185,29 +161,11 @@ export function ItemsRouter() {
       // Convert the input date to UTC format
       const date = new Date(createdAtFilter);
 
-      // Define the start and end of the day in UTC
-      const startDate = new Date(
-        Date.UTC(
-          date.getUTCFullYear(),
-          date.getUTCMonth(),
-          date.getUTCDate(),
-          0,
-          0,
-          0,
-          0
-        )
-      );
-      const endDate = new Date(
-        Date.UTC(
-          date.getUTCFullYear(),
-          date.getUTCMonth(),
-          date.getUTCDate(),
-          23,
-          59,
-          59,
-          999
-        )
-      );
+      const startDate = new Date(createdAtFilter);
+      startDate.setUTCHours(0, 0, 0, 0);
+
+      const endDate = new Date(createdAtFilter);
+      endDate.setUTCHours(23, 59, 59, 999);
 
       const query = {
         "new_stock.createdAt": {

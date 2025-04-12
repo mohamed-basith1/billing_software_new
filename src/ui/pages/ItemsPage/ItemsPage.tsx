@@ -5,7 +5,6 @@ import ItemsEntry from "./ItemsEntry";
 import { useDispatch, useSelector } from "react-redux";
 import { selectCurrentTab } from "./ItemsSlice";
 import ItemsList from "./ItemsList";
-import ItemsEntryHistory from "./ItemsEntryHistory";
 
 export default function ItemsPage() {
   const currentTab = useSelector(selectCurrentTab);

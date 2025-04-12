@@ -39,19 +39,15 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.invoke("return-bill", { id, updatedData, tempRemoveItem }),
   returnPendingAmount: (id, returnPendingAmount) =>
     ipcRenderer.invoke("return-pending-amount", { id, returnPendingAmount }),
-
   updateBill: (id, updatedData) =>
     ipcRenderer.invoke("update-bill", { id, updatedData }),
-
   payCreditBillBalance: (bill_number, received_amount) =>
     ipcRenderer.invoke("pay-credit-bill-balance", {
       bill_number,
       received_amount,
     }),
-
   updateBillPaymentMethod: (id, payment_method) =>
     ipcRenderer.invoke("update-bill-payment-method", { id, payment_method }),
-
   deleteBill: (id) => ipcRenderer.invoke("delete-bill", id),
 
   // Return Bill History API
@@ -63,4 +59,18 @@ contextBridge.exposeInMainWorld("electronAPI", {
   //dashboard
   getDashboardData: (fromDate, toDate) =>
     ipcRenderer.invoke("get-dashboard-data", { fromDate, toDate }),
+
+  // Transaction History
+
+  getTransactionSummary: () => ipcRenderer.invoke("get-transaction-summary"),
+  getTransactionHistory: (fromDate, toDate) =>
+    ipcRenderer.invoke("get-transaction-history", { fromDate, toDate }),
+
+
+
+  getLast10TransactionHistory: () =>
+    ipcRenderer.invoke("get-last10transaction-history"),
+
+  addTransactionHistory: (data) =>
+    ipcRenderer.invoke("add-transaction-history", { data }),
 });

@@ -11,6 +11,7 @@ import ItemsListTable from "../../components/items/ItemsListTable";
 import { selectItemsTab, setItemsTab } from "./ItemsSlice";
 
 import ItemsLowStock from "../../components/items/ItemsLowStock";
+import { AnimatedCounter } from "../ReportPage/Dashboard";
 
 const ItemsList = () => {
   const dispatch = useDispatch();
@@ -37,150 +38,116 @@ const ItemsList = () => {
         height: "calc(100% - 3.5rem)",
         width: "100%",
         background: "white",
-        border: ".1px solid lightgrey",
+        // border: ".1px solid lightgrey",
         borderRadius: "8px",
         p: 2,
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        mt: 3,
+        mt: 2,
         overflow: "hidden",
       }}
     >
-      <Grid container spacing={1.5} sx={{ my: 1 }}>
+      <Box
+        sx={{
+          display: "flex",
+          gap: 2,
+          flexWrap: "wrap",
+          minHeight: "8rem",
+        }}
+      >
         {[
           {
-            label: "Total Items",
+            name: "Total Items",
             value: itemSummary?.total_items,
-            color: blue[500],
+            icon: <InventoryIcon fontSize="large" />,
             tab: 0,
+            bgColor: "rgba(34, 179, 120, 0.2)", // Green
+            color: "#22b378",
+            description: "Total number of different items in your inventory",
           },
           {
-            label: "Low Stocks Items",
+            name: "Low Stocks Items",
             value: itemSummary?.low_stock_item,
-            color: green[500],
+            icon: <LayersIcon fontSize="large" />,
             tab: 1,
+            bgColor: "rgba(66, 153, 225, 0.2)", // Blue
+            color: "#4299e1",
+            description: "Total number items are running low in stock",
           },
-          // { label: "Expired Items", value: "$2,096", color: blue[700], tab: 2 },
-          {
-            label: "Total Stock Price",
-            value: `₹${Math.round(itemSummary?.total_item_price)}`,
-            color: orange[500],
-            tab: 3,
-          },
-        ].map((stat, index) => (
-          <Grid item xs={12} sm={6} md={3} key={index}>
-            <Card
-              onClick={() => dispatch(setItemsTab(stat.tab))}
-              elevation={0}
-              sx={{
-                borderLeft: `4px solid rgba(250, 160, 30, .5)`,
 
-                background:
-                  itemsTab === stat.tab
-                    ? `linear-gradient(100deg, rgba(255,255,255,1) 60%, ${
-                        stat.tab === 0
-                          ? "rgba(250, 160, 30, .5)"
-                          : stat.tab === 1
-                          ? "rgba(20, 110, 150,.5)"
-                          : stat.tab === 2
-                          ? "rgba(255,50,50)"
-                          : "rgba(50, 200, 120)"
-                      } 87%)`
-                    : "white",
-                color: "inherit",
-                height: "100%",
-                boxShadow: "0px",
-                borderRadius: "8px",
-                border: ".1px solid lightgrey",
+          {
+            name: "Total Stock Price",
+            value: Math.round(itemSummary?.total_item_price),
+            icon: <CurrencyRupeeIcon fontSize="large" />,
+            tab: 2,
+            bgColor: "rgba(246, 173, 85, 0.2)", // Amber
+            color: "#f6ad55",
+            description: "Total value of all items in your inventory",
+          },
+        ].map((item) => (
+          <Box
+            onClick={() => dispatch(setItemsTab(item.tab))}
+            key={item.tab}
+            sx={{
+              flex: "1 1 200px",
+              bgcolor: item.bgColor,
+              p: 3,
+              borderRadius: 2,
+              maxWidth: "28%",
+              height: "8rem",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              borderLeft: `4px solid ${item.color}`,
+              transition: "box-shadow 0.5s ease-in-out",
+              cursor: item.tab !== 2 ? "pointer" : "auto",
+              boxShadow:
+                item.tab === itemsTab ? `0 4px 10px ${item.color}` : "",
+            }}
+          >
+            <Box
+              sx={{
                 display: "flex",
                 alignItems: "center",
-                p: 2.5,
-
-                cursor: stat.label !== "Total Stock Price" ? "pointer" : "auto",
-                transition: "box-shadow 0.5s ease-in-out", // Ensure smooth transition in both directions
-                pointerEvents:
-                  stat.label !== "Total Stock Price" ? "auto" : "none",
-                "&:hover": {
-                  boxShadow:
-                    stat.label !== "Total Stock Price"
-                      ? "0px 1px 2px rgba(0,0,0,.3)"
-                      : "auto",
-                  // "& .MuiSvgIcon-root": {
-
-                  //   fontSize:
-                  //     stat.label !== "Total Stock Price" ? "3rem" : "auto",
-                  // },
-                },
-
-                "& .MuiSvgIcon-root": {
-                  transition:
-                    "color 0.5s ease-in-out, font-size 0.5s ease-in-out", // Smooth animation both ways
-                },
+                gap: 1,
+                justifyContent: "flex-start",
               }}
             >
-              <CardContent
+              <Box
                 sx={{
-                  bgcolor:
-                    stat.label === "Total Stock Price"
-                      ? "rgba(50, 200, 120, .3)" // Brighter green
-                      : stat.label === "Low Stocks Items"
-                      ? "rgba(40, 180, 220, .3)" // Brighter blue
-                      : stat.label === "Total Items"
-                      ? "rgba(250, 160, 30, .3)" // Brighter orange
-                      : "rgba(255, 50, 50, .3)", // Brighter red
-
-                  borderRadius: "8px",
+                  bgcolor: item.color,
                   color: "white",
-                  padding: 1.5,
-                  transition: "background-color 0.3s ease",
+                  p: 1,
+                  borderRadius: "50%",
+                  display: "flex",
                 }}
               >
-                {stat.label === "Total Items" ? (
-                  <InventoryIcon
-                    sx={{
-                      fontSize: itemsTab === 0 ? "3rem" : "1.5rem",
-                      color: "darkorange",
-
-                      transition: "background-color 3s ease",
-                    }}
-                  />
-                ) : stat.label === "Low Stocks Items" ? (
-                  <LayersIcon
-                    sx={{
-                      fontSize: itemsTab === 1 ? "2.5rem" : "1.5rem",
-                      color: "rgb(20, 110, 150)",
-                      transition: "background-color 3s ease",
-                    }}
-                  />
-                ) : stat.label === "Total Stock Price" ? (
-                  <CurrencyRupeeIcon
-                    sx={{
-                      fontSize: itemsTab === 3 ? "2.5rem" : "1.5rem",
-                      color: "rgba(50, 200, 120)",
-                      transition: "background-color 3s ease",
-                    }}
-                  />
-                ) : (
-                  <EventBusyIcon
-                    sx={{
-                      fontSize: itemsTab === 2 ? "2.5rem" : "1.5rem",
-                      color: "rgba(255,50,50)",
-                      transition: "background-color 3s ease",
-                    }}
-                  />
-                )}
-              </CardContent>
-              <CardContent>
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  {stat.value}
+                {item.icon}
+              </Box>
+              <Box
+                sx={{
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <Typography variant="subtitle2" color="text.secondary">
+                  {item.name}
                 </Typography>
-                <Typography variant="body2">{stat.label}</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
+                <AnimatedCounter
+                  value={item.value}
+                  isCurrency={item.name.includes("Total Stock Price")}
+                />
+              </Box>
+            </Box>
+            <Typography variant="caption" color="text.secondary">
+              {item.description}
+            </Typography>
+          </Box>
         ))}
-      </Grid>
+      </Box>
       <Box sx={{ height: "100%", width: "100%" }}>
         {itemsTab === 0 ? <ItemsListTable /> : <ItemsLowStock />}
       </Box>

@@ -30,11 +30,11 @@ const ReportsTabs = () => {
   return (
     <Box
       sx={{
-        borderBottom: 1,
+        // borderBottom: 1,
         borderColor: "divider",
         height: "3rem",
         background: "white",
-        border: ".1px solid lightgrey",
+        // border: ".1px solid lightgrey",
         borderRadius: "8px",
       }}
     >

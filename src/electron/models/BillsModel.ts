@@ -1,5 +1,13 @@
 import mongoose from "mongoose";
 
+
+const getISTDate = () => {
+  const date = new Date();
+  const offset = 5.5 * 60 * 60 * 1000; // IST is UTC + 5:30
+  return new Date(date.getTime() + offset); // Adjust the date for IST
+};
+
+
 const ItemSchema = new mongoose.Schema({
   item_name: { type: String, required: true },
   code: { type: String, required: true },
@@ -26,8 +34,11 @@ const BillSchema = new mongoose.Schema(
     payment_method: { type: String, required: true },
     balance: { type: Number, required: true },
     billed_by: { type: String, required: true },
+
+    createdAt: { type: Date, default: getISTDate },
+    updatedAt: { type: Date, default: getISTDate },
   },
-  { timestamps: true }
+  { timestamps: false } // Enable timestamps
 );
 
 // Convert MongoDB `_id` to `id` and remove unnecessary fields
