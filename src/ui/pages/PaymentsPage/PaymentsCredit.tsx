@@ -174,7 +174,7 @@ const PaymentsCredit = () => {
     dispatch(setUPIBillsList(serializedData));
   };
   const handleBillSearch = async (billnumber: string) => {
-    // alert(`value ${billnumber}`)
+
     if (billnumber) {
       dispatch(setBillSearch(billnumber));
       //@ts-ignore
@@ -189,7 +189,7 @@ const PaymentsCredit = () => {
     } else {
       dispatch(setBillSearch(billnumber));
       getUPIBills();
-      // alert("empty");
+
     }
   };
   const handleDateChange = async () => {

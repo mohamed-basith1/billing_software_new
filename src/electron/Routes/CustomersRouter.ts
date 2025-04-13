@@ -26,27 +26,40 @@ export function CustomersRouter() {
         };
       }
       // Check if primary contact already exists
-      const existingCustomerByPrimaryContact = await Customer.findOne({
+      const existingCustomerByPrimaryContact: any = await Customer.findOne({
         customerPrimaryContact,
       });
+
+      console.log(
+        "existingCustomerByPrimaryContact",
+        existingCustomerByPrimaryContact
+      );
+
       if (existingCustomerByPrimaryContact) {
-        return {
-          status: 409,
-          message: "Customer with this primary contact already exists.",
-        };
+        if (existingCustomerByPrimaryContact?.customerPrimaryContact !== "") {
+          return {
+            status: 409,
+            message: "Customer with this primary contact already exists.",
+          };
+        }
       }
       // Check if secondary contact already exists
-      if (customerSecondaryContact) {
-        const existingCustomerBySecondaryContact = await Customer.findOne({
-          customerSecondaryContact,
-        });
-        if (existingCustomerBySecondaryContact) {
+
+      const existingCustomerBySecondaryContact: any = await Customer.findOne({
+        customerSecondaryContact,
+      });
+
+      if (existingCustomerBySecondaryContact) {
+        if (
+          existingCustomerBySecondaryContact?.customerSecondaryContact !== ""
+        ) {
           return {
             status: 409,
             message: "Customer with this secondary contact already exists.",
           };
         }
       }
+
       // Check if email already exists
       if (customerEmail) {
         const existingCustomerByEmail = await Customer.findOne({

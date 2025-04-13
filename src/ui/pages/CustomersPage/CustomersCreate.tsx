@@ -45,8 +45,8 @@ const CustomersCreate = () => {
   function isCustomerDataValid(state) {
     const requiredFields = [
       "customerName",
-      "customerAddress",
-      "customerPrimaryContact",
+      // "customerAddress",
+      // "customerPrimaryContact",
     ];
 
     // Check required fields are non-empty

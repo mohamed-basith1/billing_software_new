@@ -46,7 +46,7 @@ const CustomerCreateModal = () => {
 
   const handleSubmitCustomerCreate = async () => {
     if (!customerDetails.customerName.trim()) {
-      alert("error");
+     
       setError(true);
       return;
     }

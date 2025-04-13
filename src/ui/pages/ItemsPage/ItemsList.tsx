@@ -100,7 +100,7 @@ const ItemsList = () => {
               bgcolor: item.bgColor,
               p: 3,
               borderRadius: 2,
-              maxWidth: "28%",
+              maxWidth: "24%",
               height: "8rem",
               display: "flex",
               flexDirection: "column",
@@ -148,7 +148,7 @@ const ItemsList = () => {
                 />
               </Box>
             </Box>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" color="text.secondary" width={"10rem"} sx={{mt:2}}>
               {item.description}
             </Typography>
           </Box>
