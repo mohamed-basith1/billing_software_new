@@ -52,60 +52,17 @@ import utc from "dayjs/plugin/utc";
 
 import timezone from "dayjs/plugin/timezone";
 import { AnimatedCounter } from "../ReportPage/Dashboard";
-const PaymentsCash = () => {
+const PaymentsSelfUse = () => {
   dayjs.extend(utc);
   dayjs.extend(timezone);
 
   console.log("render in cash");
   const columns: GridColDef[] = [
-    {
-      field: "action",
-      headerName: "#",
-      flex: 0.5,
-      align: "center",
-      headerAlign: "center",
-      renderCell: (params: any) => {
-        return (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              width: "100%",
-              height: "100%",
-              outline: "none",
-              border: "none",
-              userSelect: "none", // Prevents text selection
-            }}
-            onMouseDown={(e) => e.stopPropagation()} // Prevents cell highlight
-            onClick={(e) => e.stopPropagation()} // Prevents cell focus
-          >
-            <IconButton
-              style={{ outline: "none", border: "none", padding: 0 }}
-              disabled={selectedBills.itemsList.length === 1 ? true : false}
-              onClick={(e) => {
-                e.stopPropagation(); // Stops focus from moving to the cell
-                dispatch(setItemRemove(params.row.code));
-              }}
-            >
-              <ClearRoundedIcon
-                sx={{
-                  color: "red",
-                  opacity: selectedBills.itemsList.length === 1 ? ".5" : "auto",
-                }}
-              />
-            </IconButton>
-          </div>
-        );
-      },
-    },
-
     { field: "item_name", headerName: "ITEM NAME", flex: 3 },
     {
       field: "qty",
       headerName: "QUANTITY",
       flex: 1,
-      editable: true,
       align: "right",
       headerAlign: "right",
     },
@@ -168,7 +125,7 @@ const PaymentsCash = () => {
     let response: any = await fetchBills(
       dayjs().subtract(1, "month").tz("Asia/Kolkata"),
       dayjs().tz("Asia/Kolkata"),
-      "Cash Paid"
+      "Self Use"
     );
     // Convert `_id` to string before dispatching
     const serializedData = response.data.map((bill: any) => ({
@@ -185,7 +142,7 @@ const PaymentsCash = () => {
       //@ts-ignore
       let response: any = await window.electronAPI.getBillBySearch(
         billnumber,
-        "Cash Paid"
+        "Self Use"
       );
 
       if (response.status === 200) {
@@ -375,10 +332,8 @@ const PaymentsCash = () => {
 
               width: "100%",
               background:
-                "linear-gradient(133deg, rgba(247,247,254,1) 60%, rgba(34,179,120,1) 87%)",
-              // "linear-gradient(133deg, rgba(247,247,254,1) 60%, rgba(155, 89, 182, 1) 87%)",
+                "linear-gradient(133deg, rgba(247,247,254,1) 60%, rgba(52, 152, 219, 1) 87%)",
 
-              // "linear-gradient(133deg, rgba(247,247,254,1) 60%, rgba(236,117,30,1) 72%, rgba(34,179,120,1) 90%)",
               my: 2,
               position: "relative",
               display: "flex",
@@ -405,7 +360,7 @@ const PaymentsCash = () => {
               <Box sx={{ display: "flex", gap: "60px" }}>
                 <Box>
                   <Typography sx={{ color: "grey", fontSize: ".8rem" }}>
-                    Total Cash Bill Received
+                    Total Self Use Bill Received
                   </Typography>
                   <Typography sx={{ mt: 1 }}>
                     {" "}
@@ -418,7 +373,7 @@ const PaymentsCash = () => {
                 </Box>
                 <Box>
                   <Typography sx={{ color: "grey", fontSize: ".8rem" }}>
-                    Today Cash Bill Received
+                    Today Self Use Bill Received
                   </Typography>
                   <Typography sx={{ mt: 1 }}>
                     <AnimatedCounter
@@ -455,7 +410,7 @@ const PaymentsCash = () => {
                     marginTop: "-100px",
                   }}
                 >
-                  Cash
+                  Self Use
                 </span>
               </Typography>
             </Box>
@@ -543,91 +498,6 @@ const PaymentsCash = () => {
               overflow: "scroll",
             }}
           >
-            <Box
-              sx={{
-                display: "flex",
-                width: "100%",
-                bgcolor: "#F7F7FE",
-                borderBottom: ".1px solid lightgrey",
-
-                boxShadow: "0px 11px 1px 0px rgba(0,0,0,0.15)",
-                justifyContent: "flex-start",
-              }}
-            >
-              <Box
-                sx={{
-                  px: 2,
-                  py: 1,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  borderRight: ".1px solid lightgrey",
-                  cursor: "pointer",
-
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    backgroundColor: "rgba(34, 179, 120, 0.2)",
-                    color: "#1E8449",
-                  },
-                  fontSize: ".7rem",
-                }}
-                onClick={() => handleChangePaymentMethod()}
-              >
-                <PublishedWithChangesIcon
-                  sx={{ fontSize: "1rem", color: "inherit" }}
-                />
-                CHANGE TO UPI BILL
-              </Box>
-
-              <Box
-                sx={{
-                  px: 2,
-                  py: 1,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  borderRight: ".1px solid lightgrey",
-                  cursor: "pointer",
-
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    backgroundColor: "rgba(52, 152, 219, 0.2)",
-                    color: "#217DBB",
-                  },
-                  fontSize: ".7rem",
-                }}
-              >
-                <FileDownloadOutlinedIcon
-                  sx={{ fontSize: "1rem", color: "inherit" }}
-                />
-                GENERATE INVOICE
-              </Box>
-              <Box
-                sx={{
-                  px: 2,
-                  py: 1,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  borderRight: ".1px solid lightgrey",
-                  cursor: "pointer",
-
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    backgroundColor: "rgba(255, 215, 0, 0.2)", // Gold-like yellow
-                    color: "#9A7D0A", // Dark golden text
-                  },
-                  fontSize: ".7rem",
-                }}
-                onClick={() => dispatch(setReturnBillHistoryModal(true))}
-              >
-                <HistoryOutlinedIcon
-                  sx={{ fontSize: "1rem", color: "inherit" }}
-                />
-                RETURN BILL HISTORY
-              </Box>
-            </Box>
-
             <Box sx={{ bgcolor: "white", height: "100%" }}>
               <Box
                 sx={{
@@ -666,6 +536,12 @@ const PaymentsCash = () => {
                           )
                         : ""}
                     </Typography>
+                    <Typography sx={{ mt: 2 }}>Billed BY</Typography>
+                    <Typography
+                      sx={{ fontSize: ".7rem", color: "grey", mt: 1 }}
+                    >
+                      {selectedBills?.billed_by}
+                    </Typography>
                   </Box>
                   <Box
                     sx={{
@@ -697,73 +573,6 @@ const PaymentsCash = () => {
                     }
                     columns={columns}
                     disableColumnMenu
-                    processRowUpdate={(newRow) => {
-                      console.log("newRow", newRow, UPIBillsList);
-
-                      let oldRow = UPIBillsList.find(
-                        (data: any) =>
-                          data.bill_number === selectedBills.bill_number
-                      )?.itemsList?.find(
-                        (data: any) => data.code === newRow.code
-                      );
-
-                      if (!/^\d*\.?\d+$/.test(newRow.qty)) {
-                        toast.warning(
-                          "Invalid quantity! Only numbers are allowed.",
-                          { position: "bottom-left" }
-                        );
-
-                        return oldRow;
-                      }
-
-                      let updatedQty = Number(newRow.qty);
-
-                      if (
-                        newRow.uom.toLowerCase() === "piece" &&
-                        !Number.isInteger(updatedQty)
-                      ) {
-                        toast.warning(
-                          "Quantity must be a whole number for items with UOM 'piece'.",
-                          { position: "bottom-left" }
-                        );
-
-                        return oldRow; // Revert to the old row
-                      }
-
-                      // Restriction: New quantity should not be more than the old quantity
-                      if (updatedQty > oldRow.qty) {
-                        toast.warning(
-                          `New quantity cannot be greater than the billed quantity (${oldRow.qty})`,
-                          { position: "bottom-left" }
-                        );
-
-                        return oldRow; // Revert to the old row
-                      }
-
-                      // Restriction: New quantity should be greater than zero
-                      if (updatedQty <= 0) {
-                        toast.warning("Quantity must be greater than zero", {
-                          position: "bottom-left",
-                        });
-
-                        return oldRow; // Revert to the old row
-                      }
-
-                      let updatedAmount = updatedQty * newRow.rate; // Default calculation
-
-                      if (newRow.uom.toLowerCase() === "gram") {
-                        updatedAmount = (updatedQty / 1000) * newRow.rate; // Adjust for grams
-                      }
-
-                      const updatedRow = {
-                        ...newRow,
-                        qty: updatedQty, // Ensure qty is a number
-                        amount: parseFloat(updatedAmount.toFixed(2)), // Round to 2 decimal places
-                      };
-
-                      dispatch(setReturnItem(updatedRow));
-                      return updatedRow; // Apply the valid changes
-                    }}
                     hideFooter
                     sx={{
                       borderRadius: 0,
@@ -780,12 +589,6 @@ const PaymentsCash = () => {
                       "& .MuiDataGrid-cell": {
                         border: "none",
                       },
-                      // "& .MuiDataGrid-columnHeader": {
-                      //   backgroundColor: "#1E1E2D !important", // Ensure each column header is colored
-                      //   color: "white",
-                      //   borderRadius: 0,
-                      //   pt: 0,
-                      // },
                     }}
                   />
                 </Box>
@@ -842,57 +645,7 @@ const PaymentsCash = () => {
                     <Typography sx={{ fontSize: ".7rem" }}>Total </Typography>
                     <Typography sx={{ fontSize: ".7rem", fontWeight: 600 }}>
                       ₹ {selectedBills?.total_amount}
-                      {/* {selectedBills?.itemsList?.reduce((sum, item) => {
-                        const quantity =
-                          item.uom === "gram" ? item.qty / 1000 : item.qty;
-                        return sum + quantity * item.rate;
-                      }, 0)} */}
                     </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      width: "30%",
-                      display: "flex",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Typography sx={{ fontSize: ".7rem" }}>
-                      Return Amount{" "}
-                    </Typography>
-                    <Typography sx={{ fontSize: ".7rem", fontWeight: 600 }}>
-                      ₹{" "}
-                      {UPIBillsList.find(
-                        (data: any) =>
-                          data.bill_number === selectedBills.bill_number
-                      )?.itemsList?.reduce((sum, item) => {
-                        const quantity =
-                          item.uom === "gram" ? item.qty / 1000 : item.qty;
-                        return sum + quantity * item.rate;
-                      }, 0) - Number(selectedBills?.total_amount)}
-                    </Typography>
-                  </Box>
-
-                  <Box
-                    sx={{
-                      width: "30%",
-                      display: "flex",
-                      justifyContent: "space-between",
-                      mt: 3,
-                    }}
-                  >
-                    <Button
-                      sx={{
-                        height: "",
-                        opacity:
-                          selectedBills?.itemsList?.length === 0
-                            ? ".5"
-                            : "auto",
-                      }}
-                      fullWidth
-                      onClick={() => handleReturnBill()}
-                    >
-                      Bill again
-                    </Button>
                   </Box>
                 </Box>
               </Box>
@@ -918,4 +671,4 @@ const PaymentsCash = () => {
   );
 };
 
-export default React.memo(PaymentsCash);
+export default React.memo(PaymentsSelfUse);

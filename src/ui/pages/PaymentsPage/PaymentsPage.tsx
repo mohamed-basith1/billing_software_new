@@ -9,10 +9,11 @@ import PaymentsCredit from "./PaymentsCredit";
 
 import PayCreditBillModal from "../../components/modals/PayCreditBillModal";
 import ReturnBillHistoryModal from "../../components/modals/ReturnBillModal";
+import PaymentsSelfUse from "./PaymentsSelfUse";
 
 const PaymentsPage = () => {
   const currentTab = useSelector(selectCurrentPaymentsTab);
-  console.log("render in payment")
+  console.log("render in payment");
   return (
     <Box
       sx={{
@@ -24,16 +25,18 @@ const PaymentsPage = () => {
       }}
     >
       <PaymentsTabs />
- 
+
       {currentTab === 0 ? (
         <PaymentsCash />
       ) : currentTab === 1 ? (
         <PaymentsUPI />
-      ) : (
+      ) : currentTab === 2 ? (
         <PaymentsCredit />
+      ) : (
+        <PaymentsSelfUse />
       )}
       <PayCreditBillModal />
-      <ReturnBillHistoryModal/>
+      <ReturnBillHistoryModal />
     </Box>
   );
 };

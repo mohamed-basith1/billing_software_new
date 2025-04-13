@@ -140,7 +140,13 @@ const ItemEntryHistory = () => {
 
       <Box
         ref={gridRef}
-        sx={{ height: "90%", width: "100%", overflow: "hidden" }}
+        sx={{
+          height: "90%",
+          width: "100%",
+          overflow: "hidden",
+          border: "none",
+          pt:6
+        }}
       >
         <DataGrid
           rows={entryHistory}
@@ -148,10 +154,19 @@ const ItemEntryHistory = () => {
           disableColumnMenu
           hideFooter
           sx={{
+            "& .MuiDataGrid-columnSeparator": {
+              display: "none",
+            },
             "& .MuiDataGrid-columnHeader": {
               backgroundColor: "#1E1E2D !important",
               color: "white",
+              maxHeight: "50px",
+              border: "none",
             },
+            "& .MuiDataGrid-cell": {
+              border: "none",
+            },
+            border: "none",
           }}
         />
       </Box>

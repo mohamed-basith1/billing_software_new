@@ -18,7 +18,7 @@ const BillContainer = () => {
   );
 
   return (
-    <Box sx={{ height: "calc(100% - 3.5rem)", width: "100%" }}>
+    <Box sx={{ height: "calc(100% - 3rem)", width: "100%" }}>
       {selectedBill && (
         <Box
           sx={{
@@ -27,7 +27,7 @@ const BillContainer = () => {
             borderRadius: "8px",
             p: 1,
             mt: 2,
-            border: ".1px solid lightgrey",
+            // border: ".1px solid lightgrey",
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",

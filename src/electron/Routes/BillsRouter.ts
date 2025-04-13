@@ -459,6 +459,7 @@ ipcMain.handle("get-dashboard-data", async (_event, { fromDate, toDate }) => {
       $gte: new Date(fromDate).setUTCHours(0, 0, 0, 0),
       $lte: new Date(toDate).setUTCHours(23, 59, 59, 999),
     },
+    payment_method: { $ne: "Self Use" },
   };
 
   const bills = await BillsModel.find(query).lean(); // Use lean() for better performance

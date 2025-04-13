@@ -215,12 +215,20 @@ const ReturnBillHistoryModal = () => {
                         hideFooter
                         sx={{
                           borderRadius: 0,
-                          "& .MuiDataGrid-columnHeader": {
-                            backgroundColor: "#1E1E2D !important", // Ensure each column header is colored
-                            color: "white",
-                            borderRadius: 0,
-                            pt: 0,
+
+                          "& .MuiDataGrid-columnSeparator": {
+                            display: "none",
                           },
+                          "& .MuiDataGrid-columnHeader": {
+                            backgroundColor: "#1E1E2D !important",
+                            color: "white",
+                            maxHeight: "50px",
+                            border: "none",
+                          },
+                          "& .MuiDataGrid-cell": {
+                            border: "none",
+                          },
+                         
                         }}
                       />
                     </Box>

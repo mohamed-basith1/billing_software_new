@@ -147,30 +147,73 @@ export function TransactionRouter() {
       };
     }
   });
+  
   ipcMain.handle("add-transaction-history", async (_event, { data }) => {
     try {
-      // 1. Find admin user
-      const admin = await AuthendicationModel.findOne({
-        role: "administrator",
-      });
+      if (data.billtransactionhistory === false) {
+        // 1. Find admin user
+        const admin = await AuthendicationModel.findOne({
+          role: "administrator",
+        });
 
-      if (!admin) {
-        return {
-          status: 404,
-          message: "Admin account not found",
-        };
+        if (!admin) {
+          return {
+            status: 404,
+            message: "Admin account not found",
+          };
+        }
+
+        // 2. Verify password (fixed comparison - was previously checking inequality)
+        const isPasswordValid = data.password === admin.password;
+
+        if (!isPasswordValid) {
+          return {
+            status: 403,
+            message: "Invalid admin password",
+          };
+        }
       }
 
-      // 2. Verify password (fixed comparison - was previously checking inequality)
-      const isPasswordValid = data.password === admin.password;
+      const lastBill: any = await BillsModel.findOne().sort({ createdAt: -1 }); // Get latest bill
+      let finalData = { ...data, bill_no: lastBill.bill_number };
+      // 3. Create and save transaction
+      const newTransaction = new TransactionSchema(finalData);
 
-      if (!isPasswordValid) {
-        return {
-          status: 403,
-          message: "Invalid admin password",
-        };
-      }
+      const savedTransaction = await newTransaction.save();
 
+      const formattedTransactions = [savedTransaction].map(
+        (transaction, index) => ({
+          id: index + 1, // Sequential ID
+          status: transaction.status,
+          createdAt: transaction.createdAt.toISOString().split("T")[0], // Format date
+          bill_no: transaction.bill_no || "", // Handle empty bill_no
+          customer: transaction.customer || "", // Handle empty customer
+          method: transaction.method,
+          handler: transaction.handler,
+          reason: transaction.reason,
+          employee: transaction.employee,
+          amount: `${transaction.status === "Increased" ? "+" : "-"}${
+            transaction.amount
+          }`,
+        })
+      );
+      // 4. Return simple object (not Mongoose document)
+      return {
+        status: 201,
+        message: "Transaction added successfully",
+        data: JSON.parse(JSON.stringify(formattedTransactions)),
+      };
+    } catch (error) {
+      console.error("Transaction error:", error);
+      return {
+        status: 500,
+        message: "Internal server error",
+      };
+    }
+  });
+
+  ipcMain.handle("add-bill-transaction-history", async (_event, { data }) => {
+    try {
       // 3. Create and save transaction
       const newTransaction = new TransactionSchema(data);
 

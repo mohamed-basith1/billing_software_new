@@ -21,7 +21,7 @@ const ItemsEntry = () => {
           justifyContent: "space-between",
           mt: 2,
           overflow: "hidden",
-          gap: "20px",
+          // gap: "20px",
         }}
       >
         {/* item new/upload  */}
@@ -30,8 +30,7 @@ const ItemsEntry = () => {
             height: "100%",
             width: "45%",
             bgcolor: "white",
-            // border: ".1px solid lightgrey",
-            borderRadius: "8px",
+
             p: 2,
             display: "flex",
             flexDirection: "column",
@@ -67,8 +66,8 @@ const ItemsEntry = () => {
             height: "100%",
             width: "55%",
             bgcolor: "white",
-            border: ".1px solid lightgrey",
-            borderRadius: "8px",
+            borderLeft: ".1px solid lightgrey",
+            // borderRadius: "8px",
             p: 2,
             display: "flex",
             flexDirection: "column",
@@ -76,6 +75,7 @@ const ItemsEntry = () => {
             boxSizing: "border-box",
           }}
         >
+
           <ItemEntryHistory />
         </Box>
       </Box>

@@ -140,7 +140,8 @@ const ItemsDailyEntry = () => {
       rate: selectedItem.rate,
       uom: selectedItem.uom,
       stock_qty: Number(uploadStock),
-      item_expiry_date: dayjs(selectedDate).toISOString(), // Keep expiry date
+      item_expiry_date: "",
+      // item_expiry_date: dayjs(selectedDate).toISOString(), // Keep expiry date
     };
 
     //@ts-ignore
@@ -153,7 +154,8 @@ const ItemsDailyEntry = () => {
       toast.error(`${response.message}`, { position: "bottom-left" });
     } else {
       dispatch(setClearFilterData());
-      dispatch(setDateTigger())
+      dispatch(setDateTigger());
+      setUplaodStock("");
       toast.success(`${response.message}`, { position: "bottom-left" });
     }
   };
@@ -336,18 +338,18 @@ const ItemsDailyEntry = () => {
               }}
               sx={{ mb: 2, width: "48.5%" }}
             />
-            <DatePicker
+            {/* <DatePicker
               label="Select Expiry Date"
               sx={{ width: "48.5%" }}
               value={selectedDate}
               onChange={(newDate: any) => setSelectedDate(newDate)}
               renderInput={(params: any) => <TextField {...params} fullWidth />}
-            />
+            /> */}
           </Box>
           <Button
             sx={{
-              opacity: !selectedDate || !uploadStock ? ".5" : "1",
-              pointerEvents: !selectedDate || !uploadStock ? "none" : "auot",
+              opacity: !uploadStock ? ".5" : "1",
+              pointerEvents: !uploadStock ? "none" : "auot",
             }}
             onClick={() => handleUploadStockSubmit()}
           >

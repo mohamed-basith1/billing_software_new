@@ -49,13 +49,13 @@ const CustomerslistUI = () => {
       sx={{
         width: "40%",
         p: 2,
-        borderRadius: "8px",
-        border: ".1px solid lightgrey",
+        // borderRadius: "8px",
+        // border: ".1px solid lightgrey",
         bgcolor: "white",
         display: "flex",
         flexDirection: "column",
         justifyContent: "flex-start", // Aligns content at the top
-        mr: 2,
+        // mr: 2,
         height: "100%",
         boxSizing: "border-box",
       }}

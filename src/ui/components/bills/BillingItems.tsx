@@ -131,10 +131,23 @@ const BillingItems = () => {
           hideFooter
           processRowUpdate={handleProcessRowUpdate}
           sx={{
-            "& .MuiDataGrid-columnHeader": {
-              backgroundColor: "#1E1E2D !important", // Ensure each column header is colored
-              color: "white",
+            "& .MuiDataGrid-columnSeparator": {
+              display: "none",
             },
+            "& .MuiDataGrid-columnHeader": {
+              backgroundColor: "#1E1E2D !important",
+              color: "white",
+              maxHeight: "50px",
+              border: "none",
+            },
+            "& .MuiDataGrid-cell": {
+              border: "none",
+            },
+
+            // "& .MuiDataGrid-columnHeader": {
+            //   backgroundColor: "#1E1E2D !important", // Ensure each column header is colored
+            //   color: "white",
+            // },
           }}
         />
       </div>

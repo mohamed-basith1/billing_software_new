@@ -40,12 +40,12 @@ const CustomersTabs = () => {
   return (
     <Box
       sx={{
-        borderBottom: 1,
+        // borderBottom: 1,
         borderColor: "divider",
         height: "3rem",
         background: "white",
         // boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-        border: ".1px solid lightgrey",
+        // border: ".1px solid lightgrey",
         borderRadius: "8px",
       }}
     >

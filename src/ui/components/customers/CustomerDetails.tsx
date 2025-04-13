@@ -282,8 +282,8 @@ const CustomerDetails = () => {
         minWidth: "400px",
         maxWidth: "900px",
         p: 2,
-        borderRadius: "8px",
-        border: ".1px solid lightgrey",
+        // borderRadius: "8px",
+        borderLeft: ".1px solid lightgrey",
         bgcolor: "white",
         overflow: "hidden",
         display: "flex",
@@ -377,10 +377,10 @@ const CustomerDetails = () => {
                   display: "flex",
                   flexWrap: "wrap",
                   gap: "20px",
-                  bgcolor: "#F7F7FE",
+                  // bgcolor: "#F7F7FE",
                   p: 3,
                   borderRadius: "8px",
-                  border: ".1px solid lightgrey",
+                  // border: ".1px solid lightgrey",
                 }}
               >
                 {customerDetails.map((detail, i) => (
@@ -477,6 +477,12 @@ const CustomerDetails = () => {
               disableColumnMenu
               hideFooter
               sx={{
+                "& .MuiDataGrid-cell": {
+                  border: "none",
+                },
+                "& .MuiDataGrid-columnSeparator": {
+                  display: "none",
+                },
                 "& .MuiDataGrid-columnHeader": { color: "black" },
                 border: "1px solid white",
               }}

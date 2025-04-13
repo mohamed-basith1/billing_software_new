@@ -17,6 +17,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
   // Authentication API
   createAccount: (data) => ipcRenderer.invoke("create-account", data),
   loginAPI: (data) => ipcRenderer.invoke("login-api", data),
+  getEmployee: () => ipcRenderer.invoke("get-employee-list"),
 
   // Customers API
   createCustomer: (data) => ipcRenderer.invoke("create-customer", data),
@@ -65,8 +66,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
   getTransactionSummary: () => ipcRenderer.invoke("get-transaction-summary"),
   getTransactionHistory: (fromDate, toDate) =>
     ipcRenderer.invoke("get-transaction-history", { fromDate, toDate }),
-
-
 
   getLast10TransactionHistory: () =>
     ipcRenderer.invoke("get-last10transaction-history"),

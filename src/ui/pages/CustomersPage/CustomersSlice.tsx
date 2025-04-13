@@ -34,7 +34,6 @@ const customersSlice = createSlice({
     setCustomerSearch: (state, action) => {
       state.customerSearch = action.payload;
     },
-
     setCustomerDetails: (state, action: any) => {
       if (action.payload.field === undefined) {
         Object.entries(action.payload).forEach(([key, value]) => {

@@ -35,7 +35,7 @@ const Tabs = () => {
         bgcolor: "white",
         borderRadius: 2,
         // boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-        border: ".1px solid lightgrey",
+        // border: ".1px solid lightgrey",
         height: "3rem",
         display: "flex",
         justifyContent: "space-between",

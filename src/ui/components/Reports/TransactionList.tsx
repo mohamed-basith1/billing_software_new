@@ -251,7 +251,7 @@ const TransactionList = ({}: any) => {
       sx={{
         borderRadius: 1,
         height: "calc(100vh - 20rem)",
-
+        mt: 1,
         display: "flex",
         flexDirection: "column",
       }}
@@ -276,7 +276,14 @@ const TransactionList = ({}: any) => {
         disableColumnFilter
         disableColumnSelector
         sx={{
-          border: "none",
+          "& .MuiDataGrid-scrollbarFiller": {
+            borderBottom: "none",
+          },
+
+          "& .MuiDataGrid-row--borderBottom": {
+            borderBottom: "none !important",
+          },
+          border: "none !important",
           "& .MuiDataGrid-columnSeparator": {
             display: "none",
           },
@@ -286,11 +293,19 @@ const TransactionList = ({}: any) => {
             color: "rgba(0,0,0,.4)",
             border: "none",
           },
+          "& .MuiDataGrid-row": {
+            border: "none !important",
+            borderBottom: "none !important",
+          },
+          "& .MuiDataGrid-cell": {
+            borderBottom: "none !important",
+          },
           "& .MuiDataGrid-columnHeaders": {
             border: "none",
             backgroundColor: "white",
             fontSize: ".8rem",
             fontWeight: 800,
+            borderBottom: "none",
           },
           "& .MuiDataGrid-cell": {
             border: "none",

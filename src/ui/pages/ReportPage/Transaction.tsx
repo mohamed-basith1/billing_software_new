@@ -4,6 +4,7 @@ import {
   selectTransactionHistoryTab,
   selectTransactionSummary,
   setAddTransactionModal,
+  setEmployeeList,
   setTransactionHistoryTab,
   setTransactionSummary,
 } from "./ReportsSlice";
@@ -30,7 +31,16 @@ const Transaction = () => {
       dispatch(setTransactionSummary(response.data));
     };
 
+    const getEmployeeListHandler = async () => {
+      //@ts-ignore
+      let response = await window.electronAPI.getEmployee();
+
+      console.log("response employee list", response);
+      dispatch(setEmployeeList(response.data));
+    };
+
     getTransactionSummaryHandler();
+    getEmployeeListHandler();
   }, []);
   return (
     <Box
@@ -190,7 +200,7 @@ const Transaction = () => {
               flex: 1,
               display: "flex",
               flexDirection: "column",
-
+              mt: 1,
               justifyContent: "flex-start",
             }}
           >

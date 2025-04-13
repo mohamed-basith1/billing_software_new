@@ -53,6 +53,7 @@ import {
 import { selectUserName } from "../LoginPage/LoginSlice";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import { AnimatedCounter } from "../ReportPage/Dashboard";
 
 const PaymentsCredit = () => {
   dayjs.extend(utc);
@@ -432,8 +433,12 @@ const PaymentsCredit = () => {
                     Total Credit Payments
                   </Typography>
                   <Typography sx={{ mt: 1 }}>
-                    {" "}
-                    ₹{getTotalAmount(UPIBillsList, "total_amount")}
+                    <AnimatedCounter
+                      value={getTotalAmount(UPIBillsList, "total_amount")}
+                      isCurrency={true}
+                    />
+                    {/* {" "}
+                    ₹{getTotalAmount(UPIBillsList, "total_amount")} */}
                   </Typography>
                 </Box>
 
@@ -448,7 +453,11 @@ const PaymentsCredit = () => {
                     Total Payments Received
                   </Typography>
                   <Typography sx={{ mt: 1 }}>
-                    ₹{getTotalAmount(UPIBillsList, "amount_paid")}
+                    <AnimatedCounter
+                      value={getTotalAmount(UPIBillsList, "amount_paid")}
+                      isCurrency={true}
+                    />
+                    {/* ₹{getTotalAmount(UPIBillsList, "amount_paid")} */}
                   </Typography>
                 </Box>
                 <Box>
@@ -462,7 +471,11 @@ const PaymentsCredit = () => {
                     Total Due Amount
                   </Typography>
                   <Typography sx={{ mt: 1 }}>
-                    ₹{getTotalAmount(UPIBillsList, "balance")}
+                    <AnimatedCounter
+                      value={getTotalAmount(UPIBillsList, "balance")}
+                      isCurrency={true}
+                    />
+                    {/* ₹{getTotalAmount(UPIBillsList, "balance")} */}
                   </Typography>
                 </Box>
 
@@ -477,7 +490,11 @@ const PaymentsCredit = () => {
                     Return Pending Amount
                   </Typography>
                   <Typography sx={{ mt: 1 }}>
-                    ₹{getTotalAmount(UPIBillsList, "return_amount")}
+                    <AnimatedCounter
+                      value={getTotalAmount(UPIBillsList, "return_amount")}
+                      isCurrency={true}
+                    />
+                    {/* ₹{getTotalAmount(UPIBillsList, "return_amount")} */}
                   </Typography>
                 </Box>
               </Box>
@@ -908,13 +925,25 @@ const PaymentsCredit = () => {
                     }}
                     hideFooter
                     sx={{
-                      borderRadius: 0,
-                      "& .MuiDataGrid-columnHeader": {
-                        backgroundColor: "#1E1E2D !important", // Ensure each column header is colored
-                        color: "white",
-                        borderRadius: 0,
-                        pt: 0,
+                      "& .MuiDataGrid-columnSeparator": {
+                        display: "none",
                       },
+                      "& .MuiDataGrid-columnHeader": {
+                        backgroundColor: "#1E1E2D !important",
+                        color: "white",
+                        maxHeight: "50px",
+                        border: "none",
+                      },
+                      "& .MuiDataGrid-cell": {
+                        border: "none",
+                      },
+                      borderRadius: 0,
+                      // "& .MuiDataGrid-columnHeader": {
+                      //   backgroundColor: "#1E1E2D !important", // Ensure each column header is colored
+                      //   color: "white",
+                      //   borderRadius: 0,
+                      //   pt: 0,
+                      // },
                     }}
                   />
                 </Box>

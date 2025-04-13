@@ -99,4 +99,24 @@ export function AuthenticationRouter() {
       };
     }
   });
+
+  ipcMain.handle("get-employee-list", async (_, data) => {
+    try {
+      const employee = await AuthendicationModel.find({
+        role: "employee",
+      });
+
+      return {
+        status: 201,
+        message: "Employee List",
+        data: JSON.parse(JSON.stringify(employee)),
+      };
+    } catch (error) {
+      return {
+        status: 500,
+        message: "Internal server error.",
+        // error: error.message,
+      };
+    }
+  });
 }

@@ -47,6 +47,7 @@ import {
 import { selectUserName } from "../LoginPage/LoginSlice";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import { AnimatedCounter } from "../ReportPage/Dashboard";
 
 const PaymentsUPI = () => {
   dayjs.extend(utc);
@@ -393,23 +394,33 @@ const PaymentsUPI = () => {
               <Box sx={{ display: "flex", gap: "60px" }}>
                 <Box>
                   <Typography sx={{ color: "grey", fontSize: ".8rem" }}>
-                    Total UPI Received
+                    Total UPI Bill Received
                   </Typography>
                   <Typography sx={{ mt: 1 }}>
-                    {" "}
-                    ₹{getTotalAmount(UPIBillsList, "total_amount")}
+                    <AnimatedCounter
+                      value={getTotalAmount(UPIBillsList, "total_amount")}
+                      isCurrency={true}
+                    />{" "}
+                    {/* ₹{getTotalAmount(UPIBillsList, "total_amount")} */}
                   </Typography>
                 </Box>
                 <Box>
                   <Typography sx={{ color: "grey", fontSize: ".8rem" }}>
-                    Today UPI Received
+                    Today UPI Bill Received
                   </Typography>
                   <Typography sx={{ mt: 1 }}>
-                    ₹
+                    <AnimatedCounter
+                      value={getTotalAmount(
+                        filterTodayBills(UPIBillsList),
+                        "total_amount"
+                      )}
+                      isCurrency={true}
+                    />
+                    {/* ₹
                     {getTotalAmount(
                       filterTodayBills(UPIBillsList),
                       "total_amount"
-                    )}
+                    )} */}
                   </Typography>
                 </Box>
               </Box>
@@ -748,13 +759,25 @@ const PaymentsUPI = () => {
                     }}
                     hideFooter
                     sx={{
-                      borderRadius: 0,
-                      "& .MuiDataGrid-columnHeader": {
-                        backgroundColor: "#1E1E2D !important", // Ensure each column header is colored
-                        color: "white",
-                        borderRadius: 0,
-                        pt: 0,
+                      "& .MuiDataGrid-columnSeparator": {
+                        display: "none",
                       },
+                      "& .MuiDataGrid-columnHeader": {
+                        backgroundColor: "#1E1E2D !important",
+                        color: "white",
+                        maxHeight: "50px",
+                        border: "none",
+                      },
+                      "& .MuiDataGrid-cell": {
+                        border: "none",
+                      },
+                      borderRadius: 0,
+                      // "& .MuiDataGrid-columnHeader": {
+                      //   backgroundColor: "#1E1E2D !important", // Ensure each column header is colored
+                      //   color: "white",
+                      //   borderRadius: 0,
+                      //   pt: 0,
+                      // },
                     }}
                   />
                 </Box>

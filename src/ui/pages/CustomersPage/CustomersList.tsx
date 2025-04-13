@@ -6,7 +6,7 @@ const CustomersList = () => {
   return (
     <Box
       sx={{
-        height: "calc(100% - 3.5rem)",
+        height: "calc(100% - 3rem)",
         width: "100%",
         borderRadius: "8px",
         display: "flex",
@@ -21,8 +21,9 @@ const CustomersList = () => {
           mt: 2,
           display: "flex",
           justifyContent: "space-between",
-          gap: "10px",
+          // gap: "10px",
           height: "100%",
+          borderRadius:"8px",
         }}
       >
         {/* Left Container */}

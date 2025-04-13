@@ -94,6 +94,26 @@ const BillingPrice = () => {
     };
     //@ts-ignore
     let response = await window.electronAPI.createBill(payload);
+    //
+    if (selectedBill.payment_method !== "Credit Bill" && selectedBill.payment_method !== "Self Use") {
+      let TransactionPayload = {
+        status: "Increased",
+        bill_no: "None",
+        customer: "None",
+        employee: "",
+        method: selectedBill.payment_method,
+        reason: "Bill",
+        amount: Number(selectedBill.total_amount),
+        handler: userName,
+        billtransactionhistory: true,
+        password: "",
+      };
+      //@ts-ignore
+      let response = await window.electronAPI.addTransactionHistory(
+        TransactionPayload
+      );
+    }
+
     if (response.status !== 201) {
       toast.error(`${response.message}`, { position: "bottom-left" });
     } else {

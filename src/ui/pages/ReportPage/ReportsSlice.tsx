@@ -16,6 +16,7 @@ const initialState: any = {
   transactionHistoryTab: 0,
   transactionAmountTakeTab: 0,
   submitLoader: false,
+  employeeList: [],
 };
 
 const reportSlice = createSlice({
@@ -52,6 +53,9 @@ const reportSlice = createSlice({
     setSubmitLoader: (state, action) => {
       state.submitLoader = action.payload;
     },
+    setEmployeeList: (state, action) => {
+      state.employeeList = action.payload;
+    },
   },
 });
 
@@ -67,6 +71,7 @@ export const {
   setAddTransactionModal,
   setSubmitLoader,
   setTransactionSummary,
+  setEmployeeList,
 } = reportSlice.actions;
 
 // Selectors
@@ -87,5 +92,6 @@ export const selectAddTransactionModal = (state: any) =>
 export const selectSubmitLoader = (state: any) => state.reports.submitLoader;
 export const selectTransactionSummary = (state: any) =>
   state.reports.transactionSummary;
+export const selectEmployeeList = (state: any) => state.reports.employeeList;
 
 export default reportSlice.reducer;

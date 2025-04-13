@@ -40,6 +40,42 @@ const CustomersCreate = () => {
     }
   };
 
+  console.log("customerDetails", customerDetails);
+
+  function isCustomerDataValid(state) {
+    const requiredFields = [
+      "customerName",
+      "customerAddress",
+      "customerPrimaryContact",
+    ];
+
+    // Check required fields are non-empty
+    const areRequiredFieldsFilled = requiredFields.every(
+      (field) => state[field] && state[field].trim() !== ""
+    );
+
+    // Check primary and secondary contact numbers (if present) are exactly 10 digits
+    const isPrimaryContactValid =
+      state.customerPrimaryContact &&
+      state.customerPrimaryContact.trim().length === 10;
+
+    const isSecondaryContactValid =
+      !state.customerSecondaryContact || // allow empty
+      state.customerSecondaryContact.trim().length === 10;
+
+    // Check pincode (if present) is exactly 6 digits
+    const isPincodeValid =
+      !state.customerPincode || state.customerPincode.trim().length === 6;
+
+    return (
+      areRequiredFieldsFilled &&
+      isPrimaryContactValid &&
+      isSecondaryContactValid &&
+      isPincodeValid
+    );
+  }
+
+  console.log("isCustomerDataValid", isCustomerDataValid(customerDetails));
   const handleChange = (field: any, value: any) => {
     setError(false);
     //@ts-ignore
@@ -49,16 +85,16 @@ const CustomersCreate = () => {
   return (
     <Box
       sx={{
-        height: "calc(100% - 3.5rem)",
+        height: "calc(100% - 3rem)",
         width: "100%",
         background: "white",
-        border: ".1px solid lightgrey",
+        // border: ".1px solid lightgrey",
         borderRadius: "8px",
         p: 2,
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        mt: 3,
+        mt: 2,
         overflow: "hidden",
       }}
     >
@@ -189,7 +225,16 @@ const CustomersCreate = () => {
           <Button
             variant="contained"
             fullWidth
-            sx={{ bgcolor: "#1E1E2D", mt: 2 }}
+            sx={{
+              bgcolor: "#1E1E2D",
+              mt: 2,
+              pointerEvents:
+                isCustomerDataValid(customerDetails) === false
+                  ? "none"
+                  : "auto",
+              opacity:
+                isCustomerDataValid(customerDetails) === false ? ".5" : "1",
+            }}
             onClick={handleSubmit}
           >
             Create Customer

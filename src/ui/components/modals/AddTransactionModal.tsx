@@ -23,6 +23,7 @@ import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectAddTransactionModal,
+  selectEmployeeList,
   selectSubmitLoader,
   selectTransactionAmountTakeTab,
   selectTransactionData,
@@ -75,6 +76,8 @@ const AddTransactionModal = () => {
   const loader = useSelector(selectSubmitLoader);
   const transactionHistoryList = useSelector(selectTransactionData);
   const transactionSummary = useSelector(selectTransactionSummary);
+
+  const employeeList = useSelector(selectEmployeeList);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -135,6 +138,7 @@ const AddTransactionModal = () => {
       amount: Number(amount),
       handler: username,
       password,
+      billtransactionhistory:false
     };
     //@ts-ignore
     let response = await window.electronAPI.addTransactionHistory(
@@ -296,9 +300,12 @@ const AddTransactionModal = () => {
                     label="Select Employee"
                     onChange={(e: any) => setSelectedEmployee(e.target.value)}
                   >
-                    <MenuItem value={"admin"}>Admin</MenuItem>
+                    {employeeList.map((data: any) => (
+                      <MenuItem value={data.username}>{data.username}</MenuItem>
+                    ))}
+                    {/* <MenuItem value={"admin"}>Admin</MenuItem>
                     <MenuItem value={"amrin"}>Amrin</MenuItem>
-                    <MenuItem value={"test"}>Test</MenuItem>
+                    <MenuItem value={"test"}>Test</MenuItem> */}
                   </Select>
                 </FormControl>
               </Box>

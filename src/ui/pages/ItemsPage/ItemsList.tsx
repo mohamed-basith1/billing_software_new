@@ -62,8 +62,8 @@ const ItemsList = () => {
             value: itemSummary?.total_items,
             icon: <InventoryIcon fontSize="large" />,
             tab: 0,
-            bgColor: "rgba(34, 179, 120, 0.2)", // Green
-            color: "#22b378",
+            bgColor: "rgba(246, 173, 85, 0.2)", // Amber
+            color: "#f6ad55",
             description: "Total number of different items in your inventory",
           },
           {
@@ -81,13 +81,19 @@ const ItemsList = () => {
             value: Math.round(itemSummary?.total_item_price),
             icon: <CurrencyRupeeIcon fontSize="large" />,
             tab: 2,
-            bgColor: "rgba(246, 173, 85, 0.2)", // Amber
-            color: "#f6ad55",
+
+            bgColor: "rgba(34, 179, 120, 0.2)", // Green
+            color: "#22b378",
+
             description: "Total value of all items in your inventory",
           },
         ].map((item) => (
           <Box
-            onClick={() => dispatch(setItemsTab(item.tab))}
+            onClick={() => {
+              if (item.tab !== 2) {
+                return dispatch(setItemsTab(item.tab));
+              }
+            }}
             key={item.tab}
             sx={{
               flex: "1 1 200px",
@@ -104,7 +110,7 @@ const ItemsList = () => {
               transition: "box-shadow 0.5s ease-in-out",
               cursor: item.tab !== 2 ? "pointer" : "auto",
               boxShadow:
-                item.tab === itemsTab ? `0 4px 10px ${item.color}` : "",
+                item.tab === itemsTab ? `0 1px 10px ${item.color}` : "",
             }}
           >
             <Box

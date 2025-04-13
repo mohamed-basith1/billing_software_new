@@ -109,10 +109,20 @@ const ItemsListTable = () => {
           hideFooter
           sx={{
             minHeight: "400px", // Ensure it has a scrollable area
+
+            "& .MuiDataGrid-columnSeparator": {
+              display: "none",
+            },
             "& .MuiDataGrid-columnHeader": {
               backgroundColor: "#1E1E2D !important",
               color: "white",
+              maxHeight: "50px",
+              border: "none",
             },
+            "& .MuiDataGrid-cell": {
+              border: "none",
+            },
+            border: "none",
           }}
         />
       </Box>

@@ -44,7 +44,10 @@ const ItemsNewEntry = () => {
           (Number(value) / 1000) * Number(perKgPurchasedPrice) || 0;
       }
       dispatch(
-        setField({ field: "itemPurchasedPrice", value: calculatedPrice })
+        setField({
+          field: "itemPurchasedPrice",
+          value: Math.round(calculatedPrice),
+        })
       );
     }
 
@@ -57,7 +60,10 @@ const ItemsNewEntry = () => {
       }
 
       dispatch(
-        setField({ field: "perKgPurchasedPrice", value: calculatedPerKgPrice })
+        setField({
+          field: "perKgPurchasedPrice",
+          value: Math.round(calculatedPerKgPrice),
+        })
       );
 
       // Update selling price only if it was calculated automatically before
@@ -69,7 +75,9 @@ const ItemsNewEntry = () => {
         dispatch(
           setField({
             field: "sellingPricePerUOM",
-            value: Number(calculatedPerKgPrice) + Number(marginPerUOM),
+            value: Math.round(
+              Number(calculatedPerKgPrice) + Number(marginPerUOM)
+            ),
           })
         );
       }
@@ -79,7 +87,7 @@ const ItemsNewEntry = () => {
       dispatch(
         setField({
           field: "sellingPricePerUOM",
-          value: Number(value) + Number(marginPerUOM || 0),
+          value: Math.round(Number(value) + Number(marginPerUOM || 0)),
         })
       );
     }
@@ -90,7 +98,7 @@ const ItemsNewEntry = () => {
       dispatch(
         setField({
           field: "sellingPricePerUOM",
-          value: Number(value),
+          value: Math.round(Number(value)),
         })
       );
 
@@ -99,7 +107,7 @@ const ItemsNewEntry = () => {
         dispatch(
           setField({
             field: "marginPerUOM",
-            value: Number(value) - Number(perKgPurchasedPrice),
+            value: Math.round(Number(value) - Number(perKgPurchasedPrice)),
           })
         );
       }
@@ -109,18 +117,18 @@ const ItemsNewEntry = () => {
       dispatch(
         setField({
           field: "sellingPricePerUOM",
-          value: Number(perKgPurchasedPrice || 0) + Number(value),
+          value: Math.round(Number(perKgPurchasedPrice || 0) + Number(value)),
         })
       );
     }
   };
 
-  const handleExpiryDateChange = (date: any) => {
-    if (date) {
-      const isoDate = dayjs(date).toISOString(); // Convert to ISO format
-      dispatch(setField({ field: "expiryDate", value: isoDate }));
-    }
-  };
+  // const handleExpiryDateChange = (date: any) => {
+  //   if (date) {
+  //     const isoDate = dayjs(date).toISOString(); // Convert to ISO format
+  //     dispatch(setField({ field: "expiryDate", value: isoDate }));
+  //   }
+  // };
 
   const validateForm = () => {
     const fieldsToCheck = [
@@ -132,12 +140,12 @@ const ItemsNewEntry = () => {
       perKgPurchasedPrice,
       marginPerUOM,
       sellingPricePerUOM,
-      expiryDate,
+      // expiryDate,
       lowStockReminder,
     ];
 
     if (fieldsToCheck.some((field) => !String(field || "").trim())) {
-      toast.error("All fields must be filled!", { position: "bottom-left" });
+      // toast.error("All fields must be filled!", { position: "bottom-left" });
       return false;
     }
 
@@ -324,14 +332,14 @@ const ItemsNewEntry = () => {
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
+            {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
                 label="Expiry Date"
                 value={expiryDate ? dayjs(expiryDate) : null}
                 onChange={handleExpiryDateChange}
                 slotProps={{ textField: { fullWidth: true } }}
               />
-            </LocalizationProvider>
+            </LocalizationProvider> */}
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
@@ -348,7 +356,12 @@ const ItemsNewEntry = () => {
       <Button
         variant="contained"
         fullWidth
-        sx={{ bgcolor: "#1E1E2D", mt: 2 }}
+        sx={{
+          pointerEvents: validateForm() === false ? "none" : "auto",
+          opacity: validateForm() === false ? ".5" : "1",
+          bgcolor: "#1E1E2D",
+          mt: 2,
+        }}
         onClick={handleCreateItem}
       >
         Create Item
