@@ -9,6 +9,7 @@ import { AuthenticationRouter } from "./Routes/AuthenticationRouter.js";
 import { CustomersRouter } from "./Routes/CustomersRouter.js";
 import { BillsRouter } from "./Routes/BillsRouter.js";
 import { TransactionRouter } from "./Routes/TransactionRouter.js";
+import { DealerBillRouter } from "./Routes/DealerBillHistory.js";
 
 app.commandLine.appendSwitch("disable-features", "AutofillServerCommunication");
 app.commandLine.appendSwitch(
@@ -23,6 +24,7 @@ app.on("ready", async () => {
   CustomersRouter();
   BillsRouter();
   TransactionRouter();
+  DealerBillRouter();
 
   const mainWindow = new BrowserWindow({
     webPreferences: {

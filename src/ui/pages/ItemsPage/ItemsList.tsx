@@ -12,6 +12,7 @@ import { selectItemsTab, setItemsTab } from "./ItemsSlice";
 
 import ItemsLowStock from "../../components/items/ItemsLowStock";
 import { AnimatedCounter } from "../ReportPage/Dashboard";
+import EditSelectedItemModal from "../../components/modals/EditSelectedItemModal";
 
 const ItemsList = () => {
   const dispatch = useDispatch();
@@ -148,7 +149,13 @@ const ItemsList = () => {
                 />
               </Box>
             </Box>
-            <Typography variant="caption" color="text.secondary" width={"10rem"} sx={{mt:2}}>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              width={"10rem"}
+              sx={{ mt: 2 }}
+              
+            >
               {item.description}
             </Typography>
           </Box>
@@ -157,6 +164,8 @@ const ItemsList = () => {
       <Box sx={{ height: "100%", width: "100%" }}>
         {itemsTab === 0 ? <ItemsListTable /> : <ItemsLowStock />}
       </Box>
+
+      <EditSelectedItemModal />
     </Box>
   );
 };

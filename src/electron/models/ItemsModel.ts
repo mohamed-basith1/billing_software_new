@@ -8,13 +8,14 @@ const getISTDate = () => {
 const ItemSchema = new mongoose.Schema(
   {
     item_name: { type: String, required: true, unique: true },
-    code: { type: String, required: true, unique: true },
+    code: { type: String, required: true },
     uom: { type: String, required: true },
     qty: { type: Number, required: true },
     purchased_rate: { type: Number, required: true },
     rate: { type: Number, required: true },
     amount: { type: Number, required: true },
     stock_qty: { type: Number, required: true },
+    unique_id: { type: String, required: true },
     margin: { type: Number },
     low_stock_remainder: { type: Number },
     item_expiry_date: { type: String },

@@ -16,19 +16,24 @@ import React, { useEffect, useRef, useState } from "react";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  selectDealerPurchasedPrice,
   selectFilterSearchItem,
   selectItemSearch,
+  selectItems,
   setClearFilterData,
   setClearItems,
   setClearItemsearch,
   setDateTigger,
   setFilterSearchItem,
-  setItemsearch,
+  setItemSearch,
+  setLoadItemWithDealer,
+  setNewItemEntryModel,
 } from "../../pages/ItemsPage/ItemsSlice";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
+import { v4 as uuidv4 } from "uuid";
 const itemsList = [
   {
     item_name: "Basmati Rice",
@@ -89,7 +94,8 @@ const ItemsDailyEntry = () => {
   const dispatch = useDispatch();
   const itemsearch = useSelector(selectItemSearch);
   const selectedItem = useSelector(selectFilterSearchItem);
-
+  const dealerDetails = useSelector(selectItems);
+  const dealerPurchasedPrice = useSelector(selectDealerPurchasedPrice);
   const [suggestions, setSuggestions] = useState<typeof itemsList>([]);
   const [selectedFlag, setSelectFlag] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -101,10 +107,10 @@ const ItemsDailyEntry = () => {
       setSuggestions([]);
     } else {
       const getSuggestionsHandle = async () => {
-        const sanitizedData = JSON.parse(JSON.stringify(itemsearch));
+        // const sanitizedData = JSON.parse(JSON.stringify(itemsearch));
 
         //@ts-ignore
-        const results = await window.electronAPI.searchItem(sanitizedData);
+        const results = await window.electronAPI.searchItem(itemsearch);
         setSuggestions(results);
         console.log("suggestion data", results);
       };
@@ -116,11 +122,15 @@ const ItemsDailyEntry = () => {
   useEffect(() => {
     return () => {
       dispatch(setClearItemsearch());
+      setSuggestions([]);
+      setUplaodStock(0);
+      dispatch(setClearFilterData());
     };
   }, []);
 
   const handleSelect = (item: any) => {
-    dispatch(setItemsearch(item.item_name)); // Update search first
+    console.log("item suggestiojg", item);
+    dispatch(setItemSearch(item.item_name)); // Update search first
     setSelectFlag(true);
     setTimeout(() => {
       setSuggestions([]);
@@ -132,6 +142,21 @@ const ItemsDailyEntry = () => {
   };
 
   const handleUploadStockSubmit = async () => {
+    let enterprice =
+      selectedItem.uom === "gram"
+        ? (Number(uploadStock) / 1000) * selectedItem.purchased_rate
+        : Number(uploadStock) * selectedItem.purchased_rate;
+
+    if (enterprice > Number(dealerPurchasedPrice)) {
+      toast.error(
+        `Entered item price is more than the dealer's purchased price`,
+        {
+          position: "bottom-left",
+        }
+      );
+      return;
+    }
+
     let newStockQtyAndExpiry = {
       item_name: selectedItem.item_name,
       code: selectedItem.code,
@@ -141,43 +166,58 @@ const ItemsDailyEntry = () => {
       uom: selectedItem.uom,
       stock_qty: Number(uploadStock),
       item_expiry_date: "",
-      // item_expiry_date: dayjs(selectedDate).toISOString(), // Keep expiry date
+      _id: selectedItem._id,
+      unique_id: selectedItem.unique_id,
+      total_purchased_amount:
+        selectedItem.uom === "gram"
+          ? (Number(uploadStock) / 1000) * Number(selectedItem.purchased_rate)
+          : Number(uploadStock) * Number(selectedItem.purchased_rate),
     };
-
-    //@ts-ignore
-    let response: any = await window.electronAPI.updateItem(
-      selectedItem._id,
+    console.log(
+      "newStockQtyAndExpirynewStockQtyAndExpirynewStockQtyAndExpirynewStockQtyAndExpiry",
       newStockQtyAndExpiry
     );
-
-    if (response.status !== 200) {
-      toast.error(`${response.message}`, { position: "bottom-left" });
-    } else {
-      dispatch(setClearFilterData());
-      dispatch(setDateTigger());
-      setUplaodStock("");
-      toast.success(`${response.message}`, { position: "bottom-left" });
-    }
+    dispatch(setLoadItemWithDealer(newStockQtyAndExpiry));
+    dispatch(setClearFilterData());
+    setUplaodStock(0);
+    setSuggestions([]);
   };
 
+  const isDealerInfoInvalid = () => {
+    return (
+      dealerDetails.dealerName === "" ||
+      Number(dealerDetails.dealerPurchasedPrice) < 1
+    );
+  };
+  console.log("suggestions list", suggestions);
   return (
     <Box
       sx={{
         display: "flex",
         flexDirection: "column",
         width: "100%",
-        pt: 2,
+        pt: 1,
+        opacity: isDealerInfoInvalid() ? 0.5 : 1,
         justifyContent: "space-between",
-        height: "100%",
+        flex: 1,
       }}
+      aria-hidden="true"
     >
       {/* Search Bar with relative positioning for absolute dropdown */}
-      <Box sx={{ position: "relative", width: "100%" }}>
+      <Box
+        sx={{
+          position: "relative",
+          width: "100%",
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
         <TextField
           placeholder="Item Name or Code"
           variant="outlined"
+          disabled={isDealerInfoInvalid()}
           sx={{
-            width: "100%",
+            width: "50%",
             p: 0.5,
             background: "#F7F7FE",
             borderRadius: "8px",
@@ -193,7 +233,7 @@ const ItemsDailyEntry = () => {
           value={itemsearch}
           size="small"
           inputRef={itemSearchRef}
-          onChange={(e) => dispatch(setItemsearch(e.target.value))}
+          onChange={(e) => dispatch(setItemSearch(e.target.value))}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -215,7 +255,7 @@ const ItemsDailyEntry = () => {
               position: "absolute",
               top: "100%",
               left: 0,
-              width: "100%",
+              width: "50%",
               background: "#fff",
               boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
               borderRadius: "8px",
@@ -238,6 +278,16 @@ const ItemsDailyEntry = () => {
             </List>
           </Paper>
         )}
+        <Button
+          onClick={() => {
+            if (isDealerInfoInvalid() === true ? false : true) {
+              dispatch(setNewItemEntryModel(true));
+            }
+          }}
+        >
+          {" "}
+          + New Item
+        </Button>
       </Box>
 
       {/* Display Selected Item in Grid Layout */}
@@ -260,7 +310,7 @@ const ItemsDailyEntry = () => {
           >
             Stock Item Details
           </Typography>
-          <Grid container spacing={2}>
+          <Grid container spacing={1}>
             {[
               { label: "Item Name", value: selectedItem.item_name },
               { label: "Code", value: selectedItem.code },
@@ -316,7 +366,7 @@ const ItemsDailyEntry = () => {
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <Box
             sx={{
-              height: "25%",
+              height: "20%",
               width: "100%",
               p: 2,
               display: "flex",
@@ -327,6 +377,7 @@ const ItemsDailyEntry = () => {
               label="Enter Stock Upload Qty"
               type="number"
               variant="outlined"
+              disabled={isDealerInfoInvalid()}
               value={uploadStock}
               onChange={(e) => setUplaodStock(e.target.value)}
               InputProps={{
@@ -338,22 +389,34 @@ const ItemsDailyEntry = () => {
               }}
               sx={{ mb: 2, width: "48.5%" }}
             />
-            {/* <DatePicker
-              label="Select Expiry Date"
-              sx={{ width: "48.5%" }}
-              value={selectedDate}
-              onChange={(newDate: any) => setSelectedDate(newDate)}
-              renderInput={(params: any) => <TextField {...params} fullWidth />}
-            /> */}
+            <TextField
+              label="Total Purchased Price"
+              type="number"
+              variant="outlined"
+              value={
+                selectedItem.uom === "gram"
+                  ? (uploadStock / 1000) * selectedItem.purchased_rate
+                  : uploadStock * selectedItem.purchased_rate
+              }
+              InputProps={{
+                endAdornment: <InputAdornment position="end">₹</InputAdornment>,
+              }}
+              // disabled
+              sx={{ mb: 2, width: "48.5%" }}
+            />
           </Box>
           <Button
             sx={{
-              opacity: !uploadStock ? ".5" : "1",
-              pointerEvents: !uploadStock ? "none" : "auot",
+              opacity: Number(uploadStock) > 0 ? "1" : ".5",
+              pointerEvents: Number(uploadStock) > 0 ? "auto" : "none",
             }}
-            onClick={() => handleUploadStockSubmit()}
+            onClick={() => {
+              if (isDealerInfoInvalid() === true ? false : true) {
+                handleUploadStockSubmit();
+              }
+            }}
           >
-            Upload Stock
+            Add Stock
           </Button>
         </LocalizationProvider>
       )}

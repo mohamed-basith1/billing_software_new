@@ -1,51 +1,105 @@
-import { Box, IconButton, InputAdornment, TextField } from "@mui/material";
-import { useEffect } from "react";
+import {
+  Box,
+  Button,
+  IconButton,
+  InputAdornment,
+  TextField,
+} from "@mui/material";
+import { useEffect, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import { useDispatch, useSelector } from "react-redux";
-import { selectItemList, setItemList } from "../../pages/ItemsPage/ItemsSlice";
+import {
+  selectItemList,
+  selectItemListSearch,
+  selectItemSearch,
+  setEditItemModal,
+  setItemList,
+  setItemListSearch,
+  setSelectItemName,
+  setSelectedItem,
+} from "../../pages/ItemsPage/ItemsSlice";
 
-export const columns = [
-  { field: "item_name", headerName: "ITEM NAME", flex: 2 },
-  { field: "code", headerName: "CODE", flex: 1 },
-  {
-    field: "purchased_rate",
-    headerName: "PURCHASED RATE",
-    flex: 1,
-  },
-  { field: "margin", headerName: "MARGIN", flex: 1 },
-  {
-    field: "amount",
-    headerName: "SELLING RATE",
-    flex: 1,
-  },
-  { field: "stock_qty", headerName: "STOCK QTY", flex: 1 },
-  { field: "uom", headerName: "UOM", flex: 1 },
-
-  {
-    field: "low_stock_remainder",
-    headerName: "LOW STOCK REMAINDER",
-    flex: 1,
-  },
-  {
-    field: "item_expiry_date",
-    headerName: "EXPIRY DATE",
-    flex: 1,
-    valueGetter: (params) => new Date(params).toLocaleDateString(),
-  },
-];
 const ItemsListTable = () => {
+  const columns = [
+    { field: "item_name", headerName: "ITEM NAME", flex: 2 },
+    { field: "code", headerName: "CODE", flex: 1 },
+    {
+      field: "purchased_rate",
+      headerName: "PURCHASED RATE",
+      flex: 1,
+    },
+    { field: "margin", headerName: "MARGIN", flex: 1 },
+    {
+      field: "amount",
+      headerName: "SELLING RATE",
+      flex: 1,
+    },
+    { field: "stock_qty", headerName: "STOCK QTY", flex: 1 },
+    { field: "uom", headerName: "UOM", flex: 1 },
+
+    {
+      field: "low_stock_remainder",
+      headerName: "LOW STOCK REMAINDER",
+      flex: 1,
+    },
+    {
+      field: "item_expiry_date",
+      headerName: "ACTION",
+      flex: 1,
+      renderCell: (params) => {
+        try {
+          console.log("testing ", params.row);
+          return (
+            <Button
+              onClick={() => {
+                dispatch(setSelectedItem(params.row));
+                dispatch(setSelectItemName(params.row.item_name));
+                dispatch(setEditItemModal(true));
+              }}
+              sx={{
+                height: "2rem",
+                bgcolor: "white",
+                color: "black",
+                "&:hover": {
+                  bgcolor: "white", // Change this to any color you want on hover,
+                  color: "black",
+                },
+              }}
+            >
+              Edit
+            </Button>
+          );
+        } catch (err) {
+          return <span>Error</span>;
+        }
+      },
+    },
+  ];
   const dispatch = useDispatch();
   const ItemList = useSelector(selectItemList);
+  const itemListSearch = useSelector(selectItemListSearch);
   useEffect(() => {
     const fetItemList = async () => {
       //@ts-ignore
       let response: any = await window.electronAPI.getItem();
+
+      console.log("first time", response);
       dispatch(setItemList(response));
     };
+    if (itemListSearch === "") {
+      fetItemList();
+    }
+  }, [itemListSearch]);
 
-    fetItemList();
-  }, []);
+  const handleSearch = async (data: any) => {
+    dispatch(setItemListSearch(data));
+    //@ts-ignore
+    let response = await window.electronAPI.searchItem(data);
+    console.log("search time", response);
+    dispatch(setItemList(response.map((data) => ({ id: data._id, ...data }))));
+  };
+
   return (
     <Box
       sx={{
@@ -81,9 +135,9 @@ const ItemsListTable = () => {
               borderRadius: "8px",
             },
           }}
-          value={""}
+          value={itemListSearch}
           size="small"
-          onChange={(e) => console.log("")}
+          onChange={(e) => handleSearch(e.target.value)}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">

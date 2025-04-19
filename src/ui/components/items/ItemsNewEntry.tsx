@@ -4,6 +4,8 @@ import {
   selectItems,
   setClearItems,
   setDateTigger,
+  selectItemsEntryTab,
+  setNewItemWithDealer,
 } from "../../pages/ItemsPage/ItemsSlice"; // Adjust the import path
 import {
   Box,
@@ -19,9 +21,11 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
+import { v4 as uuidv4 } from "uuid";
 
 const ItemsNewEntry = () => {
   const dispatch = useDispatch();
+  const ItemsEntryTab = useSelector(selectItemsEntryTab);
   const {
     itemName,
     itemUOM,
@@ -123,13 +127,6 @@ const ItemsNewEntry = () => {
     }
   };
 
-  // const handleExpiryDateChange = (date: any) => {
-  //   if (date) {
-  //     const isoDate = dayjs(date).toISOString(); // Convert to ISO format
-  //     dispatch(setField({ field: "expiryDate", value: isoDate }));
-  //   }
-  // };
-
   const validateForm = () => {
     const fieldsToCheck = [
       itemName,
@@ -193,7 +190,13 @@ const ItemsNewEntry = () => {
         stock_qty: Number(itemPurchasedQuantity),
         margin: Number(marginPerUOM),
         low_stock_remainder: Number(lowStockReminder),
+        unique_id: uuidv4(),
         item_expiry_date: expiryDate,
+        total_purchased_amount:
+          itemUOM === "gram"
+            ? (Number(itemPurchasedQuantity) / 1000) *
+              Number(perKgPurchasedPrice)
+            : Number(itemPurchasedQuantity) * Number(perKgPurchasedPrice),
         new_stock: [
           {
             item_name: capitalizeFirstLetter(itemName),
@@ -209,14 +212,30 @@ const ItemsNewEntry = () => {
         ],
       };
       const sanitizedData = JSON.parse(JSON.stringify(itemPayload)); // Removes undefined & BigInt
-      //@ts-ignore
-      let response = await window.electronAPI.insertItem(sanitizedData);
-      if (response.status !== 201) {
-        toast.error(`${response.message}`, { position: "bottom-left" });
+      console.log("insertItem upload data", sanitizedData);
+      if (ItemsEntryTab === 0) {
+        //@ts-ignore
+        let response = await window.electronAPI.existItemValidate(
+          sanitizedData
+        );
+        if (response.status === 200) {
+          dispatch(setNewItemWithDealer(sanitizedData));
+          dispatch(setClearItems());
+        } else {
+          toast.error(`${response.message}`, { position: "bottom-left" });
+        }
+
+        // updateItem
       } else {
-        dispatch(setClearItems());
-        dispatch(setDateTigger());
-        toast.success(`${response.message}`, { position: "bottom-left" });
+        //@ts-ignore
+        let response = await window.electronAPI.insertItem(sanitizedData);
+        if (response.status !== 201) {
+          toast.error(`${response.message}`, { position: "bottom-left" });
+        } else {
+          dispatch(setClearItems());
+          dispatch(setDateTigger());
+          toast.success(`${response.message}`, { position: "bottom-left" });
+        }
       }
     }
   };

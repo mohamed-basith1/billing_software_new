@@ -59,7 +59,8 @@ import {
 //   },
 // ];
 
-const SalesGraph = ({ data }:any) => {
+const SalesGraph = ({ data }: any) => {
+  console.log("sale graph data", data);
   return (
     <ResponsiveContainer width="100%" height="100%">
       <AreaChart
@@ -139,9 +140,11 @@ const SalesGraph = ({ data }:any) => {
           formatter={(value, name, props) => {
             // Format the displayed value in tooltip
             if (value >= 1000000) {
-              return [`₹${(value / 1000000).toFixed(1)}M`, name];
+              // return [`₹${(value / 1000000).toFixed(1)}M`, name];
+              return [`₹ ${value}`, name];
             } else if (value >= 1000) {
-              return [`₹${(value / 1000).toFixed(1)}k`, name];
+              // return [`₹${(value / 1000).toFixed(1)}k`, name];
+              return [`₹ ${value}`, name];
             }
             return [`₹${value}`, name];
           }}
@@ -159,7 +162,5 @@ const SalesGraph = ({ data }:any) => {
     </ResponsiveContainer>
   );
 };
-
-
 
 export default React.memo(SalesGraph);

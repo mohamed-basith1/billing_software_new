@@ -80,7 +80,31 @@ const CustomerSelectModal = () => {
       toast.success(`${response.message}`, { position: "bottom-left" });
     }
   };
- console.log("selectedBill1",selectedBill);
+  const handleBillWithoutPrint = async () => {
+    let payload: any = {
+      customer_name: selectedBill.customer_name,
+      customer_id: selectedBill.customer_id,
+      itemsList: selectedBill.items, // Embedding `ItemSchema`
+      discount: selectedBill.discount,
+      sub_amount: selectedBill.sub_amount,
+      total_amount: selectedBill.total_amount,
+      paid: selectedBill.paid,
+      amount_paid: 0,
+      payment_method: selectedBill.payment_method,
+      balance: selectedBill.total_amount,
+      billed_by: userName,
+    };
+    //@ts-ignore
+    let response = await window.electronAPI.createBill(payload);
+    if (response.status !== 201) {
+      toast.error(`${response.message}`, { position: "bottom-left" });
+    } else {
+      dispatch(setCustomerSelectModal(false));
+      dispatch(setClearBill());
+      toast.success(`${response.message}`, { position: "bottom-left" });
+    }
+  };
+  console.log("selectedBill1", selectedBill);
   return (
     <Modal
       open={customerSelectModal}
@@ -205,12 +229,18 @@ const CustomerSelectModal = () => {
           <Button
             variant="contained"
             sx={{ height: "2.2rem", width: "6rem" }}
-            disabled={
-              selectedBill.customer_id === "" 
-            }
+            disabled={selectedBill.customer_id === ""}
             onClick={() => handleBillPrint()}
           >
             Print bill
+          </Button>
+          <Button
+            variant="contained"
+            sx={{ height: "2.2rem" }}
+            disabled={selectedBill.customer_id === ""}
+            onClick={() => handleBillWithoutPrint()}
+          >
+            Bill without print
           </Button>
         </Box>
 

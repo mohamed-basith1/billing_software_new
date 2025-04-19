@@ -6,6 +6,13 @@ contextBridge.exposeInMainWorld("electronAPI", {
   getLowStockItem: () => ipcRenderer.invoke("get-low-stock-item"),
 
   insertItem: (data) => ipcRenderer.invoke("insert-item", data),
+  existItemValidate: (data) => ipcRenderer.invoke("exist-item-validate", data),
+  editItemDetails: (updatedData) =>
+    ipcRenderer.invoke("edit-item-details", updatedData),
+
+  //update-item
+
+  // exist-item-validate
   updateItem: (id, newData) => ipcRenderer.invoke("update-item", id, newData),
   deleteItem: (id) => ipcRenderer.invoke("delete-item", id),
   searchItem: (id) => ipcRenderer.invoke("search-item", id),
@@ -62,7 +69,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.invoke("get-dashboard-data", { fromDate, toDate }),
 
   // Transaction History
-
   getTransactionSummary: () => ipcRenderer.invoke("get-transaction-summary"),
   getTransactionHistory: (fromDate, toDate) =>
     ipcRenderer.invoke("get-transaction-history", { fromDate, toDate }),
@@ -72,4 +78,16 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
   addTransactionHistory: (data) =>
     ipcRenderer.invoke("add-transaction-history", { data }),
+
+  //dealer bill
+  createDealerBill: (data) => ipcRenderer.invoke("create-dealer-bill", data),
+  getDealerBillSummary: () => ipcRenderer.invoke("get-dealer-bill-summary"),
+  getDealerBill: () => ipcRenderer.invoke("get-dealer-bill"),
+  addDealerBillHistory: (data) =>
+    ipcRenderer.invoke("add-dealer-bill-history", data),
+  deleteDealerBillHistory: (data) =>
+    ipcRenderer.invoke("delete-dealer-bill-history", data),
+  deleteDealerPaymentHistory: (data) =>
+    ipcRenderer.invoke("delete-dealer-payment-history", data),
+  //
 });

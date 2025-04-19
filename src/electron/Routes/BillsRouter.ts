@@ -463,7 +463,7 @@ ipcMain.handle("get-dashboard-data", async (_event, { fromDate, toDate }) => {
   };
 
   const bills = await BillsModel.find(query).lean(); // Use lean() for better performance
-
+  console.log("bills list", bills);
   let totalRevenue = 0;
   let totalProfit = 0;
 
@@ -491,7 +491,8 @@ ipcMain.handle("get-dashboard-data", async (_event, { fromDate, toDate }) => {
 
   // Aggregate revenue by date
   const revenueByDate = bills.reduce((acc, bill) => {
-    const date = new Date(bill.createdAt).toLocaleDateString("en-GB"); // Format: dd/mm/yyyy
+    const date = new Date(new Date(bill.createdAt).setUTCHours(0, 0, 0, 0)).toLocaleDateString("en-GB");
+
     const amount = bill.total_amount;
 
     if (acc[date]) {

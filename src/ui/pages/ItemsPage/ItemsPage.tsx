@@ -5,6 +5,7 @@ import ItemsEntry from "./ItemsEntry";
 import { useDispatch, useSelector } from "react-redux";
 import { selectCurrentTab } from "./ItemsSlice";
 import ItemsList from "./ItemsList";
+import ItemPurchasedHistory from "./ItemPurchasedHistory";
 
 export default function ItemsPage() {
   const currentTab = useSelector(selectCurrentTab);
@@ -26,9 +27,9 @@ export default function ItemsPage() {
         <ItemsList />
       ) : currentTab === 1 ? (
         <ItemsEntry />
+      ) : currentTab === 2 ? (
+        <ItemPurchasedHistory />
       ) : null}
-      {/* <CustomerEditModal />
-      <DeleteModal /> */}
     </Box>
   );
 }

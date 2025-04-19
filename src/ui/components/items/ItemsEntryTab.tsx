@@ -9,6 +9,8 @@ import {
   selectItemsEntryTab,
   setItemsEntryTab,
 } from "../../pages/ItemsPage/ItemsSlice";
+import { OutlinedInput } from "@mui/material";
+import DealerInfoForm from "./DealerInfoForm";
 
 function a11yProps(index: number) {
   return {
@@ -28,8 +30,7 @@ export default function ItemsEntryTab() {
     <Box
       sx={{
         width: "100%",
-        height: "calc(100%)",
-
+        // height: "calc(100%)",
         boxSizing: "border-box",
       }}
     >
@@ -39,12 +40,9 @@ export default function ItemsEntryTab() {
           onChange={handleChange}
           aria-label="basic tabs example"
         >
-          <Tab label="Item Entry" {...a11yProps(0)} />
-          <Tab label="New Item" {...a11yProps(1)} />
+          <Tab label="Item Load" {...a11yProps(0)} />
+          <Tab label="Item Add Without Dealer" {...a11yProps(1)} />
         </Tabs>
-      </Box>
-      <Box sx={{ height: "calc(100% - 50px)" }}>
-        {ItemsEntryTab === 0 ? <ItemsDailyEntry /> : <ItemsNewEntry />}
       </Box>
     </Box>
   );

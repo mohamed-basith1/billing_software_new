@@ -5,24 +5,18 @@ export function ItemsRouter() {
     try {
       // Check if an item with the same item_name or code exists
       const normalizeString = (str) => str.replace(/\s+/g, "").toLowerCase();
+      const normalizedInput = normalizeString(data.item_name);
 
-      const existingItem = await Item.findOne({
-        $or: [
-          {
-            item_name: {
-              $regex: new RegExp(`^${normalizeString(data.item_name)}$`, "i"),
-            },
-          },
-          { code: data.code },
-        ],
-      });
+      const items = await Item.find({});
+      const existingItem = items.find(
+        (item) => normalizeString(item.item_name) === normalizedInput
+      );
 
       if (existingItem) {
         return {
           status: 404,
-          message: "Item already exists! Please use a different name and code.",
+          message: "Item already exists! Please use a different name",
         };
-        throw new Error("Item with the same name or code already exists.");
       }
       // Insert the new item
       const item = await Item.create(data);
@@ -36,6 +30,58 @@ export function ItemsRouter() {
       throw error;
     }
   });
+
+  ipcMain.handle("exist-item-validate", async (_, data) => {
+    // Check if an item with the same item_name or code exists
+    const normalizeString = (str) => str.replace(/\s+/g, "").toLowerCase();
+    const normalizedInput = normalizeString(data.item_name);
+
+    const items = await Item.find({});
+    const existingItem = items.find(
+      (item) => normalizeString(item.item_name) === normalizedInput
+    );
+    console.log("existingItem", existingItem, "data", data);
+    if (existingItem) {
+      return {
+        status: 404,
+        message: "Item already exists! Please use a different name.",
+      };
+    }
+
+    return {
+      status: 200,
+    };
+  });
+
+  ipcMain.handle("edit-item-details", async (_, updatedData) => {
+    try {
+      console.log("updatedData", updatedData);
+      const customer = await Item.findOneAndUpdate(
+        { unique_id: updatedData.unique_id },
+        updatedData,
+        { new: true }
+      );
+      if (!customer) {
+        return {
+          status: 404,
+          message: "Item not found.",
+        };
+      }
+      return {
+        status: 200,
+        message: "Item updated successfully.",
+        data: JSON.parse(JSON.stringify(customer)),
+      };
+    } catch (error: any) {
+      console.error("Error updating customer:", error);
+      return {
+        status: 500,
+        message: "Internal server error.",
+        error: error.message,
+      };
+    }
+  });
+
   ipcMain.handle("search-item", async (_, searchTerm) => {
     try {
       if (!searchTerm) return [];
@@ -47,12 +93,15 @@ export function ItemsRouter() {
       })
         .limit(8)
         .lean(); // Convert Mongoose documents to plain objects
+
+      console.log("items", items);
       return JSON.parse(JSON.stringify(items));
     } catch (error: any) {
       console.error("Error searching items:", error);
       throw error;
     }
   });
+
   ipcMain.handle("get-item", async () => {
     try {
       console.log("item list api");

@@ -3,30 +3,56 @@ import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import TextField from "@mui/material/TextField";
 import dayjs from "dayjs";
-import { Box, Typography } from "@mui/material";
+import { Box, Button, IconButton, Typography } from "@mui/material";
 import { toast } from "react-toastify";
 
 import utc from "dayjs/plugin/utc";
 import { DataGrid } from "@mui/x-data-grid";
-import { selectDateTigger } from "../../pages/ItemsPage/ItemsSlice";
-import { useSelector } from "react-redux";
+import {
+  clearDealerDetails,
+  removeEnteredListedItem,
+  selectDateTigger,
+  selectDealerPurchasedPrice,
+  selectItems,
+  selectLoadItemWithDealer,
+  selectNewItemWithDealer,
+} from "../../pages/ItemsPage/ItemsSlice";
+import { useDispatch, useSelector } from "react-redux";
 import timezone from "dayjs/plugin/timezone";
-
-const columns = [
-  { field: "code", headerName: "CODE", flex: 3 },
-  { field: "item_name", headerName: "ITEM NAME", flex: 3 },
-  { field: "stock_qty", headerName: "QTY", flex: 3 },
-  { field: "uom", headerName: "UOM", flex: 3 },
-  { field: "rate", headerName: "RATE", flex: 3 },
-  {
-    field: "item_expiry_date",
-    headerName: "EXPIRY DATE",
-    flex: 3,
-    renderCell: (params: any) => new Date(params.value).toLocaleDateString(),
-  },
-];
+import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
 
 const ItemEntryHistory = () => {
+  const columns = [
+    {
+      field: "unique_id",
+      headerName: "#",
+      flex: 0.5,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params: any) => {
+        return (
+          <IconButton
+            onClick={() =>
+              dispatch(removeEnteredListedItem({ unique_id: params.value }))
+            }
+          >
+            <ClearRoundedIcon sx={{ color: "red" }} />
+          </IconButton>
+        );
+      },
+    },
+    { field: "code", headerName: "CODE", flex: 3 },
+    { field: "item_name", headerName: "NAME", flex: 3 },
+    { field: "stock_qty", headerName: "QTY", flex: 3 },
+    { field: "uom", headerName: "UOM", flex: 3 },
+    { field: "rate", headerName: "RATE", flex: 3 },
+    { field: "purchased_rate", headerName: "PURCHASED", flex: 3 },
+    {
+      field: "total_purchased_amount",
+      headerName: "Total",
+      flex: 3,
+    },
+  ];
   dayjs.extend(utc);
   dayjs.extend(timezone);
   const [entryHistory, setEntryHistory] = useState<any[]>([]);
@@ -36,7 +62,20 @@ const ItemEntryHistory = () => {
   const gridRef = useRef<HTMLDivElement | null>(null);
 
   const dateTigger = useSelector(selectDateTigger); // Unused, consider removing it if not needed
+  const loadItemWithDealer = useSelector(selectLoadItemWithDealer);
+  const newItemWithDealer = useSelector(selectNewItemWithDealer);
+  const dealerDetails = useSelector(selectItems);
+  const dealerPurchasedPrice = useSelector(selectDealerPurchasedPrice);
 
+  const dispatch = useDispatch();
+  console.log(
+    "loadItemWithDealer",
+    loadItemWithDealer,
+    "newItemWithDealer",
+    newItemWithDealer,
+    dealerDetails.dealerName,
+    dealerDetails.dealerPurchasedPrice
+  );
   // 📌 Handle Date Selection & API Call (Only when Date Changes)
   const handleDateChange = async (date: Dayjs | null) => {
     if (!date) return;
@@ -79,7 +118,7 @@ const ItemEntryHistory = () => {
   // 📌 Call handleDateChange when `selectedDate` updates
   useEffect(() => {
     if (selectedDate) {
-      handleDateChange(selectedDate);
+      // handleDateChange(selectedDate);
     }
   }, [selectedDate, dateTigger]);
 
@@ -102,14 +141,93 @@ const ItemEntryHistory = () => {
       scrollToBottom();
     }
   }, [entryHistory.length]);
+
+  function calculateTotalAmount(items) {
+    let total = 0;
+
+    for (const item of items) {
+      const isGram = item.uom.toLowerCase() === "gram";
+      const quantity = isGram ? item.stock_qty / 1000 : item.stock_qty;
+      total += quantity * item.purchased_rate;
+    }
+
+    return total;
+  }
+
+  const submitStockUpload = async () => {
+    console.log(
+      "loadItemWithDealer",
+      loadItemWithDealer,
+      "newItemWithDealer",
+      newItemWithDealer
+    );
+    const combine = [...loadItemWithDealer, ...newItemWithDealer];
+
+    console.log("combine", combine);
+    let totalItemPrice = calculateTotalAmount(combine);
+    if (totalItemPrice !== Number(dealerPurchasedPrice)) {
+      toast.error(
+        `The item price does not match the dealer's purchase price.`,
+        {
+          position: "bottom-left",
+        }
+      );
+      return;
+    }
+
+    if (newItemWithDealer.length > 0) {
+      newItemWithDealer.forEach(async (element: any) => {
+        // @ts-ignore
+        let response = await window.electronAPI.insertItem(element);
+        if (response.status !== 201) {
+          toast.error(`${response.message}`, { position: "bottom-left" });
+        } else {
+          // toast.success(`${response.message}`, { position: "bottom-left" });
+        }
+      });
+    }
+    if (loadItemWithDealer.length > 0) {
+      loadItemWithDealer.forEach(async (element: any) => {
+        // this is for already item present updating qty
+        //@ts-ignore
+        let response: any = await window.electronAPI.updateItem(
+          element._id,
+          element
+        );
+        if (response.status !== 200) {
+          toast.error(`${response.message}`, { position: "bottom-left" });
+        } else {
+          // toast.success(`${response.message}`, { position: "bottom-left" });
+        }
+      });
+    }
+
+    let payload = {
+      purchasedItemList: [...loadItemWithDealer, ...newItemWithDealer],
+      dealerName: dealerDetails.dealerName,
+      dealerPurchasedPrice: Number(dealerDetails.dealerPurchasedPrice),
+      givenAmount: 0,
+      history: [],
+    };
+
+    // @ts-ignore
+    let response = await window.electronAPI.createDealerBill(payload);
+    if (response.status !== 201) {
+      toast.error(`${response.message}`, { position: "bottom-left" });
+    } else {
+      dispatch(clearDealerDetails());
+      toast.success(`${response.message}`, { position: "bottom-left" });
+    }
+  };
   return (
     <Box sx={{ height: "100%" }}>
-      <Box
+      {/* <Box
         sx={{
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
+          height: "2%",
         }}
       >
         <Typography
@@ -136,20 +254,22 @@ const ItemEntryHistory = () => {
             )}
           />
         </LocalizationProvider>
-      </Box>
+      </Box> */}
 
       <Box
         ref={gridRef}
         sx={{
-          height: "90%",
+          height: "80%",
           width: "100%",
           overflow: "hidden",
           border: "none",
-          pt:6
+
+          // bgcolor:"red"
         }}
       >
         <DataGrid
-          rows={entryHistory}
+          // rows={entryHistory}
+          rows={[...loadItemWithDealer, ...newItemWithDealer]}
           columns={columns}
           disableColumnMenu
           hideFooter
@@ -169,6 +289,60 @@ const ItemEntryHistory = () => {
             border: "none",
           }}
         />
+      </Box>
+
+      <Box
+        sx={{
+          height: "20%",
+          display: "flex",
+          alignItems: "flex-end",
+          flexDirection: "column",
+          justifyContent: "space-between",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            width: "50%",
+            justifyContent: "space-between",
+          }}
+        >
+          <Typography>Total Item Purchased</Typography>
+          <Typography>
+            ₹{" "}
+            {calculateTotalAmount([
+              ...loadItemWithDealer,
+              ...newItemWithDealer,
+            ])}
+          </Typography>
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            width: "50%",
+            justifyContent: "space-between",
+          }}
+        >
+          <Typography>Total Dealer Purchased</Typography>
+          <Typography>₹ {dealerPurchasedPrice}</Typography>
+        </Box>
+
+        <Button
+          fullWidth
+          onClick={() => submitStockUpload()}
+          sx={{
+            pointerEvents:
+              [...loadItemWithDealer, ...newItemWithDealer].length === 0
+                ? "none"
+                : "auto",
+            opacity:
+              [...loadItemWithDealer, ...newItemWithDealer].length === 0
+                ? ".5"
+                : "1",
+          }}
+        >
+          Upload Stock
+        </Button>
       </Box>
     </Box>
   );

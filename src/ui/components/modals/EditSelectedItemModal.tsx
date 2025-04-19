@@ -1,8 +1,9 @@
-import * as React from "react";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Button from "@mui/material/Button";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Grid, TextField, Typography } from "@mui/material";
 import {
   clearCustomerDetails,
@@ -14,6 +15,15 @@ import {
 } from "../../pages/CustomersPage/CustomersSlice";
 
 import { toast } from "react-toastify";
+import {
+  selectEditSelectedItemModal,
+  selectSelectedItem,
+  selectSelectedItemName,
+  setEditItemModal,
+  setEditSelectItem,
+  setSelectedItem,
+  updateItemList,
+} from "../../pages/ItemsPage/ItemsSlice";
 
 export const style = {
   position: "absolute",
@@ -27,52 +37,83 @@ export const style = {
   pb: 3,
 };
 
-const CustomerEditModal = () => {
+const EditSelectedItemModal = () => {
   const dispatch = useDispatch();
-  const customerDetails = useSelector(selectCustomerDetails);
-  const customerEditModal = useSelector(selectCustomerEditModal);
+
+  const selectedItem = useSelector(selectSelectedItem);
+  const editSelectedItemModal = useSelector(selectEditSelectedItemModal);
+  const selectedItemName = useSelector(selectSelectedItemName);
   const [error, setError] = React.useState(false);
 
-  const handleCloaseCustomerEditModal = () => {
-    dispatch(setCustomerEditModal(false));
-    dispatch(clearCustomerDetails());
+  const handleCloseCustomerEditModal = () => {
+    dispatch(setEditItemModal(false));
+    dispatch(setSelectedItem({}));
   };
 
   const handleChange = (field: any, value: any) => {
     setError(false);
     //@ts-ignore
-    dispatch(setCustomerDetails({ field, value }));
+    dispatch(setEditSelectItem({ field, value }));
   };
-
+  console.log(
+    "selectedItem.item_name",
+    selectedItem.item_name,
+    "selectedItemName",
+    selectedItemName
+  );
   const handleEditSubmit = async () => {
-    if (!customerDetails.customerName.trim()) {
-      setError(true);
-      return;
-    }
-    setError(false);
+    try {
+      const normalizeString = (str: string) =>
+        str.replace(/\s+/g, "").toLowerCase();
+      if (
+        normalizeString(selectedItemName) ===
+        normalizeString(selectedItem.item_name)
+      ) {
+        console.log("value for updation", selectedItem);
+        // @ts-ignore
+        const response: any = await window.electronAPI.editItemDetails(
+          selectedItem
+        );
 
-    //@ts-ignore
-    let response: any = await window.electronAPI.updateCustomer(
-      customerDetails.id,
-      customerDetails
-    );
+        console.log("tesyer", response.data);
+        dispatch(updateItemList(response.data));
+        toast.success(response.message, { position: "bottom-left" });
+        handleCloseCustomerEditModal();
+      } else {
+        // @ts-ignore
+        const validationResponse = await window.electronAPI.existItemValidate(
+          selectedItem
+        );
+        if (validationResponse.status !== 200) {
+          toast.error(validationResponse.message, { position: "bottom-left" });
+          return;
+        }
 
-    if (response.status !== 200) {
-      toast.error(`${response.message}`, { position: "bottom-left" });
-    } else {
-      let payload: any = { data: response?.data, edit: true };
-      dispatch(setSelectedCustomer(payload));
-      dispatch(clearCustomerDetails());
-      toast.success(`${response.message}`, { position: "bottom-left" });
-      handleCloaseCustomerEditModal();
+        // @ts-ignore
+        const response: any = await window.electronAPI.editItemDetails(
+          selectedItem
+        );
+
+        console.log("response response", response.data);
+
+        dispatch(updateItemList(response.data));
+        toast.success(response.message, { position: "bottom-left" });
+        handleCloseCustomerEditModal();
+      }
+    } catch (error: any) {
+      toast.error("An error occurred while editing the item.", {
+        position: "bottom-left",
+      });
+      console.error("Edit item error:", error);
     }
   };
 
+  console.log("selectedItem", selectedItem);
   return (
     <React.Fragment>
       <Modal
-        open={customerEditModal}
-        onClose={handleCloaseCustomerEditModal}
+        open={editSelectedItemModal}
+        onClose={handleCloseCustomerEditModal}
         aria-labelledby="edit-modal-title"
         aria-describedby="edit-modal-description"
         BackdropProps={{
@@ -107,54 +148,62 @@ const CustomerEditModal = () => {
               textAlignLast: "start",
             }}
           >
-            Edit Customer Details
+            Edit Item Details
           </Typography>
 
           <Grid container spacing={2}>
             {[
-              { label: "Customer Name", key: "customerName" },
-              { label: "Customer Address", key: "customerAddress" },
-              { label: "Customer Area", key: "customerArea" },
+              { label: "Item Name", key: "item_name" },
+              { label: "Item Code", key: "code" },
               {
-                label: "Customer Pincode",
-                key: "customerPincode",
+                label: "Item Low Stock Remainder",
+                key: "low_stock_remainder",
                 type: "number",
-                maxLength: 6,
-              },
-              { label: "Customer State", key: "customerState" },
-              {
-                label: "Primary Contact",
-                key: "customerPrimaryContact",
-                type: "number",
-                maxLength: 10,
               },
               {
-                label: "Secondary Contact",
-                key: "customerSecondaryContact",
+                label: "Item purchased Rate",
+                key: "purchased_rate",
                 type: "number",
-                maxLength: 10,
+                disable: true,
               },
-              { label: "Customer Email", key: "customerEmail" },
-            ].map(({ label, key, type, maxLength }) => (
+              {
+                label: "Item Selling Rate",
+                key: "rate",
+                type: "number",
+                disable: true,
+              },
+              {
+                label: "Item Margin",
+                key: "margin",
+                type: "number",
+                disable: true,
+              },
+
+              {
+                label: "Item Stock Holding",
+                key: "stock_qty",
+                type: "number",
+                disable: true,
+              },
+            ].map(({ label, key, type, disable }) => (
               <Grid item xs={12} sm={6} key={key}>
                 <TextField
                   fullWidth
                   label={label}
                   variant="outlined"
                   type={type || "text"}
-                  value={customerDetails[key] || ""}
+                  value={selectedItem[key] || ""}
+                  disabled={disable}
                   onChange={(e) => {
                     const { value } = e.target;
                     if (type === "number") {
-                      const sanitizedValue = value
-                        .replace(/\D/g, "")
-                        .slice(0, maxLength);
+                      const sanitizedValue = value.replace(/\D/g, "");
+
                       handleChange(key, sanitizedValue);
                     } else {
                       handleChange(key, value);
                     }
                   }}
-                  inputProps={type === "number" ? { maxLength } : {}}
                   error={error && key === "customerName"}
                   helperText={
                     error && key === "customerName"
@@ -171,7 +220,7 @@ const CustomerEditModal = () => {
           >
             <Button
               variant="outlined"
-              onClick={handleCloaseCustomerEditModal}
+              onClick={handleCloseCustomerEditModal}
               sx={{
                 height: "2.5rem",
                 width: "100px",
@@ -200,4 +249,4 @@ const CustomerEditModal = () => {
   );
 };
 
-export default CustomerEditModal;
+export default EditSelectedItemModal;

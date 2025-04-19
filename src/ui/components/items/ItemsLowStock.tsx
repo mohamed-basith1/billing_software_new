@@ -8,8 +8,31 @@ import {
   setLowStockItemList,
 } from "../../pages/ItemsPage/ItemsSlice";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
-import { columns } from "./ItemsListTable";
+
 const ItemsLowStock = () => {
+  const columns = [
+    { field: "item_name", headerName: "ITEM NAME", flex: 2 },
+    { field: "code", headerName: "CODE", flex: 1 },
+    {
+      field: "purchased_rate",
+      headerName: "PURCHASED RATE",
+      flex: 1,
+    },
+    { field: "margin", headerName: "MARGIN", flex: 1 },
+    {
+      field: "amount",
+      headerName: "SELLING RATE",
+      flex: 1,
+    },
+    { field: "stock_qty", headerName: "STOCK QTY", flex: 1 },
+    { field: "uom", headerName: "UOM", flex: 1 },
+
+    {
+      field: "low_stock_remainder",
+      headerName: "LOW STOCK REMAINDER",
+      flex: 1,
+    },
+  ];
   const dispatch = useDispatch();
   const lowStockItemList = useSelector(selectLowStockItemList);
   useEffect(() => {

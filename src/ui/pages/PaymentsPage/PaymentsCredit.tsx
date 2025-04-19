@@ -101,7 +101,6 @@ const PaymentsCredit = () => {
         );
       },
     },
-
     { field: "item_name", headerName: "ITEM NAME", flex: 3 },
     {
       field: "qty",
@@ -139,7 +138,6 @@ const PaymentsCredit = () => {
       },
     },
   ];
-
   const fromDate = useSelector(selectFromDate);
   const toDate = useSelector(selectToDate);
   const UPIBillsList = useSelector(selectUPIBillsList);
@@ -158,7 +156,6 @@ const PaymentsCredit = () => {
       dispatch(clearPaymentBillsDetail());
     };
   }, []);
-
   const getUPIBills = async () => {
     let response: any = await fetchBills(
       dayjs().subtract(1, "month").tz("Asia/Kolkata"),
@@ -174,7 +171,6 @@ const PaymentsCredit = () => {
     dispatch(setUPIBillsList(serializedData));
   };
   const handleBillSearch = async (billnumber: string) => {
-
     if (billnumber) {
       dispatch(setBillSearch(billnumber));
       //@ts-ignore
@@ -182,14 +178,12 @@ const PaymentsCredit = () => {
         billnumber,
         "Credit Bill"
       );
-
       if (response.status === 200) {
         dispatch(setUPIBillsList(response.data));
       }
     } else {
       dispatch(setBillSearch(billnumber));
       getUPIBills();
-
     }
   };
   const handleDateChange = async () => {
@@ -201,12 +195,6 @@ const PaymentsCredit = () => {
       (data: any) => data.bill_number === selectedBills.bill_number
     );
 
-    console.log(
-      "selectedBills sjdijsdi",
-      selectedBills,
-      "UPIBillsList",
-      UPIBillsListSelectedBill
-    );
     let returnBillHistoryPayload = {
       bill_number: selectedBills.bill_number,
       previous_bill_amount: UPIBillsListSelectedBill.total_amount,
@@ -249,7 +237,6 @@ const PaymentsCredit = () => {
     dispatch(clearReturnBillDetail());
     console.log("return bill response", response);
   };
-
   const handleReturnPendingAmount = async () => {
     //@ts-ignore
     let response: any = await window.electronAPI.returnPendingAmount(
@@ -261,9 +248,6 @@ const PaymentsCredit = () => {
     dispatch(setnewReturnBill(response.data));
     dispatch(setSelectedBills(response.data));
   };
-
-  console.log("selectedBills credit", selectedBills);
-
   return (
     <Box
       sx={{
@@ -389,14 +373,11 @@ const PaymentsCredit = () => {
           <Box
             sx={{
               height: "60%",
-
               borderRadius: "8px",
-
               width: "100%",
               background:
                 // "linear-gradient(133deg, rgba(247,247,254,1) 60%, rgba(34,179,120,1) 87%)",
                 "linear-gradient(133deg, rgba(247,247,254,1) 60%, rgba(155, 89, 182, 1) 87%)",
-
               // "linear-gradient(133deg, rgba(247,247,254,1) 60%, rgba(236,117,30,1) 72%, rgba(34,179,120,1) 90%)",
               my: 2,
               position: "relative",
