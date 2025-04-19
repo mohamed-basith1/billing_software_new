@@ -160,8 +160,8 @@ const PaymentsCredit = () => {
   }, []);
   const getUPIBills = async () => {
     let response: any = await fetchBills(
-      dayjs().subtract(1, "month").tz("Asia/Kolkata"),
-      dayjs().tz("Asia/Kolkata"),
+      dayjs().subtract(1, "month").tz("Asia/Kolkata").add(1, "day"),
+      dayjs().tz("Asia/Kolkata").add(1, "day"),
       "Credit Bill"
     );
     // Convert `_id` to string before dispatching
@@ -189,7 +189,11 @@ const PaymentsCredit = () => {
     }
   };
   const handleDateChange = async () => {
-    let response: any = await fetchBills(fromDate, toDate, "Credit Bill");
+    let response: any = await fetchBills(
+      dayjs.utc(fromDate).tz("Asia/Kolkata").add(1, "day"),
+      dayjs.utc(toDate).tz("Asia/Kolkata").add(1, "day"),
+      "Credit Bill"
+    );
     dispatch(setUPIBillsList(response.data));
   };
   const handleReturnBill = async () => {

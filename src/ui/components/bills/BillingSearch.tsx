@@ -82,6 +82,7 @@ const BillingSearch = () => {
               createdAt,
               purchased_rate,
               stock_qty,
+              unique_id,
             } = billingSearch;
 
             let payload: any = {
@@ -95,6 +96,7 @@ const BillingSearch = () => {
               createdAt,
               purchased_rate,
               stock_qty,
+              unique_id,
             };
             console.log("payload setitem top", payload);
             dispatch(setItem(payload));
@@ -165,7 +167,7 @@ const BillingSearch = () => {
 
         //@ts-ignore
         const results = await window.electronAPI.searchItem(sanitizedData);
-     
+
         setSuggestions(results);
       } catch (error) {
         console.error("Error fetching suggestions:", error);
@@ -185,6 +187,7 @@ const BillingSearch = () => {
     createdAt: any;
     purchased_rate: number;
     stock_qty: number;
+    unique_id:string
   }) => {
     dispatch(
       setBillingField({
@@ -226,6 +229,13 @@ const BillingSearch = () => {
         bill_number: billingSearch.bill_number,
         field: "rate",
         value: selectedItem.rate,
+      })
+    );
+    dispatch(
+      setBillingField({
+        bill_number: billingSearch.bill_number,
+        field: "unique_id",
+        value: selectedItem.unique_id,
       })
     );
     dispatch(
@@ -306,6 +316,7 @@ const BillingSearch = () => {
         createdAt,
         purchased_rate,
         stock_qty,
+        unique_id,
       }: any = billingSearch;
       console.log("stock_qty", stock_qty);
       // Check if all required fields are filled
@@ -354,6 +365,7 @@ const BillingSearch = () => {
           createdAt,
           purchased_rate,
           stock_qty,
+          unique_id,
         };
 
         console.log("payload setitem", payload);

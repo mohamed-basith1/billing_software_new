@@ -92,10 +92,15 @@ const BillingPrice = () => {
       balance: 0,
       billed_by: userName,
     };
+
+    console.log("create bill payload", payload);
     //@ts-ignore
     let response = await window.electronAPI.createBill(payload);
     //
-    if (selectedBill.payment_method !== "Credit Bill" && selectedBill.payment_method !== "Self Use") {
+    if (
+      selectedBill.payment_method !== "Credit Bill" &&
+      selectedBill.payment_method !== "Self Use"
+    ) {
       let TransactionPayload = {
         status: "Increased",
         bill_no: "None",

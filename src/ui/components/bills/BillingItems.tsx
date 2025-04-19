@@ -104,6 +104,7 @@ const BillingItems = () => {
     return updatedRow;
   };
 
+  console.log("modifiedBill",modifiedBill)
   useEffect(() => {
     const scrollToBottom = () => {
       if (gridRef.current) {

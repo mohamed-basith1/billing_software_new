@@ -72,9 +72,10 @@ const Dashboard = () => {
   const dashboard = useSelector(selectDashboardData);
   useEffect(() => {
     const getDashboardHandler = async () => {
-      let from: any = dayjs().subtract(1, "month");
-      let to: any = dayjs();
-
+      let from: any =dayjs().subtract(1, "month").tz("Asia/Kolkata").add(1, "day");
+      let to: any = dayjs().tz("Asia/Kolkata").add(1, "day");
+      // dayjs().subtract(1, "month").tz("Asia/Kolkata").add(1, "day"),
+      // dayjs().tz("Asia/Kolkata").add(1, "day"),
       const fromDateFormat = from?.toISOString();
       const toDateFormat = to?.toISOString();
 
@@ -94,9 +95,10 @@ const Dashboard = () => {
       console.warn("Date range not set yet");
       return;
     }
-
-    const fromDateFormat = fromDate.toISOString();
-    const toDateFormat = toDate.toISOString();
+    // dayjs.utc(fromDate).tz("Asia/Kolkata").add(1, "day"),
+    // dayjs.utc(toDate).tz("Asia/Kolkata").add(1, "day"),
+    const fromDateFormat = dayjs.utc(fromDate).tz("Asia/Kolkata").add(1, "day").toISOString();
+    const toDateFormat =  dayjs.utc(toDate).tz("Asia/Kolkata").add(1, "day").toISOString();
 
     try {
       // @ts-ignore

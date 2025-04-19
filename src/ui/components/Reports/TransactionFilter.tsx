@@ -53,7 +53,9 @@ export default function CustomizedMenus() {
   const [fromDate, setFromDate] = React.useState<Dayjs | null>(
     dayjs().tz("Asia/Kolkata").subtract(1, "month")
   );
-  const [toDate, setToDate] = React.useState<Dayjs | null>(dayjs().tz("Asia/Kolkata"));
+  const [toDate, setToDate] = React.useState<Dayjs | null>(
+    dayjs().tz("Asia/Kolkata")
+  );
   const [activeFilter, setActiveFilter] = React.useState<string | null>(
     "Last 10 Transaction"
   );
@@ -81,7 +83,7 @@ export default function CustomizedMenus() {
     handleClose();
   };
   const handleFilterSelect = (range: string) => {
-    const today = dayjs().tz("Asia/Kolkata")
+    const today = dayjs().tz("Asia/Kolkata");
     let newFromDate = today;
     // const istDate = dayjs(newValue).tz("Asia/Kolkata");
     switch (range) {
@@ -115,7 +117,10 @@ export default function CustomizedMenus() {
 
       dispatch(setTransactionData(response.data));
     };
-    getFilterTransaction(newFromDate.toISOString(), today.toISOString());
+    getFilterTransaction(
+      dayjs.utc(newFromDate).tz("Asia/Kolkata").add(1, "day").toISOString(),
+      dayjs.utc(today).tz("Asia/Kolkata").add(1, "day").toISOString()
+    );
 
     setFromDate(newFromDate);
     setToDate(today);
@@ -148,7 +153,10 @@ export default function CustomizedMenus() {
       dispatch(setTransactionData(response.data));
     };
 
-    getFilterTransaction(fromDate.toISOString(), toDate.toISOString());
+    getFilterTransaction(
+      dayjs.utc(fromDate).tz("Asia/Kolkata").add(1, "day").toISOString(),
+      dayjs.utc(toDate).tz("Asia/Kolkata").add(1, "day").toISOString()
+    );
 
     setActiveFilter(
       `${fromDate?.format("DD/MM/YYYY")} - ${toDate?.format("DD/MM/YYYY")}`

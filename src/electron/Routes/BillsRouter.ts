@@ -28,7 +28,7 @@ export function BillsRouter() {
 
       // Reduce stock_qty for each item in the billing list
       for (const item of itemsList) {
-        const existingItem = await Item.findOne({ code: item.code });
+        const existingItem = await Item.findOne({ unique_id: item.unique_id });
 
         if (!existingItem) {
           console.error(`Item with code ${item.code} not found`);

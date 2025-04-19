@@ -4,6 +4,7 @@ interface Bill {
   bill_number: number;
   items: any[];
   code: string | null;
+  unique_id: string;
   itemsearch: string;
   uom: string;
   qty: number | null;
@@ -35,6 +36,7 @@ const initialState: BillsState = {
       bill_number: 0,
       items: [],
       code: null,
+      unique_id: "",
       itemsearch: "",
       uom: "",
       qty: null,
@@ -73,6 +75,7 @@ const billsSlice = createSlice({
         bill_number: lastBillNumber + 1,
         items: [],
         code: null,
+        unique_id: "",
         itemsearch: "",
         uom: "",
         qty: null,
@@ -120,16 +123,19 @@ const billsSlice = createSlice({
         purchased_rate,
         edited,
         stock_qty,
+        unique_id,
       } = action.payload;
-
+      console.log("action.payload set item", action.payload);
       // Find the bill with the given bill_number
       const bill = state.bills.find((b) => b.bill_number === state.currentTab);
 
       if (bill) {
         // Check if the item already exists in the bill items
-        const existingItem: any = bill.items.find((item) => item.code === code);
+        const existingItem: any = bill.items.find(
+          (item) => item.unique_id === unique_id
+        );
         const existingItemIndex = bill.items.findIndex(
-          (item) => item.code === code
+          (item) => item.unique_id === unique_id
         );
 
         if (edited) {
@@ -141,7 +147,8 @@ const billsSlice = createSlice({
             amount,
             item_name,
             createdAt,
-            id: code,
+            unique_id,
+            id: unique_id,
             purchased_rate,
             stock_qty,
           };
@@ -160,8 +167,9 @@ const billsSlice = createSlice({
               rate,
               amount,
               item_name,
+              unique_id,
               createdAt,
-              id: code,
+              id: unique_id,
               purchased_rate,
               stock_qty,
             });
@@ -172,6 +180,7 @@ const billsSlice = createSlice({
         bill.code = null;
         bill.itemsearch = "";
         bill.uom = "";
+        bill.unique_id = "";
         bill.qty = null;
         bill.stock_qty = null;
         bill.rate = null;

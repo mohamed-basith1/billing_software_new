@@ -123,8 +123,8 @@ const PaymentsSelfUse = () => {
 
   const getUPIBills = async () => {
     let response: any = await fetchBills(
-      dayjs().subtract(1, "month").tz("Asia/Kolkata"),
-      dayjs().tz("Asia/Kolkata"),
+      dayjs().subtract(1, "month").tz("Asia/Kolkata").add(1, "day"),
+      dayjs().tz("Asia/Kolkata").add(1, "day"),
       "Self Use"
     );
     // Convert `_id` to string before dispatching
@@ -136,7 +136,6 @@ const PaymentsSelfUse = () => {
     dispatch(setUPIBillsList(serializedData));
   };
   const handleBillSearch = async (billnumber: string) => {
-   
     if (billnumber) {
       dispatch(setBillSearch(billnumber));
       //@ts-ignore
@@ -151,11 +150,14 @@ const PaymentsSelfUse = () => {
     } else {
       dispatch(setBillSearch(billnumber));
       getUPIBills();
-
     }
   };
   const handleDateChange = async () => {
-    let response: any = await fetchBills(fromDate, toDate, "Cash Paid");
+    let response: any = await fetchBills(
+      dayjs.utc(fromDate).tz("Asia/Kolkata").add(1, "day"),
+      dayjs.utc(toDate).tz("Asia/Kolkata").add(1, "day"),
+      "Self Use"
+    );
     dispatch(setUPIBillsList(response.data));
   };
   const handleReturnBill = async () => {

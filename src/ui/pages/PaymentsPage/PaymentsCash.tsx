@@ -153,8 +153,7 @@ const PaymentsCash = () => {
   useEffect(() => {
     dispatch((dispatch, getState) => {
       dispatch(setFromDate(dayjs().tz("Asia/Kolkata").subtract(1, "month")));
-      dispatch(setToDate(dayjs().tz("Asia/Kolkata")));
-
+      dispatch(setToDate(dayjs().tz("Asia/Kolkata").add(0, "day")));
       // Call getUPIBills after Redux state is updated
       setTimeout(() => {
         getUPIBills();
@@ -168,8 +167,8 @@ const PaymentsCash = () => {
 
   const getUPIBills = async () => {
     let response: any = await fetchBills(
-      dayjs().subtract(1, "month").tz("Asia/Kolkata"),
-      dayjs().tz("Asia/Kolkata"),
+      dayjs().subtract(1, "month").tz("Asia/Kolkata").add(1, "day"),
+      dayjs().tz("Asia/Kolkata").add(1, "day"),
       "Cash Paid"
     );
     // Convert `_id` to string before dispatching
@@ -198,10 +197,14 @@ const PaymentsCash = () => {
     }
   };
   const handleDateChange = async () => {
-    let response: any = await fetchBills(fromDate, toDate, "Cash Paid");
+    let response: any = await fetchBills(
+      dayjs.utc(fromDate).tz("Asia/Kolkata").add(1, "day"),
+      dayjs.utc(toDate).tz("Asia/Kolkata").add(1, "day"),
+      "Cash Paid"
+    );
     dispatch(setUPIBillsList(response.data));
   };
-  
+
   let returnAmount =
     UPIBillsList.find(
       (data: any) => data.bill_number === selectedBills.bill_number
