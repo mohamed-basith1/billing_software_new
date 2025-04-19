@@ -193,39 +193,38 @@ const PaymentsCredit = () => {
     dispatch(setUPIBillsList(response.data));
   };
   const handleReturnBill = async () => {
-    // let UPIBillsListSelectedBill = UPIBillsList?.find(
-    //   (data: any) => data.bill_number === selectedBills.bill_number
-    // );
+    let UPIBillsListSelectedBill = UPIBillsList?.find(
+      (data: any) => data.bill_number === selectedBills.bill_number
+    );
 
-    // let returnBillHistoryPayload = {
-    //   bill_number: selectedBills.bill_number,
-    //   previous_bill_amount: UPIBillsListSelectedBill.total_amount,
-    //   returned_items: tempRemoveItem,
-    //   return_method:"Item returned",
-    //   returned_amount: Math.max(
-    //     selectedBills?.amount_paid -
-    //       selectedBills?.itemsList?.reduce((sum, item) => {
-    //         const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
-    //         return sum + quantity * item.rate;
-    //       }, 0),
-    //     0
-    //   ),
+    let returnBillHistoryPayload = {
+      bill_number: selectedBills.bill_number,
+      previous_bill_amount: UPIBillsListSelectedBill.total_amount,
+      returned_items: tempRemoveItem,
+      return_method: "Item returned",
+      returned_amount: Math.max(
+        selectedBills?.amount_paid -
+          selectedBills?.itemsList?.reduce((sum, item) => {
+            const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
+            return sum + quantity * item.rate;
+          }, 0),
+        0
+      ),
 
-    //   returned_by: userName,
-    // };
+      returned_by: userName,
+    };
 
-    // console.log("returnBillHistoryPayload", returnBillHistoryPayload);
-    // if (
-    //   UPIBillsList?.find(
-    //     (data: any) => data.bill_number === selectedBills.bill_number
-    //   ).total_amount !== selectedBills?.total_amount
-    // ) {
-    //   alert("creating");
-    //   // @ts-ignore
-    //   await window.electronAPI.createBillReturnHistory(
-    //     returnBillHistoryPayload
-    //   );
-    // }
+    console.log("returnBillHistoryPayload", returnBillHistoryPayload);
+    if (
+      UPIBillsList?.find(
+        (data: any) => data.bill_number === selectedBills.bill_number
+      ).total_amount !== selectedBills?.total_amount
+    ) {
+      // @ts-ignore
+      await window.electronAPI.createBillReturnHistory(
+        returnBillHistoryPayload
+      );
+    }
 
     console.log("selectedBills return bill", selectedBills);
     //@ts-ignore
@@ -241,6 +240,8 @@ const PaymentsCredit = () => {
   };
   const handleReturnPendingAmount = async () => {
     dispatch(setReturnAmountModel(true));
+
+    console.log("selectedBills?.return_amount", selectedBills?.return_amount);
     // //@ts-ignore
     // let response: any = await window.electronAPI.returnPendingAmount(
     //   selectedBills._id,
@@ -253,54 +254,69 @@ const PaymentsCredit = () => {
   };
 
   const finalBillHanlder = async (method) => {
-    let UPIBillsListSelectedBill = UPIBillsList?.find(
-      (data: any) => data.bill_number === selectedBills.bill_number
-    );
-
-    let returnBillHistoryPayload = {
-      bill_number: selectedBills.bill_number,
-      previous_bill_amount: UPIBillsListSelectedBill.total_amount,
-      returned_items: tempRemoveItem,
-      return_method: method,
-      returned_amount: selectedBills?.return_amount,
-      returned_by: userName,
-    };
-
-    console.log("returnBillHistoryPayload", returnBillHistoryPayload);
-    // if (
-    //   UPIBillsList?.find(
-    //     (data: any) => data.bill_number === selectedBills.bill_number
-    //   ).total_amount !== selectedBills?.total_amount
-    // ) {
-    alert("creating");
-    // @ts-ignore
-    await window.electronAPI.createBillReturnHistory(returnBillHistoryPayload);
-    // }
-
-    //@ts-ignore
-    let response: any = await window.electronAPI.returnPendingAmount(
-      selectedBills._id,
-      selectedBills.total_amount
-    );
-
-    let TransactionPayload = {
-      status: "Decreased",
-      bill_no: selectedBills.bill_number,
-      customer: "None",
-      employee: "",
+    let validatorPayload = {
+      amount: Number(selectedBills?.return_amount),
       method: method,
-      reason: "Credit Billed Item Return",
-      amount: Number(selectedBills.total_amount),
-      handler: userName,
-      billtransactionhistory: true,
-      password: "",
     };
+
     //@ts-ignore
-    await window.electronAPI.addTransactionHistory(TransactionPayload);
-    console.log("response", response);
-    dispatch(setnewReturnBill(response.data));
-    dispatch(setSelectedBills(response.data));
-    dispatch(setReturnAmountModel(false));
+    let amountAvalaible = await window.electronAPI.amountValidator(
+      validatorPayload
+    );
+    if (amountAvalaible.status === 200) {
+      let UPIBillsListSelectedBill = UPIBillsList?.find(
+        (data: any) => data.bill_number === selectedBills.bill_number
+      );
+
+      let returnBillHistoryPayload = {
+        bill_number: selectedBills.bill_number,
+        previous_bill_amount: UPIBillsListSelectedBill.total_amount,
+        returned_items: tempRemoveItem,
+        return_method: method,
+        returned_amount: selectedBills?.return_amount,
+        returned_by: userName,
+      };
+
+      console.log("returnBillHistoryPayload", returnBillHistoryPayload);
+      // if (
+      //   UPIBillsList?.find(
+      //     (data: any) => data.bill_number === selectedBills.bill_number
+      //   ).total_amount !== selectedBills?.total_amount
+      // ) {
+
+      // @ts-ignore
+      await window.electronAPI.createBillReturnHistory(
+        returnBillHistoryPayload
+      );
+      // }
+
+      //@ts-ignore
+      let response: any = await window.electronAPI.returnPendingAmount(
+        selectedBills._id,
+        selectedBills.total_amount
+      );
+
+      let TransactionPayload = {
+        status: "Decreased",
+        bill_no: selectedBills.bill_number,
+        customer: "None",
+        employee: "",
+        method: method,
+        reason: "Credit Billed Item Return",
+        amount: Number(selectedBills?.return_amount),
+        handler: userName,
+        billtransactionhistory: true,
+        password: "",
+      };
+      //@ts-ignore
+      await window.electronAPI.addTransactionHistory(TransactionPayload);
+      console.log("response", response);
+      dispatch(setnewReturnBill(response.data));
+      dispatch(setSelectedBills(response.data));
+      dispatch(setReturnAmountModel(false));
+    } else {
+      toast.error(`${amountAvalaible.message}`, { position: "bottom-left" });
+    }
   };
   return (
     <Box
@@ -771,7 +787,12 @@ const PaymentsCredit = () => {
                 sx={{
                   px: 2,
                   py: 1,
-                  display: selectedBills.return_amount > 0 ? "flex" : "none",
+                  display:
+                    UPIBillsList.find(
+                      (data) => data.bill_number === selectedBills.bill_number
+                    )?.return_amount > 0
+                      ? "flex"
+                      : "none",
                   alignItems: "center",
                   gap: "10px",
                   borderRight: ".1px solid lightgrey",
@@ -783,8 +804,27 @@ const PaymentsCredit = () => {
                     color: "#6A1B9A", // Deep purple text for contrast
                   },
                   fontSize: ".7rem",
+                  opacity:
+                    UPIBillsList.find(
+                      (data) => data.bill_number === selectedBills.bill_number
+                    )?.total_amount === selectedBills.total_amount
+                      ? "1"
+                      : ".2",
                 }}
-                onClick={() => handleReturnPendingAmount()}
+                onClick={() => {
+                  if (
+                    UPIBillsList.find(
+                      (data) => data.bill_number === selectedBills.bill_number
+                    )?.total_amount === selectedBills.total_amount
+                  ) {
+                    handleReturnPendingAmount();
+                  } else {
+                    toast.warning(
+                      "You are trying to settle the amount before billing. Please click the 'Bill Again' button first, then try to transfer the amount. ",
+                      { position: "bottom-left" }
+                    );
+                  }
+                }}
               >
                 <RepeatOutlinedIcon
                   sx={{ fontSize: "1rem", color: "inherit" }}
@@ -1117,7 +1157,7 @@ const PaymentsCredit = () => {
                       fullWidth
                       onClick={() => handleReturnBill()}
                     >
-                      Bill dagain
+                      Bill Again
                     </Button>
                   </Box>
                 </Box>

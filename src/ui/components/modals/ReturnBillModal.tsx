@@ -276,7 +276,10 @@ const ReturnBillHistoryModal = () => {
                           }}
                         >
                           <Typography sx={{ fontSize: ".7rem" }}>
-                            Returned Amount{" "}
+                            {returnBillHistoryList?.return_method ===
+                            "Item returned"
+                              ? "Returnable Amount"
+                              : "Returned Amount"}
                           </Typography>
                           <Typography sx={{ fontSize: ".7rem" }}>
                             {returnBillHistoryList?.returned_amount}
