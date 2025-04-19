@@ -8,8 +8,10 @@ import {
   InputAdornment,
   FormControl,
   InputLabel,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { style } from "./CustomerCreateModal";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -22,13 +24,20 @@ import {
   setnewReturnBill,
 } from "../../pages/PaymentsPage/PaymentsSlice";
 import { toast } from "react-toastify";
+import { selectUserName } from "../../pages/LoginPage/LoginSlice";
 
 const PayCreditBillModal = () => {
   const dispatch = useDispatch();
   const payCreditBalance = useSelector(selectPayCreditBalance);
   const payCreditBalanceModal = useSelector(selectPayCreditBalanceModal);
   const selectedBill = useSelector(selectSelectedBills);
-
+  const [paymentMethod, setPaymentMethod] = useState<string | null>("");
+  const username = useSelector(selectUserName);
+  useEffect(() => {
+    return () => {
+      setPaymentMethod("");
+    };
+  }, [payCreditBalanceModal]);
   const handlePayCreditBalance = async () => {
     console.log("handlePayCreditBalance", selectedBill);
 
@@ -40,6 +49,20 @@ const PayCreditBillModal = () => {
       return;
     }
 
+    let TransactionPayload = {
+      status: "Increased",
+      bill_no: selectedBill.bill_number,
+      customer: "None",
+      employee: "",
+      method: paymentMethod,
+      reason: `Customer paid the credit bill balance for ${selectedBill.bill_number}`,
+      amount: Number(payCreditBalance),
+      handler: username,
+      billtransactionhistory: true,
+      password: "",
+    };
+    //@ts-ignore
+    await window.electronAPI.addTransactionHistory(TransactionPayload);
     //@ts-ignore
     let response = await window.electronAPI.payCreditBillBalance(
       selectedBill.bill_number,
@@ -55,7 +78,6 @@ const PayCreditBillModal = () => {
       dispatch(setnewReturnBill(response.data));
       dispatch(setPayCreditBalanceModal(false));
     }
-    //payCreditBillBalance
   };
   return (
     <Modal
@@ -89,14 +111,6 @@ const PayCreditBillModal = () => {
         <Typography variant="h5" sx={{ fontWeight: 500 }}>
           Pay Credit Balance
         </Typography>
-
-        {/* <TextField
-          fullWidth
-          placeholder="Enter Received Amount"
-          type="number"
-          value={payCreditBalance}
-          onChange={(e) => dispatch(setPayCreditBalance(e.target.value))}
-        ></TextField> */}
         <FormControl fullWidth sx={{ m: 1 }}>
           <InputLabel htmlFor="outlined-adornment-amount">Amount</InputLabel>
           <OutlinedInput
@@ -110,6 +124,36 @@ const PayCreditBillModal = () => {
             label="Amount"
           />
         </FormControl>
+
+        <Box
+          sx={{
+            display: "flex",
+
+            gap: 1,
+            width: "100%",
+          }}
+        >
+          {["Cash Paid", "UPI Paid"].map((label) => (
+            <FormControlLabel
+              key={label}
+              control={
+                <Checkbox
+                  checked={paymentMethod === label}
+                  onChange={() => setPaymentMethod(label)}
+                  size="small"
+                  sx={{
+                    color: "#1E1E2D",
+                    "&.Mui-checked": { color: "#1E1E2D" },
+                  }}
+                />
+              }
+              label={
+                <Typography sx={{ fontSize: "0.8rem" }}>{label}</Typography>
+              }
+              sx={{ marginRight: 0, padding: 0 }}
+            />
+          ))}
+        </Box>
         <Box
           sx={{ width: "100%", display: "flex", justifyContent: "flex-end" }}
         >
@@ -117,8 +161,10 @@ const PayCreditBillModal = () => {
             onClick={() => handlePayCreditBalance()}
             sx={{
               px: 5,
-              opacity: payCreditBalance <= 0 ? ".5" : "auto",
-              pointerEvents: payCreditBalance <= 0 ? "none" : "auto",
+              opacity:
+                paymentMethod === "" || payCreditBalance <= 0 ? ".5" : "auto",
+              pointerEvents:
+                paymentMethod === "" || payCreditBalance <= 0 ? "none" : "auto",
             }}
           >
             Pay

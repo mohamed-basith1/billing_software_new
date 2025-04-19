@@ -78,6 +78,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
   addTransactionHistory: (data) =>
     ipcRenderer.invoke("add-transaction-history", { data }),
+  amountValidator: (data) => ipcRenderer.invoke("amount-validator", data),
 
   //dealer bill
   createDealerBill: (data) => ipcRenderer.invoke("create-dealer-bill", data),

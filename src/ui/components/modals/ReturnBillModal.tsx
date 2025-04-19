@@ -47,6 +47,7 @@ const ReturnBillHistoryModal = () => {
         return params !== undefined ? `₹${params}` : " ₹0";
       },
     },
+
     {
       field: "amount",
       headerName: "AMOUNT",
@@ -135,147 +136,172 @@ const ReturnBillHistoryModal = () => {
             mt: 1,
           }}
         >
-          {returnBillHistoryList?.slice().reverse()?.map((returnBillHistoryList: any) => {
-            return (
-              <Box sx={{ width: "100%", bgcolor: "red", my: 2,borderBottom:".1px solid lightgrey" }}>
-                <Box sx={{ bgcolor: "white", height: "100%" }}>
-                  <Box
-                    sx={{
-                      bgcolor: "white",
-
-                      py: 10,
-
-                      px: 8,
-                    }}
-                  >
+          {returnBillHistoryList
+            ?.slice()
+            .reverse()
+            ?.map((returnBillHistoryList: any) => {
+              return (
+                <Box
+                  sx={{
+                    width: "100%",
+                    bgcolor: "red",
+                    my: 2,
+                    borderBottom: ".1px solid lightgrey",
+                  }}
+                >
+                  <Box sx={{ bgcolor: "white", height: "100%" }}>
                     <Box
                       sx={{
-                        width: "100%",
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "flex-start",
+                        bgcolor: "white",
+
+                        py: 10,
+
+                        px: 8,
                       }}
                     >
                       <Box
                         sx={{
+                          width: "100%",
                           display: "flex",
-                          flexDirection: "column",
-                          justifyContent: "flex-start",
-                        }}
-                      >
-                        <Typography>Order Date</Typography>
-                        <Typography
-                          sx={{ fontSize: ".7rem", color: "grey", mt: 1 }}
-                        >
-                          {returnBillHistoryList?.createdAt
-                            ? new Date(
-                                returnBillHistoryList.createdAt
-                              ).toLocaleDateString("en-GB", {
-                                timeZone: "UTC",
-                              })
-                            : ""}
-                        </Typography>
-                      </Box>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          flexDirection: "column",
-
                           justifyContent: "space-between",
-                          textAlign: "start",
-                          alignItems: "flex-end",
+                          alignItems: "flex-start",
                         }}
                       >
-                        <Typography sx={{ fontSize: "3rem", lineHeight: 1.5 }}>
-                          INVOICE
-                        </Typography>
-                        <Typography
+                        <Box
                           sx={{
-                            fontSize: ".7rem",
-                            color: "grey",
-                            fontWeight: 600,
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "flex-start",
                           }}
                         >
-                          BILL NUMBER - {returnBillHistoryList?.bill_number}
-                        </Typography>
-                      </Box>
-                    </Box>
-                    <Box sx={{ mt: 5 }}>
-                      <DataGrid
-                        rows={
-                          returnBillHistoryList?.returned_items?.map(
-                            (data) => ({
-                              ...data,
-                              id: data.code,
-                            })
-                          ) || []
-                        }
-                        columns={columns}
-                        disableColumnMenu
-                        hideFooter
-                        sx={{
-                          borderRadius: 0,
+                          <Typography>Order Date</Typography>
+                          <Typography
+                            sx={{ fontSize: ".7rem", color: "grey", mt: 1 }}
+                          >
+                            {returnBillHistoryList?.createdAt
+                              ? new Date(
+                                  returnBillHistoryList.createdAt
+                                ).toLocaleDateString("en-GB", {
+                                  timeZone: "UTC",
+                                })
+                              : ""}
+                          </Typography>
+                        </Box>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
 
-                          "& .MuiDataGrid-columnSeparator": {
-                            display: "none",
-                          },
-                          "& .MuiDataGrid-columnHeader": {
-                            backgroundColor: "#1E1E2D !important",
-                            color: "white",
-                            maxHeight: "50px",
-                            border: "none",
-                          },
-                          "& .MuiDataGrid-cell": {
-                            border: "none",
-                          },
-                         
-                        }}
-                      />
-                    </Box>
-                    <Box
-                      sx={{
-                        width: "100%",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "flex-end",
-                        gap: "10px",
-                        mt: 3,
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          width: "40%",
-                          display: "flex",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <Typography sx={{ fontSize: ".7rem" }}>
-                          Previous Bill Amount{" "}
-                        </Typography>
-                        <Typography sx={{ fontSize: ".7rem" }}>
-                          {returnBillHistoryList?.previous_bill_amount}
-                        </Typography>
+                            justifyContent: "space-between",
+                            textAlign: "start",
+                            alignItems: "flex-end",
+                          }}
+                        >
+                          <Typography
+                            sx={{ fontSize: "3rem", lineHeight: 1.5 }}
+                          >
+                            INVOICE
+                          </Typography>
+                          <Typography
+                            sx={{
+                              fontSize: ".7rem",
+                              color: "grey",
+                              fontWeight: 600,
+                            }}
+                          >
+                            BILL NUMBER - {returnBillHistoryList?.bill_number}
+                          </Typography>
+                        </Box>
+                      </Box>
+                      <Box sx={{ mt: 5 }}>
+                        <DataGrid
+                          rows={
+                            returnBillHistoryList?.returned_items?.map(
+                              (data) => ({
+                                ...data,
+                                id: data.code,
+                              })
+                            ) || []
+                          }
+                          columns={columns}
+                          disableColumnMenu
+                          hideFooter
+                          sx={{
+                            borderRadius: 0,
+
+                            "& .MuiDataGrid-columnSeparator": {
+                              display: "none",
+                            },
+                            "& .MuiDataGrid-columnHeader": {
+                              backgroundColor: "#1E1E2D !important",
+                              color: "white",
+                              maxHeight: "50px",
+                              border: "none",
+                            },
+                            "& .MuiDataGrid-cell": {
+                              border: "none",
+                            },
+                          }}
+                        />
                       </Box>
                       <Box
                         sx={{
-                          width: "40%",
+                          width: "100%",
                           display: "flex",
-                          justifyContent: "space-between",
+                          flexDirection: "column",
+                          alignItems: "flex-end",
+                          gap: "10px",
+                          mt: 3,
                         }}
                       >
-                        <Typography sx={{ fontSize: ".7rem" }}>
-                          Returned Amount{" "}
-                        </Typography>
-                        <Typography sx={{ fontSize: ".7rem" }}>
-                          {returnBillHistoryList?.returned_amount}
-                        </Typography>
+                        <Box
+                          sx={{
+                            width: "40%",
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Typography sx={{ fontSize: ".7rem" }}>
+                            Previous Bill Amount{" "}
+                          </Typography>
+                          <Typography sx={{ fontSize: ".7rem" }}>
+                            {returnBillHistoryList?.previous_bill_amount}
+                          </Typography>
+                        </Box>
+                        <Box
+                          sx={{
+                            width: "40%",
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Typography sx={{ fontSize: ".7rem" }}>
+                            Returned Amount{" "}
+                          </Typography>
+                          <Typography sx={{ fontSize: ".7rem" }}>
+                            {returnBillHistoryList?.returned_amount}
+                          </Typography>
+                        </Box>
+                        <Box
+                          sx={{
+                            width: "40%",
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <Typography sx={{ fontSize: ".7rem" }}>
+                            Returned Method{" "}
+                          </Typography>
+                          <Typography sx={{ fontSize: ".7rem" }}>
+                            {returnBillHistoryList?.return_method}
+                          </Typography>
+                        </Box>
                       </Box>
                     </Box>
                   </Box>
                 </Box>
-              </Box>
-            );
-          })}
+              );
+            })}
         </Box>
       </Box>
     </Modal>

@@ -14,6 +14,7 @@ const initialState: any = {
   payCreditBalanceModal: false,
   returnBillHistoryModal: false,
   returnBillHistoryList: [],
+  returnAmountModel:false
 };
 
 const paymentSlice = createSlice({
@@ -26,6 +27,10 @@ const paymentSlice = createSlice({
     setUPIBillsList: (state, action) => {
       state.UPIBillsList = action.payload;
     },
+    setReturnAmountModel: (state, action) => {
+      state.returnAmountModel = action.payload;
+    },
+
     setSelectedBills: (state, action) => {
       state.tempRemoveItem = [];
       state.selectedBills = action.payload;
@@ -209,6 +214,7 @@ const paymentSlice = createSlice({
 // Actions
 export const {
   setCurrentPaymentsTab,
+  setReturnAmountModel,
   setUPIBillsList,
   setSelectedBills,
   setItemRemove,
@@ -246,4 +252,6 @@ export const selectReturnBillHistoryModal = (state: any) =>
 export const selectReturnBillHistoryList = (state: any) =>
   state.payments.returnBillHistoryList;
 
+export const selectReturnAmountModel = (state: any) =>
+  state.payments.returnAmountModel;
 export default paymentSlice.reducer;

@@ -12,6 +12,7 @@ const ReturnBillsHistorySchema = new mongoose.Schema(
     previous_bill_amount: { type: Number, required: true },
     returned_amount: { type: Number, required: true },
     returned_by: { type: String, required: true },
+    return_method:{ type: String, required: true },
     createdAt: { type: Date, default: getISTDate },
     updatedAt: { type: Date, default: getISTDate },
   },

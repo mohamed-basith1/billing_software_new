@@ -147,7 +147,75 @@ export function TransactionRouter() {
       };
     }
   });
-  
+
+  ipcMain.handle("amount-validator", async (_, data) => {
+    try {
+      const { method, amount } = data;
+
+      // Fetch current balances
+      const transactions = await TransactionSchema.find().lean();
+
+      let upi_balance = 0;
+      let cash_balance = 0;
+
+      transactions.forEach((transaction) => {
+        const amt = transaction.amount || 0;
+        const isIncrease = transaction.status === "Increased";
+
+        if (transaction.method === "UPI Paid") {
+          upi_balance += isIncrease ? amt : -amt;
+        } else if (transaction.method === "Cash Paid") {
+          cash_balance += isIncrease ? amt : -amt;
+        }
+      });
+
+      // Round balances
+      upi_balance = parseFloat(upi_balance.toFixed(2));
+      cash_balance = parseFloat(cash_balance.toFixed(2));
+
+      let available = false;
+      let message = "";
+
+      if (method === "UPI Paid") {
+        available = upi_balance >= amount;
+        message = available
+          ? "Sufficient UPI balance available"
+          : `Insufficient UPI balance. Choose another method.`;
+      } else if (method === "Cash Paid") {
+        available = cash_balance >= amount;
+        message = available
+          ? "Sufficient Cash balance available"
+          : `Insufficient Cash balance. Choose another method.`;
+      } else {
+        return {
+          status: 400,
+          available: false,
+          message: "Invalid payment method",
+        };
+      }
+
+      if (available) {
+        return {
+          status: 200,
+          available: true,
+          message,
+        };
+      } else {
+        return {
+          status: 400,
+          available: false,
+          message,
+        };
+      }
+    } catch (error) {
+      console.error("Error validating amount:", error);
+      return {
+        status: 500,
+        message: "Internal server error during amount validation",
+      };
+    }
+  });
+
   ipcMain.handle("add-transaction-history", async (_event, { data }) => {
     try {
       if (data.billtransactionhistory === false) {
@@ -174,13 +242,6 @@ export function TransactionRouter() {
         }
       }
 
-
-
-
-
-
-
-      
       const lastBill: any = await BillsModel.findOne().sort({ createdAt: -1 }); // Get latest bill
       let finalData = { ...data, bill_no: lastBill.bill_number };
       // 3. Create and save transaction

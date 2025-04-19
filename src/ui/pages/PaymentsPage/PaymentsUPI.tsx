@@ -37,6 +37,7 @@ import {
   setFromDate,
   setItemRemove,
   setPaymentChange,
+  setReturnAmountModel,
   setReturnBillHistoryModal,
   setReturnItem,
   setSelectedBills,
@@ -48,6 +49,7 @@ import { selectUserName } from "../LoginPage/LoginSlice";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { AnimatedCounter } from "../ReportPage/Dashboard";
+import ReturnAmountModal from "../../components/modals/ReturnAmountModal";
 
 const PaymentsUPI = () => {
   dayjs.extend(utc);
@@ -189,38 +191,96 @@ const PaymentsUPI = () => {
     let response: any = await fetchBills(fromDate, toDate, "UPI Paid");
     dispatch(setUPIBillsList(response.data));
   };
+  let returnAmount =
+    UPIBillsList.find(
+      (data: any) => data.bill_number === selectedBills.bill_number
+    )?.itemsList?.reduce((sum, item) => {
+      const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
+      return sum + quantity * item.rate;
+    }, 0) - Number(selectedBills?.total_amount);
+
   const handleReturnBill = async () => {
-    let returnBillHistoryPayload = {
-      bill_number: selectedBills.bill_number,
-      previous_bill_amount: UPIBillsList?.find(
-        (data: any) => data.bill_number === selectedBills.bill_number
-      ).total_amount,
-      returned_items: tempRemoveItem,
-      returned_amount:
+    if (Number(returnAmount) === 0) {
+      alert("No Change");
+    } else {
+      dispatch(setReturnAmountModel(true));
+    }
+  };
+
+  const finalBillHanlder = async (method) => {
+    let validatorPayload = {
+      amount: Number(
         UPIBillsList.find(
           (data: any) => data.bill_number === selectedBills.bill_number
         )?.itemsList?.reduce((sum, item) => {
           const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
           return sum + quantity * item.rate;
-        }, 0) - Number(selectedBills?.total_amount),
-      returned_by: userName,
+        }, 0) - Number(selectedBills?.total_amount)
+      ),
+      method: method,
     };
 
-    console.log("returnBillHistoryPayload", returnBillHistoryPayload);
-    // createBillReturnHistory
-    // @ts-ignore
-    await window.electronAPI.createBillReturnHistory(returnBillHistoryPayload);
-
     //@ts-ignore
-    let response: any = await window.electronAPI.returnBill(
-      selectedBills._id,
-      selectedBills,
-      tempRemoveItem
+    let amountAvalaible = await window.electronAPI.amountValidator(
+      validatorPayload
     );
-    dispatch(setnewReturnBill(response.data));
-    toast.success(`${response.message}`, { position: "bottom-left" });
-    dispatch(clearReturnBillDetail());
-    console.log("return bill response", response);
+    if (amountAvalaible.status === 200) {
+      let TransactionPayload = {
+        status: "Decreased",
+        bill_no: selectedBills.bill_number,
+        customer: "None",
+        employee: "",
+        method: method,
+        reason: "Billed Item Return",
+        amount: Number(
+          UPIBillsList.find(
+            (data: any) => data.bill_number === selectedBills.bill_number
+          )?.itemsList?.reduce((sum, item) => {
+            const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
+            return sum + quantity * item.rate;
+          }, 0) - Number(selectedBills?.total_amount)
+        ),
+        handler: userName,
+        billtransactionhistory: true,
+        password: "",
+      };
+      //@ts-ignore
+      await window.electronAPI.addTransactionHistory(TransactionPayload);
+      let returnBillHistoryPayload = {
+        bill_number: selectedBills.bill_number,
+        previous_bill_amount: UPIBillsList?.find(
+          (data: any) => data.bill_number === selectedBills.bill_number
+        ).total_amount,
+        returned_items: tempRemoveItem,
+        return_method: method,
+        returned_amount:
+          UPIBillsList.find(
+            (data: any) => data.bill_number === selectedBills.bill_number
+          )?.itemsList?.reduce((sum, item) => {
+            const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
+            return sum + quantity * item.rate;
+          }, 0) - Number(selectedBills?.total_amount),
+        returned_by: userName,
+      };
+      console.log("returnBillHistoryPayload", returnBillHistoryPayload);
+      // createBillReturnHistory
+      // @ts-ignore
+      await window.electronAPI.createBillReturnHistory(
+        returnBillHistoryPayload
+      );
+      //@ts-ignore
+      let response: any = await window.electronAPI.returnBill(
+        selectedBills._id,
+        selectedBills,
+        tempRemoveItem
+      );
+      dispatch(setnewReturnBill(response.data));
+      toast.success(`${response.message}`, { position: "bottom-left" });
+      dispatch(clearReturnBillDetail());
+      dispatch(setReturnAmountModel(false));
+    } else {
+      toast.error(`${amountAvalaible.message}`, { position: "bottom-left" });
+    }
   };
   const handleChangePaymentMethod = async () => {
     //@ts-ignore
@@ -871,13 +931,18 @@ const PaymentsUPI = () => {
                     }}
                   >
                     <Button
-                      sx={{
-                        height: "",
-                        opacity:
-                          selectedBills?.itemsList?.length === 0
-                            ? ".5"
-                            : "auto",
-                      }}
+                      sx={(theme) => ({
+                        height: "2.5rem",
+                        bgcolor:
+                          returnAmount <= 0 ? theme.palette.grey[400] : "",
+                        color:
+                          returnAmount <= 0 ? theme.palette.text.disabled : "",
+                        "&:hover": {
+                          bgcolor:
+                            returnAmount <= 0 ? theme.palette.grey[400] : "",
+                        },
+                      })}
+                      disabled={returnAmount <= 0}
                       fullWidth
                       onClick={() => handleReturnBill()}
                     >
@@ -904,6 +969,7 @@ const PaymentsUPI = () => {
           </Box>
         )}
       </Box>
+      <ReturnAmountModal finalBillHanlder={finalBillHanlder} />
     </Box>
   );
 };
