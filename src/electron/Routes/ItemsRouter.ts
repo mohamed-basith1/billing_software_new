@@ -3,7 +3,7 @@ import Item from "../models/ItemsModel.js";
 export function ItemsRouter() {
   ipcMain.handle("insert-item", async (_, data) => {
     try {
-      // Check if an item with the same item_name or code exists
+      // Check if an item with the same item_name 
       const normalizeString = (str) => str.replace(/\s+/g, "").toLowerCase();
       const normalizedInput = normalizeString(data.item_name);
 
@@ -32,7 +32,7 @@ export function ItemsRouter() {
   });
 
   ipcMain.handle("exist-item-validate", async (_, data) => {
-    // Check if an item with the same item_name or code exists
+    // Check if an item with the same item_name 
     const normalizeString = (str) => str.replace(/\s+/g, "").toLowerCase();
     const normalizedInput = normalizeString(data.item_name);
 
@@ -250,6 +250,7 @@ export function ItemsRouter() {
               result.push({
                 item_name: stock.item_name,
                 code: stock.code,
+                unique_id: stock.unique_id,
                 amount: stock.amount,
                 purchased_rate: stock.purchased_rate,
                 rate: stock.rate,

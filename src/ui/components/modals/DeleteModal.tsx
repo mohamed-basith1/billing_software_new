@@ -8,7 +8,7 @@ import {
   selectCustomerDetails,
   setCustomerDeleteModal,
 } from "../../pages/CustomersPage/CustomersSlice";
-import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
+import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 
 import { toast } from "react-toastify";
 export const style = {
@@ -22,7 +22,7 @@ export const style = {
   px: 4,
   pb: 3,
 };
-const DeleteModal = () => {
+const DeleteModal = ({ bill, handleDeleteBill, credit }: any) => {
   const customerDeleteModal = useSelector(selectCustomerDeleteModal);
   const customerDetails = useSelector(selectCustomerDetails);
   const dispatch = useDispatch();
@@ -71,7 +71,7 @@ const DeleteModal = () => {
             textAlign: "center",
           }}
         >
-          <Box sx={{ display: "flex" ,gap:"10px"}}>
+          <Box sx={{ display: "flex", gap: "10px" }}>
             <Box
               sx={{
                 bgcolor: "rgb(193,9,21)",
@@ -93,7 +93,6 @@ const DeleteModal = () => {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "flex-start",
-             
               }}
             >
               <Typography
@@ -116,8 +115,9 @@ const DeleteModal = () => {
                   mt: 1,
                 }}
               >
-                This action can not be undone. This will permanently delete
-                customer.
+                {bill === true || credit === true
+                  ? "This action cannot be undone. It will permanently delete the bill record."
+                  : "This action cannot be undone. It will permanently delete the customer."}
               </Typography>
             </Box>
           </Box>
@@ -146,7 +146,11 @@ const DeleteModal = () => {
             </Button>
             <Button
               variant="contained"
-              onClick={handleCustomerDelete}
+              onClick={
+                bill === true || credit === true
+                  ? handleDeleteBill
+                  : handleCustomerDelete
+              }
               sx={{
                 height: "2.5rem",
                 width: "100px",

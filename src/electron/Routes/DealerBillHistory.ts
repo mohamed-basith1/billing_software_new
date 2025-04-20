@@ -137,7 +137,7 @@ export function DealerBillRouter() {
       // Step 1: Reduce stock for each item in the purchased list
       for (const purchasedItem of data.purchasedItemList) {
         await Item.updateOne(
-          { unique_id: purchasedItem.unique_id }, // you can also use another identifier like code or id
+          { unique_id: purchasedItem.unique_id }, // you can also use another identifier like unique or id
           { $inc: { stock_qty: -purchasedItem.stock_qty } }
         );
       }

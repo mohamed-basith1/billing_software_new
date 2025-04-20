@@ -34,60 +34,6 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
 import { v4 as uuidv4 } from "uuid";
-const itemsList = [
-  {
-    item_name: "Basmati Rice",
-    code: "001",
-    uom: "Kg",
-    qty: 1,
-    purchased_rate: 125,
-    rate: 175,
-    amount: 175,
-    stock_qty: 20,
-    margin: 50,
-    low_stock_remainder: 5,
-    item_expiry_date: "2025-03-28T18:30:00.000Z",
-  },
-  {
-    item_name: "Horlicks (500g)",
-    code: "002",
-    uom: "piece",
-    qty: 1,
-    purchased_rate: 500,
-    rate: 520,
-    amount: 520,
-    stock_qty: 10,
-    margin: 20,
-    low_stock_remainder: 5,
-    item_expiry_date: "2025-03-26T18:30:00.000Z",
-  },
-  {
-    item_name: "Cashew",
-    code: "003",
-    uom: "gram",
-    qty: 1000,
-    purchased_rate: 1500,
-    rate: 1800,
-    amount: 1800,
-    stock_qty: 2000,
-    margin: 300,
-    low_stock_remainder: 500,
-    item_expiry_date: "2025-03-27T18:30:00.000Z",
-  },
-  {
-    item_name: "Oil",
-    code: "004",
-    uom: "liter",
-    qty: 1,
-    purchased_rate: 180,
-    rate: 200,
-    amount: 200,
-    stock_qty: 50,
-    margin: 20,
-    low_stock_remainder: 10,
-    item_expiry_date: "2025-03-28T18:30:00.000Z",
-  },
-];
 
 const ItemsDailyEntry = () => {
   const itemSearchRef = useRef<HTMLInputElement>(null);
@@ -96,7 +42,7 @@ const ItemsDailyEntry = () => {
   const selectedItem = useSelector(selectFilterSearchItem);
   const dealerDetails = useSelector(selectItems);
   const dealerPurchasedPrice = useSelector(selectDealerPurchasedPrice);
-  const [suggestions, setSuggestions] = useState<typeof itemsList>([]);
+  const [suggestions, setSuggestions] = useState<any>([]);
   const [selectedFlag, setSelectFlag] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [uploadStock, setUplaodStock] = useState("");

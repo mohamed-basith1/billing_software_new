@@ -23,18 +23,30 @@ export function BillsRouter() {
       console.log("createBill", data);
 
       // Count existing bills to determine the next bill number
-      const billCount = await BillsModel.countDocuments();
-      const bill_number = `BILL-${billCount + 1}`; // Generates a sequential bill number (e.g., BILL-1, BILL-2)
+      const lastBill = await BillsModel.findOne()
+        .sort({ createdAt: -1 }) // Or sort by numeric bill number if you store that separately
+        .limit(1);
+
+      let lastNumber = 0;
+
+      if (lastBill && lastBill.bill_number) {
+        const match = lastBill.bill_number.match(/BILL-(\d+)/);
+        if (match) {
+          lastNumber = parseInt(match[1]);
+        }
+      }
+
+      const bill_number = `BILL-${lastNumber + 1}`;
 
       // Reduce stock_qty for each item in the billing list
       for (const item of itemsList) {
         const existingItem = await Item.findOne({ unique_id: item.unique_id });
 
         if (!existingItem) {
-          console.error(`Item with code ${item.code} not found`);
+          console.error(`Item with unique_id ${item.unique_id} not found`);
           return {
             status: 400,
-            message: `Item with code ${item.code} not found.`,
+            message: `Item with unique_id ${item.unique_id} not found.`,
           };
         }
 
@@ -128,7 +140,12 @@ export function BillsRouter() {
   ipcMain.handle(
     "return-bill",
     async (_, { id, updatedData, tempRemoveItem }) => {
-      console.log("tempRemoveItem =>", tempRemoveItem);
+      console.log(
+        "tempRemoveItem =>",
+        tempRemoveItem,
+        "updatedData",
+        updatedData
+      );
       try {
         // Update the bill
         const bill = await BillsModel.findOneAndReplace(
@@ -149,10 +166,10 @@ export function BillsRouter() {
 
         // Process tempRemoveItem to update stock_qty
         for (const tempItem of tempRemoveItem) {
-          const { code, qty } = tempItem;
+          const { unique_id, qty } = tempItem;
 
-          // Find the item in the database by code
-          const item = await Item.findOne({ code });
+          // Find the item in the database by unique_id
+          const item = await Item.findOne({ unique_id });
 
           if (item) {
             // Update stock_qty by adding the qty from tempRemoveItem
@@ -366,15 +383,31 @@ export function BillsRouter() {
   );
 
   // Delete Bill
-  ipcMain.handle("delete-bill", async (_, billId) => {
+  ipcMain.handle("delete-bill", async (_, data: any) => {
     try {
-      const bill = await BillsModel.findByIdAndDelete(billId);
+      console.log("delete-bill", data);
+      // Process tempRemoveItem to update stock_qty
+      for (const tempItem of data.itemsList) {
+        const { unique_id, qty } = tempItem;
+
+        // Find the item in the database by unique_id
+        const item = await Item.findOne({ unique_id });
+
+        if (item) {
+          // Update stock_qty by adding the qty from tempRemoveItem
+          item.stock_qty += qty;
+          await item.save();
+        }
+      }
+
+      const bill = await BillsModel.findByIdAndDelete(data._id);
       if (!bill) {
         return {
           status: 404,
           message: "Bill not found.",
         };
       }
+
       return {
         status: 200,
         message: "Bill deleted successfully.",
@@ -491,7 +524,9 @@ ipcMain.handle("get-dashboard-data", async (_event, { fromDate, toDate }) => {
 
   // Aggregate revenue by date
   const revenueByDate = bills.reduce((acc, bill) => {
-    const date = new Date(new Date(bill.createdAt).setUTCHours(0, 0, 0, 0)).toLocaleDateString("en-GB");
+    const date = new Date(
+      new Date(bill.createdAt).setUTCHours(0, 0, 0, 0)
+    ).toLocaleDateString("en-GB");
 
     const amount = bill.total_amount;
 

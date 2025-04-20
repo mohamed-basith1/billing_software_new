@@ -1,6 +1,7 @@
 import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import PublishedWithChangesIcon from "@mui/icons-material/PublishedWithChanges";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
@@ -28,6 +29,7 @@ import {
 import {
   clearPaymentBillsDetail,
   clearReturnBillDetail,
+  removeBill,
   selectBillSearch,
   selectFromDate,
   selectSelectedBills,
@@ -52,6 +54,8 @@ import utc from "dayjs/plugin/utc";
 
 import timezone from "dayjs/plugin/timezone";
 import { AnimatedCounter } from "../ReportPage/Dashboard";
+import DeleteModal from "../../components/modals/DeleteModal";
+import { setCustomerDeleteModal } from "../CustomersPage/CustomersSlice";
 const PaymentsSelfUse = () => {
   dayjs.extend(utc);
   dayjs.extend(timezone);
@@ -202,6 +206,21 @@ const PaymentsSelfUse = () => {
 
     dispatch(setPaymentChange(response.data));
     toast.success(`${response.message}`, { position: "bottom-left" });
+  };
+
+  const handleDeleteBill = async () => {
+ 
+    let payload: any = UPIBillsList.find(
+      (data: any) => data.bill_number === selectedBills.bill_number
+    );
+    //@ts-ignore
+    let response = await window.electronAPI.deleteBill(payload);
+
+    if (response.status === 200) {
+      toast.success(response.message, { position: "bottom-left" });
+      dispatch(removeBill(payload));
+      dispatch(setCustomerDeleteModal(false));
+    }
   };
 
   return (
@@ -500,7 +519,40 @@ const PaymentsSelfUse = () => {
               overflow: "scroll",
             }}
           >
-            <Box sx={{ bgcolor: "white", height: "100%" }}>
+            <Box
+              sx={{
+                bgcolor: "#F7F7FE",
+                borderBottom: ".1px solid lightgrey",
+                height: "100%",
+              }}
+            >
+              <Box
+                sx={{
+                  px: 2,
+                  py: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  borderRight: ".1px solid lightgrey",
+
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: "rgba(220, 53, 69, 0.2)", // Light red background
+                    color: "#C82333", // Deep red text for contrast
+                  },
+
+                  fontSize: ".7rem",
+                  width: "8rem",
+                  justifyContent: "center",
+                }}
+                onClick={() => dispatch(setCustomerDeleteModal(true))}
+              >
+                <DeleteOutlineOutlinedIcon
+                  sx={{ fontSize: "1rem", color: "inherit" }}
+                />
+                DELETE
+              </Box>
               <Box
                 sx={{
                   bgcolor: "white",
@@ -570,7 +622,7 @@ const PaymentsSelfUse = () => {
                     rows={
                       selectedBills?.itemsList?.map((data) => ({
                         ...data,
-                        id: data.code,
+                        id: data.unique_id,
                       })) || []
                     }
                     columns={columns}
@@ -668,6 +720,7 @@ const PaymentsSelfUse = () => {
             <Typography>Select The Listed Bills</Typography>
           </Box>
         )}
+        <DeleteModal bill={true} handleDeleteBill={handleDeleteBill} />
       </Box>
     </Box>
   );

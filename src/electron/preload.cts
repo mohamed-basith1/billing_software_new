@@ -56,7 +56,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
     }),
   updateBillPaymentMethod: (id, payment_method) =>
     ipcRenderer.invoke("update-bill-payment-method", { id, payment_method }),
-  deleteBill: (id) => ipcRenderer.invoke("delete-bill", id),
+  deleteBill: (data) => ipcRenderer.invoke("delete-bill", data),
 
   // Return Bill History API
   createBillReturnHistory: (data) =>

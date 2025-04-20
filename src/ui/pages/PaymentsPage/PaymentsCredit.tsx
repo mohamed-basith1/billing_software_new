@@ -32,6 +32,7 @@ import {
 import {
   clearPaymentBillsDetail,
   clearReturnBillDetail,
+  removeBill,
   selectBillSearch,
   selectFromDate,
   selectSelectedBills,
@@ -56,6 +57,11 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { AnimatedCounter } from "../ReportPage/Dashboard";
 import ReturnAmountModal from "../../components/modals/ReturnAmountModal";
+import DeleteModal from "../../components/modals/DeleteModal";
+import {
+  selectCustomerDeleteModal,
+  setCustomerDeleteModal,
+} from "../CustomersPage/CustomersSlice";
 
 const PaymentsCredit = () => {
   dayjs.extend(utc);
@@ -89,7 +95,7 @@ const PaymentsCredit = () => {
               disabled={selectedBills.itemsList.length === 1 ? true : false}
               onClick={(e) => {
                 e.stopPropagation(); // Stops focus from moving to the cell
-                dispatch(setItemRemove(params.row.code));
+                dispatch(setItemRemove(params.row.unique_id));
               }}
             >
               <ClearRoundedIcon
@@ -148,6 +154,7 @@ const PaymentsCredit = () => {
   const billSearch: any = useSelector(selectBillSearch);
   const dispatch: any = useDispatch();
   const userName = useSelector(selectUserName);
+  const deleteModalvalue = useSelector(selectCustomerDeleteModal);
   console.log("UPIBillsList", UPIBillsList);
   useEffect(() => {
     dispatch(setFromDate(dayjs().tz("Asia/Kolkata").subtract(1, "month")));
@@ -258,70 +265,130 @@ const PaymentsCredit = () => {
   };
 
   const finalBillHanlder = async (method) => {
-    let validatorPayload = {
-      amount: Number(selectedBills?.return_amount),
-      method: method,
-    };
-
-    //@ts-ignore
-    let amountAvalaible = await window.electronAPI.amountValidator(
-      validatorPayload
+    let UPIBillsListSelectedBill = UPIBillsList?.find(
+      (data: any) => data.bill_number === selectedBills.bill_number
     );
-    if (amountAvalaible.status === 200) {
-      let UPIBillsListSelectedBill = UPIBillsList?.find(
-        (data: any) => data.bill_number === selectedBills.bill_number
-      );
-
-      let returnBillHistoryPayload = {
-        bill_number: selectedBills.bill_number,
-        previous_bill_amount: UPIBillsListSelectedBill.total_amount,
-        returned_items: tempRemoveItem,
-        return_method: method,
-        returned_amount: selectedBills?.return_amount,
-        returned_by: userName,
-      };
-
-      console.log("returnBillHistoryPayload", returnBillHistoryPayload);
-      // if (
-      //   UPIBillsList?.find(
-      //     (data: any) => data.bill_number === selectedBills.bill_number
-      //   ).total_amount !== selectedBills?.total_amount
-      // ) {
-
-      // @ts-ignore
-      await window.electronAPI.createBillReturnHistory(
-        returnBillHistoryPayload
-      );
-      // }
-
-      //@ts-ignore
-      let response: any = await window.electronAPI.returnPendingAmount(
-        selectedBills._id,
-        selectedBills.total_amount
-      );
-
-      let TransactionPayload = {
-        status: "Decreased",
-        bill_no: selectedBills.bill_number,
-        customer: "None",
-        employee: "",
-        method: method,
-        reason: "Credit Billed Item Return",
+    if (deleteModalvalue === false) {
+      let validatorPayload = {
         amount: Number(selectedBills?.return_amount),
-        handler: userName,
-        billtransactionhistory: true,
-        password: "",
+        method: method,
+      };
+
+      //@ts-ignore
+      let amountAvalaible = await window.electronAPI.amountValidator(
+        validatorPayload
+      );
+      if (amountAvalaible.status === 200) {
+        let returnBillHistoryPayload = {
+          bill_number: selectedBills.bill_number,
+          previous_bill_amount: UPIBillsListSelectedBill.total_amount,
+          returned_items: tempRemoveItem,
+          return_method: method,
+          returned_amount: selectedBills?.return_amount,
+          returned_by: userName,
+        };
+
+        console.log("returnBillHistoryPayload", returnBillHistoryPayload);
+        // if (
+        //   UPIBillsList?.find(
+        //     (data: any) => data.bill_number === selectedBills.bill_number
+        //   ).total_amount !== selectedBills?.total_amount
+        // ) {
+
+        // @ts-ignore
+        await window.electronAPI.createBillReturnHistory(
+          returnBillHistoryPayload
+        );
+        // }
+
+        //@ts-ignore
+        let response: any = await window.electronAPI.returnPendingAmount(
+          selectedBills._id,
+          selectedBills.total_amount
+        );
+
+        let TransactionPayload = {
+          status: "Decreased",
+          bill_no: selectedBills.bill_number,
+          customer: "None",
+          employee: "",
+          method: method,
+          reason: `Credit billed item returned, amount refunded to customer — ${method}.`,
+          amount: Number(selectedBills?.return_amount),
+          handler: userName,
+          billtransactionhistory: true,
+          password: "",
+        };
+        //@ts-ignore
+        await window.electronAPI.addTransactionHistory(TransactionPayload);
+        console.log("response", response);
+        dispatch(setnewReturnBill(response.data));
+        dispatch(setSelectedBills(response.data));
+        dispatch(setReturnAmountModel(false));
+      } else {
+        toast.error(`${amountAvalaible.message}`, { position: "bottom-left" });
+      }
+    } else {
+  
+      //this is for delete whole bill
+      let validatorPayload = {
+        amount: Number(selectedBills?.amount_paid),
+        method: method,
       };
       //@ts-ignore
-      await window.electronAPI.addTransactionHistory(TransactionPayload);
-      console.log("response", response);
-      dispatch(setnewReturnBill(response.data));
-      dispatch(setSelectedBills(response.data));
-      dispatch(setReturnAmountModel(false));
-    } else {
-      toast.error(`${amountAvalaible.message}`, { position: "bottom-left" });
+      let amountAvalaible = await window.electronAPI.amountValidator(
+        validatorPayload
+      );
+      if (amountAvalaible.status === 200) {
+        let TransactionPayloadAfter = {
+          status: "Decreased",
+          bill_no: selectedBills.bill_number,
+          customer: "None",
+          employee: "",
+          method: method,
+          reason: `${selectedBills.payment_method} record permanently deleted. amount refunded to customer — ${method}.`,
+          amount: Number(selectedBills?.amount_paid),
+          handler: userName,
+          billtransactionhistory: true,
+          password: "",
+        };
+        //@ts-ignore
+        await window.electronAPI.addTransactionHistory(TransactionPayloadAfter);
+        //@ts-ignore
+        let response = await window.electronAPI.deleteBill(
+          UPIBillsListSelectedBill
+        );
+        if (response.status === 200) {
+          toast.success(response.message, { position: "bottom-left" });
+          dispatch(removeBill(UPIBillsListSelectedBill));
+        }
+        dispatch(setCustomerDeleteModal(false));
+        dispatch(setReturnAmountModel(false));
+      } else {
+        toast.error(amountAvalaible.message, { position: "bottom-left" });
+      }
     }
   };
+
+  const handleDeleteBill = async () => {
+ 
+    let payload: any = UPIBillsList.find(
+      (data: any) => data.bill_number === selectedBills.bill_number
+    );
+
+    if (payload.amount_paid === 0) {
+      //@ts-ignore
+      let response = await window.electronAPI.deleteBill(payload);
+      if (response.status === 200) {
+        toast.success(response.message, { position: "bottom-left" });
+        dispatch(removeBill(payload));
+      }
+      dispatch(setCustomerDeleteModal(false));
+    } else {
+      dispatch(setReturnAmountModel(true));
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -849,9 +916,28 @@ const PaymentsCredit = () => {
                     backgroundColor: "rgba(220, 53, 69, 0.2)", // Light red background
                     color: "#C82333", // Deep red text for contrast
                   },
+                  opacity:
+                    UPIBillsList.find(
+                      (data) => data.bill_number === selectedBills.bill_number
+                    )?.total_amount === selectedBills.total_amount
+                      ? "1"
+                      : ".2",
                   fontSize: ".7rem",
                 }}
-                onClick={() => dispatch(setReturnBillHistoryModal(true))}
+                onClick={() => {
+                  if (
+                    UPIBillsList.find(
+                      (data) => data.bill_number === selectedBills.bill_number
+                    )?.total_amount === selectedBills.total_amount
+                  ) {
+                    dispatch(setCustomerDeleteModal(true));
+                  } else {
+                    toast.warning(
+                      "You are trying to delete, but the billed item has been updated. Please remove the changes or click the 'Bill Again' button first, then try to delete",
+                      { position: "bottom-left" }
+                    );
+                  }
+                }}
               >
                 <DeleteOutlineOutlinedIcon
                   sx={{ fontSize: "1rem", color: "inherit" }}
@@ -930,7 +1016,7 @@ const PaymentsCredit = () => {
                     rows={
                       selectedBills?.itemsList?.map((data) => ({
                         ...data,
-                        id: data.code,
+                        id: data.unique_id,
                       })) || []
                     }
                     columns={columns}
@@ -942,7 +1028,7 @@ const PaymentsCredit = () => {
                         (data: any) =>
                           data.bill_number === selectedBills.bill_number
                       )?.itemsList?.find(
-                        (data: any) => data.code === newRow.code
+                        (data: any) => data.unique_id === newRow.unique_id
                       );
 
                       if (!/^\d*\.?\d+$/.test(newRow.qty)) {
@@ -1185,6 +1271,7 @@ const PaymentsCredit = () => {
         )}
       </Box>
       <ReturnAmountModal finalBillHanlder={finalBillHanlder} />
+      <DeleteModal credit={true} handleDeleteBill={handleDeleteBill} />
     </Box>
   );
 };

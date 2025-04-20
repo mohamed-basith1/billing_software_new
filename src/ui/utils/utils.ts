@@ -19,8 +19,6 @@ export const calculateAmount = (
   }
 };
 
-
-
 export const getDaysDifference = (startDate, endDate) => {
   const start = new Date(startDate);
   const end = new Date(endDate);
@@ -34,6 +32,7 @@ export const getGreeting = () => {
   if (hour < 18) return "Good Afternoon , ";
   return "Good Evening , ";
 };
+
 export const generateInvoicePDF = (items, subAmount, discount, TotalAmount) => {
   const doc = new jsPDF();
 
@@ -121,149 +120,6 @@ export const generateInvoicePDF = (items, subAmount, discount, TotalAmount) => {
   doc.save("invoice.pdf");
 };
 
-export const sampleData = [
-  {
-    item_name: "Basmati Rice",
-    code: "IR001",
-    uom: "Kg",
-    qty: 1,
-    stock_qty: 15, // 1 + 1
-    purchased_rate: 50,
-    rate: 60,
-    amount: 60,
-  },
-  {
-    item_name: "Wheat Flour",
-    code: "WF002",
-    uom: "Kg",
-    qty: 1,
-    stock_qty: 15, // 1 + 1
-    purchased_rate: 40,
-    rate: 50,
-    amount: 50,
-  },
-  {
-    item_name: "Toor Dal",
-    code: "TD003",
-    uom: "Kg",
-    qty: 1,
-    stock_qty: 15, // 1 + 1
-    purchased_rate: 90,
-    rate: 110,
-    amount: 110,
-  },
-  {
-    item_name: "Mustard Seeds",
-    code: "MS004",
-    uom: "gram",
-    qty: 100,
-    stock_qty: 2000, // 100 + 100
-    purchased_rate: 200,
-    rate: 250,
-    amount: 250,
-  },
-  {
-    item_name: "Cumin Seeds",
-    code: "CS005",
-    uom: "gram",
-    qty: 100,
-    stock_qty: 2000, // 100 + 100
-    purchased_rate: 400,
-    rate: 500,
-    amount: 500,
-  },
-  {
-    item_name: "Turmeric Powder",
-    code: "TP006",
-    uom: "gram",
-    qty: 100,
-    stock_qty: 2000, // 100 + 100
-    purchased_rate: 120,
-    rate: 150,
-    amount: 150,
-  },
-  {
-    item_name: "Coconut Oil",
-    code: "CO007",
-    uom: "liter",
-    qty: 1,
-    stock_qty: 15, // 1 + 1
-    purchased_rate: 180,
-    rate: 220,
-    amount: 220,
-  },
-  {
-    item_name: "Sunflower Oil",
-    code: "SO008",
-    uom: "liter",
-    qty: 1,
-    stock_qty: 15, // 1 + 1
-    purchased_rate: 160,
-    rate: 190,
-    amount: 190,
-  },
-  {
-    item_name: "Milk",
-    code: "MK009",
-    uom: "liter",
-    qty: 1,
-    stock_qty: 15, // 1 + 1
-    purchased_rate: 55,
-    rate: 65,
-    amount: 65,
-  },
-  {
-    item_name: "Ghee",
-    code: "GH010",
-    uom: "Kg",
-    qty: 1,
-    stock_qty: 15, // 1 + 1
-    purchased_rate: 500,
-    rate: 600,
-    amount: 600,
-  },
-  {
-    item_name: "Tea Powder",
-    code: "TP011",
-    uom: "gram",
-    qty: 100,
-    stock_qty: 2000, // 100 + 100
-    purchased_rate: 220,
-    rate: 260,
-    amount: 260,
-  },
-  {
-    item_name: "Coffee Powder",
-    code: "CP012",
-    uom: "gram",
-    qty: 100,
-    stock_qty: 2000, // 100 + 100
-    purchased_rate: 300,
-    rate: 350,
-    amount: 350,
-  },
-  {
-    item_name: "Bread",
-    code: "BR013",
-    uom: "piece",
-    qty: 1,
-    stock_qty: 15, // 1 + 1
-    purchased_rate: 30,
-    rate: 40,
-    amount: 40,
-  },
-  {
-    item_name: "Egg",
-    code: "EG014",
-    uom: "piece",
-    qty: 1,
-    stock_qty: 15, // 1 + 1
-    purchased_rate: 6,
-    rate: 8,
-    amount: 8,
-  },
-];
-
 export async function addData(itemData: any) {
   const sanitizedData = JSON.parse(JSON.stringify(itemData)); // Removes undefined & BigInt
 
@@ -309,17 +165,18 @@ export const fetchBills = async (
   return response;
 };
 
-export const aggregateItemsByCode=(data)=> {
+export const aggregateItemsByCode = (data) => {
+  console.log("data agrregateItem", JSON.stringify(data));
   const aggregated: any = {};
 
   data.forEach((item: any) => {
-    const { code, qty, rate, uom } = item;
+    const { qty, rate, uom, unique_id } = item;
 
-    if (!aggregated[code]) {
-      aggregated[code] = { ...item, qty: 0 }; // Initialize qty to 0
+    if (!aggregated[unique_id]) {
+      aggregated[unique_id] = { ...item, qty: 0 }; // Initialize qty to 0
     }
 
-    aggregated[code].qty += qty; // Sum up qty
+    aggregated[unique_id].qty += qty; // Sum up qty
   });
 
   // Recalculate amount based on qty and rate
@@ -332,7 +189,7 @@ export const aggregateItemsByCode=(data)=> {
   });
 
   return Object.values(aggregated);
-}
+};
 //dark
 export const colorsList = [
   "rgb(30, 120, 80)", // Dark Green
@@ -346,8 +203,8 @@ export const getTotalAmount = <T>(bills: T[], key: keyof T): number => {
   return bills.reduce((sum, bill) => sum + (bill[key] as number), 0);
 };
 
-export const filterTodayBills=(bills:any)=> {
+export const filterTodayBills = (bills: any) => {
   const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
 
-  return bills.filter(bill => bill.createdAt.startsWith(today));
-}
+  return bills.filter((bill) => bill.createdAt.startsWith(today));
+};

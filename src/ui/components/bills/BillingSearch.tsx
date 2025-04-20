@@ -417,7 +417,7 @@ const BillingSearch = () => {
             {suggestions.map((item: any, index: number) => (
               <ListItem
                 component="div"
-                key={item.code}
+                key={item.unique_id}
                 onClick={() => handleSelectItem(item)}
                 sx={{
                   borderBottom: ".5px solid lightgray",

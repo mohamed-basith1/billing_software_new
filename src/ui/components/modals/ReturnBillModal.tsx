@@ -219,7 +219,7 @@ const ReturnBillHistoryModal = () => {
                             returnBillHistoryList?.returned_items?.map(
                               (data) => ({
                                 ...data,
-                                id: data.code,
+                                id: data.unique_id,
                               })
                             ) || []
                           }

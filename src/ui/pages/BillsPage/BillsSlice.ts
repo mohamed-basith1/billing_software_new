@@ -132,7 +132,7 @@ const billsSlice = createSlice({
       if (bill) {
         // Check if the item already exists in the bill items
         const existingItem: any = bill.items.find(
-          (item) => item.unique_id === unique_id
+          (item) => item.unique_id === unique_id  
         );
         const existingItemIndex = bill.items.findIndex(
           (item) => item.unique_id === unique_id
@@ -190,14 +190,14 @@ const billsSlice = createSlice({
       }
     },
     removeItem: (state, action) => {
-      const { code } = action.payload;
+      const { unique_id } = action.payload;
 
       // Find the bill with the given bill_number
       const bill = state.bills.find((b) => b.bill_number === state.currentTab);
 
       if (bill) {
         // Find the index of the item with the given code
-        const itemIndex = bill.items.findIndex((item) => item.code === code);
+        const itemIndex = bill.items.findIndex((item) => item.unique_id === unique_id);
 
         // If the item exists, remove it from the array
         if (itemIndex !== -1) {

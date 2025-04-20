@@ -508,7 +508,7 @@ const ItemPurchasedHistory = () => {
                         dealerHistoryselected?.purchasedItemList?.map(
                           (data) => ({
                             ...data,
-                            id: data.code,
+                            id: data.unique_id,
                           })
                         ) || []
                       }

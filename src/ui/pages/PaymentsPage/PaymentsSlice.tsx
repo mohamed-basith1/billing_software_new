@@ -14,7 +14,7 @@ const initialState: any = {
   payCreditBalanceModal: false,
   returnBillHistoryModal: false,
   returnBillHistoryList: [],
-  returnAmountModel:false
+  returnAmountModel: false,
 };
 
 const paymentSlice = createSlice({
@@ -32,26 +32,34 @@ const paymentSlice = createSlice({
     },
 
     setSelectedBills: (state, action) => {
+      console.log("duhiushdi", action.payload);
       state.tempRemoveItem = [];
       state.selectedBills = action.payload;
     },
+    removeBill: (state, action) => {
+      const updatedItems = state.UPIBillsList.filter(
+        (bill) => bill.bill_number !== action.payload.bill_number
+      );
+      state.UPIBillsList=updatedItems
+      state.selectedBills={}
+    },
     setItemRemove: (state, action) => {
-      console.log("remove code", action.payload);
+      console.log("remove unique_id", action.payload);
       const codeToRemove = action.payload;
 
       if (!state.selectedBills) return; // Prevent errors if `selectedBills` is undefined
 
-      // Aggregate removed items by code
+      // Aggregate removed items by unique_id
       state.tempRemoveItem = aggregateItemsByCode([
         ...state.tempRemoveItem,
         ...state.selectedBills.itemsList.filter(
-          (item) => item.code === codeToRemove
+          (item) => item.unique_id === codeToRemove
         ),
       ]);
 
       // Filter out the removed item
       const updatedItems = state.selectedBills.itemsList.filter(
-        (item) => item.code !== codeToRemove
+        (item) => item.unique_id !== codeToRemove
       );
 
       // Calculate new total amount
@@ -90,7 +98,7 @@ const paymentSlice = createSlice({
 
     setReturnItem: (state, action) => {
       const index = state.selectedBills.itemsList.findIndex(
-        (item) => item.code === action.payload.code
+        (item) => item.unique_id === action.payload.unique_id
       );
 
       if (index !== -1) {
@@ -109,7 +117,7 @@ const paymentSlice = createSlice({
 
         let removeSelectedItem = [
           ...state.selectedBills.itemsList.filter(
-            (data: any) => data.code !== action.payload.code
+            (data: any) => data.unique_id !== action.payload.unique_id
           ),
           action.payload,
         ];
@@ -144,12 +152,7 @@ const paymentSlice = createSlice({
           ...state.tempRemoveItem,
           { ...action.payload, qty: qtyDifference },
         ];
-        console.log(
-          "tempRemoveItemData",
-          tempRemoveItemData,
-          "aggregateItemsByCode(tempRemoveItemData)",
-          aggregateItemsByCode(tempRemoveItemData)
-        );
+
         state.tempRemoveItem = aggregateItemsByCode(tempRemoveItemData);
       }
     },
@@ -231,6 +234,7 @@ export const {
   setReturnBillHistoryModal,
   setReturnBillHistoryList,
   clearReturnBillDetail,
+  removeBill
 } = paymentSlice.actions;
 
 // Selectors

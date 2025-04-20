@@ -42,7 +42,9 @@ const BillingItems = () => {
       renderCell: (params: any) => {
         console.log("sysguyd", params);
         return (
-          <IconButton onClick={() => dispatch(removeItem({ code: params.id }))}>
+          <IconButton
+            onClick={() => dispatch(removeItem({ unique_id: params.id }))}
+          >
             <ClearRoundedIcon sx={{ color: "red" }} />
           </IconButton>
         );
@@ -89,14 +91,14 @@ const BillingItems = () => {
       return { ...modifiedBill[0] };
     }
 
-    console.log(Number(newRow.qty), modifiedBill[0], "super");
-    if (Number(newRow.qty) > modifiedBill[0].stock_qty) {
-      toast.warning(
-        `Entered quantity exceeds available stock. We only have ${modifiedBill[0].stock_qty} ${modifiedBill[0].uom} of ${modifiedBill[0].item_name}`,
-        { position: "bottom-left" }
-      );
-      return { ...modifiedBill[0] };
-    }
+    // console.log(Number(newRow.qty), modifiedBill[0], "super");
+    // if (Number(newRow.qty) > modifiedBill[0].stock_qty) {
+    //   toast.warning(
+    //     `Entered quantity exceeds available stock. We only have ${modifiedBill[0].stock_qty} ${modifiedBill[0].uom} of ${modifiedBill[0].item_name}`,
+    //     { position: "bottom-left" }
+    //   );
+    //   return { ...modifiedBill[0] };
+    // }
     // Recalculate the amount when qty is edited
     const updatedAmount = calculateAmount(newRow.uom, newRow.qty, newRow.rate);
     const updatedRow: any = { ...newRow, amount: updatedAmount };
@@ -104,7 +106,7 @@ const BillingItems = () => {
     return updatedRow;
   };
 
-  console.log("modifiedBill",modifiedBill)
+  console.log("modifiedBill", modifiedBill);
   useEffect(() => {
     const scrollToBottom = () => {
       if (gridRef.current) {

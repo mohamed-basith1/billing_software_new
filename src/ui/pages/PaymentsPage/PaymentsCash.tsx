@@ -1,7 +1,7 @@
 import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import PublishedWithChangesIcon from "@mui/icons-material/PublishedWithChanges";
-
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import {
@@ -28,6 +28,7 @@ import {
 import {
   clearPaymentBillsDetail,
   clearReturnBillDetail,
+  removeBill,
   selectBillSearch,
   selectFromDate,
   selectSelectedBills,
@@ -54,6 +55,8 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { AnimatedCounter } from "../ReportPage/Dashboard";
 import ReturnAmountModal from "../../components/modals/ReturnAmountModal";
+import DeleteModal from "../../components/modals/DeleteModal";
+import { setCustomerDeleteModal } from "../CustomersPage/CustomersSlice";
 const PaymentsCash = () => {
   dayjs.extend(utc);
   dayjs.extend(timezone);
@@ -86,8 +89,9 @@ const PaymentsCash = () => {
               style={{ outline: "none", border: "none", padding: 0 }}
               disabled={selectedBills.itemsList.length === 1 ? true : false}
               onClick={(e) => {
+                console.log("params usihsd", params);
                 e.stopPropagation(); // Stops focus from moving to the cell
-                dispatch(setItemRemove(params.row.code));
+                dispatch(setItemRemove(params.row.unique_id));
               }}
             >
               <ClearRoundedIcon
@@ -298,14 +302,85 @@ const PaymentsCash = () => {
   };
 
   const handleChangePaymentMethod = async () => {
+    let TransactionPayload = {
+      status: "Decreased",
+      bill_no: selectedBills.bill_number,
+      customer: "None",
+      employee: "",
+      method: selectedBills.payment_method,
+      reason: "Bill method changed from Cash to UPI.",
+      amount: Number(selectedBills.total_amount),
+      handler: userName,
+      billtransactionhistory: true,
+      password: "",
+    };
+    //@ts-ignore
+    await window.electronAPI.addTransactionHistory(TransactionPayload);
+
     //@ts-ignore
     let response: any = await window.electronAPI.updateBillPaymentMethod(
       selectedBills._id,
       "UPI Paid"
     );
-
+    let TransactionPayloadAfter = {
+      status: "Increased",
+      bill_no: selectedBills.bill_number,
+      customer: "None",
+      employee: "",
+      method: "UPI Paid",
+      reason: "Bill method changed from Cash to UPI.",
+      amount: Number(selectedBills.total_amount),
+      handler: userName,
+      billtransactionhistory: true,
+      password: "",
+    };
+    //@ts-ignore
+    await window.electronAPI.addTransactionHistory(TransactionPayloadAfter);
     dispatch(setPaymentChange(response.data));
     toast.success(`${response.message}`, { position: "bottom-left" });
+  };
+
+  console.log("selectesdhsuiddBills", selectedBills);
+
+  const handleDeleteBill = async () => {
+    let payload: any = UPIBillsList.find(
+      (data: any) => data.bill_number === selectedBills.bill_number
+    );
+    let validatorPayload = {
+      amount: Number(payload.total_amount),
+      method: payload.payment_method,
+    };
+    //@ts-ignore
+    let amountAvalaible = await window.electronAPI.amountValidator(
+      validatorPayload
+    );
+    if (amountAvalaible.status === 200) {
+      let TransactionPayloadAfter = {
+        status: "Decreased",
+        bill_no: payload.bill_number,
+        customer: "None",
+        employee: "",
+        method: payload.payment_method,
+        reason: `${payload.payment_method} Bill record permanently deleted.`,
+        amount: Number(payload.total_amount),
+        handler: userName,
+        billtransactionhistory: true,
+        password: "",
+      };
+      //@ts-ignore
+      await window.electronAPI.addTransactionHistory(TransactionPayloadAfter);
+      //@ts-ignore
+      let response = await window.electronAPI.deleteBill(payload);
+
+      if (response.status === 200) {
+        toast.success(response.message, { position: "bottom-left" });
+        dispatch(removeBill(payload));
+      }
+    } else {
+      toast.error(amountAvalaible.message, { position: "bottom-left" });
+    }
+
+    dispatch(setCustomerDeleteModal(false));
   };
 
   return (
@@ -689,6 +764,31 @@ const PaymentsCash = () => {
                 />
                 RETURN BILL HISTORY
               </Box>
+
+              <Box
+                sx={{
+                  px: 2,
+                  py: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  borderRight: ".1px solid lightgrey",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: "rgba(220, 53, 69, 0.2)", // Light red background
+                    color: "#C82333", // Deep red text for contrast
+                  },
+                  fontSize: ".7rem",
+                }}
+              
+                onClick={() => dispatch(setCustomerDeleteModal(true))}
+              >
+                <DeleteOutlineOutlinedIcon
+                  sx={{ fontSize: "1rem", color: "inherit" }}
+                />
+                DELETE
+              </Box>
             </Box>
 
             <Box sx={{ bgcolor: "white", height: "100%" }}>
@@ -755,7 +855,7 @@ const PaymentsCash = () => {
                     rows={
                       selectedBills?.itemsList?.map((data) => ({
                         ...data,
-                        id: data.code,
+                        id: data.unique_id,
                       })) || []
                     }
                     columns={columns}
@@ -767,7 +867,7 @@ const PaymentsCash = () => {
                         (data: any) =>
                           data.bill_number === selectedBills.bill_number
                       )?.itemsList?.find(
-                        (data: any) => data.code === newRow.code
+                        (data: any) => data.unique_id === newRow.unique_id
                       );
 
                       if (!/^\d*\.?\d+$/.test(newRow.qty)) {
@@ -982,6 +1082,7 @@ const PaymentsCash = () => {
           </Box>
         )}
         <ReturnAmountModal finalBillHanlder={finalBillHanlder} />
+        <DeleteModal bill={true} handleDeleteBill={handleDeleteBill} />
       </Box>
     </Box>
   );
