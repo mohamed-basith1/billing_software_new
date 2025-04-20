@@ -33,34 +33,37 @@ export const getGreeting = () => {
   return "Good Evening , ";
 };
 
-export const generateInvoicePDF = (items, subAmount, discount, TotalAmount) => {
+export const generateInvoicePDF = (
+  items,
+  subAmount,
+  discount,
+  TotalAmount,
+  fulldata
+) => {
   const doc = new jsPDF();
-
+  console.log("fulldata", fulldata);
   // Company Name (Centered Top)
-  doc.setFontSize(16);
-  doc.text("Your Company Name", 105, 15, { align: "center" });
+  doc.setFontSize(40);
+  doc.text("INVOICE", 165, 28, { align: "center" });
 
   // Invoice Details (Left)
-  doc.setFontSize(13);
-  doc.text(`Invoice No`, 14, 25);
-
   doc.setFontSize(10);
-  doc.text(`Invoice No`, 14, 31);
-  doc.text(`${new Date().getTime()}`, 34, 31);
-  doc.text(`Issue Date`, 14, 37);
-  doc.text(`${new Date().toLocaleDateString()}`, 34, 37);
+  doc.text(`INVOICE N0 :`, 14, 51);
+  doc.text(`${new Date().getTime()}`, 38, 51);
+  doc.text(`ISSUE DATE :`, 14, 57);
+  doc.text(`${new Date().toLocaleDateString()}`, 38, 57);
 
   // From Company Details
-  doc.text("From:", 14, 45);
-  doc.text("Your Company Name", 14, 50);
-  doc.text("123 Street, City, Country", 14, 55);
-  doc.text("Phone: +91 9876543210", 14, 60);
+  doc.text("FROM :", 14, 75);
+  doc.text(`${fulldata.customer_name}`, 14, 82);
+  doc.text("123 Street, City, Country", 14, 87);
+  doc.text("Phone: +91 9876543210", 14, 92);
 
   // Customer Details (Right)
-  doc.text("To:", 195, 45, { align: "right" });
-  doc.text("Customer Name", 195, 50, { align: "right" });
-  doc.text("Customer Address", 195, 55, { align: "right" });
-  doc.text("Phone: +91 9876543210", 195, 60, { align: "right" });
+  doc.text("BILL TO :", 195, 75, { align: "right" });
+  doc.text(`${fulldata.customer_name}`, 195, 82, { align: "right" });
+  doc.text("Customer Address", 195, 87, { align: "right" });
+  doc.text("Phone: +91 9876543210", 195, 92, { align: "right" });
 
   // Table Headers
   const headers = [
@@ -82,7 +85,7 @@ export const generateInvoicePDF = (items, subAmount, discount, TotalAmount) => {
   doc.autoTable({
     head: headers,
     body: rows,
-    startY: 75,
+    startY: 120,
     theme: "grid",
     styles: { fontSize: 8 }, // Reduce font size
     headStyles: {
@@ -108,11 +111,11 @@ export const generateInvoicePDF = (items, subAmount, discount, TotalAmount) => {
   // Summary Section (Below Table)
   const finalY = doc.lastAutoTable.finalY + 10;
   doc.setFontSize(10);
-  doc.text(`Sub Total:`, 150, finalY, { align: "right" });
+  doc.text(`SUB TOTAL:`, 150, finalY, { align: "right" });
   doc.text(`${subAmount}`, 195, finalY, { align: "right" });
-  doc.text(`Discount:`, 150, finalY + 6, { align: "right" });
+  doc.text(`DISCOUNT:`, 150, finalY + 6, { align: "right" });
   doc.text(`${discount}`, 195, finalY + 6, { align: "right" });
-  doc.text(`Total:`, 150, finalY + 12, { align: "right" });
+  doc.text(`TOTAL:`, 150, finalY + 12, { align: "right" });
   doc.setFontSize(13);
   doc.text(`${TotalAmount}`, 195, finalY + 12, { align: "right" });
 

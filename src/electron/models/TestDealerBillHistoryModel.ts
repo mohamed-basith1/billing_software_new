@@ -25,8 +25,8 @@ const DealerBillSchema = new mongoose.Schema(
   { timestamps: false }
 );
 
-const DealerBillHistoryModel = mongoose.model(
+const TestDealerBillHistoryModel = mongoose.model(
   "DealerBillHistories",
   DealerBillSchema
 );
-export default DealerBillHistoryModel;
+export default TestDealerBillHistoryModel;

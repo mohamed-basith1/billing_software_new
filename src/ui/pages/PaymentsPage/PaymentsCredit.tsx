@@ -821,7 +821,8 @@ const PaymentsCredit = () => {
                     selectedBills?.itemsList,
                     selectedBills.sub_amount,
                     selectedBills.discount,
-                    selectedBills.total_amount
+                    selectedBills.total_amount,
+                    selectedBills
                   )
                 }
               >

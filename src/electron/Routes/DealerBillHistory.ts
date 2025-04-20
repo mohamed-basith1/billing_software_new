@@ -1,10 +1,10 @@
 import { ipcMain } from "electron";
-import DealerBillHistoryModel from "../models/DealerBillHistoryModel.js"; // make sure path is correct
+import TestDealerBillHistoryModel from "../models/TestDealerBillHistoryModel.js"; // make sure path is correct
 import Item from "../models/ItemsModel.js";
 export function DealerBillRouter() {
   ipcMain.handle("get-dealer-bill-summary", async () => {
     try {
-      const DealerBillList = await DealerBillHistoryModel.find().lean(); // Use lean() for better performance
+      const DealerBillList = await TestDealerBillHistoryModel.find().lean(); // Use lean() for better performance
       // Calculate totals
       const totals = DealerBillList.reduce(
         (acc, bill) => {
@@ -41,7 +41,7 @@ export function DealerBillRouter() {
   ipcMain.handle("get-dealer-bill", async () => {
     try {
       console.log("htting");
-      const DealerBillList = await DealerBillHistoryModel.find().lean(); // Use lean() for better performance
+      const DealerBillList = await TestDealerBillHistoryModel.find().lean(); // Use lean() for better performance
       return {
         status: 200,
         data: JSON.parse(JSON.stringify(DealerBillList)),
@@ -60,7 +60,7 @@ export function DealerBillRouter() {
   ipcMain.handle("create-dealer-bill", async (_, data) => {
     try {
       console.log("Creating Dealer Bill:", data);
-      const newDealerBill = await DealerBillHistoryModel.create(data);
+      const newDealerBill = await TestDealerBillHistoryModel.create(data);
       return {
         status: 201,
         message: "Dealer bill created successfully.",
@@ -81,7 +81,7 @@ export function DealerBillRouter() {
     try {
       const { id, amount, paymentMethod } = data;
       // Step 1: Find the existing document
-      const existingDealerBill = await DealerBillHistoryModel.findById(id);
+      const existingDealerBill = await TestDealerBillHistoryModel.findById(id);
 
       if (!existingDealerBill) {
         return {
@@ -94,7 +94,7 @@ export function DealerBillRouter() {
       const updatedGivenAmount =
         Number(existingDealerBill.givenAmount || 0) + Number(amount);
 
-      const updatedDealerBill = await DealerBillHistoryModel.findByIdAndUpdate(
+      const updatedDealerBill = await TestDealerBillHistoryModel.findByIdAndUpdate(
         id,
         {
           $push: {
@@ -141,7 +141,7 @@ export function DealerBillRouter() {
           { $inc: { stock_qty: -purchasedItem.stock_qty } }
         );
       }
-      const deletedDealerBill = await DealerBillHistoryModel.findByIdAndDelete(
+      const deletedDealerBill = await TestDealerBillHistoryModel.findByIdAndDelete(
         data._id
       );
 
@@ -182,7 +182,7 @@ ipcMain.handle("delete-dealer-payment-history", async (_, data) => {
     }
 
     // Step 1: Find the parent dealer bill
-    const dealerBill = await DealerBillHistoryModel.findOne({
+    const dealerBill = await TestDealerBillHistoryModel.findOne({
       "history._id": _id,
     });
 
@@ -194,7 +194,7 @@ ipcMain.handle("delete-dealer-payment-history", async (_, data) => {
     }
 
     // Step 2: Remove the history entry and reduce the givenAmount
-    const updatedDealerBill = await DealerBillHistoryModel.findOneAndUpdate(
+    const updatedDealerBill = await TestDealerBillHistoryModel.findOneAndUpdate(
       { _id: dealerBill._id },
       {
         $pull: { history: { _id } },

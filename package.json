@@ -30,6 +30,7 @@
     "@types/mongoose": "^5.11.96",
     "dayjs": "^1.11.13",
     "i": "^0.3.7",
+    "install": "^0.13.0",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.4",
     "lodash.debounce": "^4.0.8",

@@ -20,8 +20,6 @@ export function BillsRouter() {
         billed_by,
       } = data;
 
-      console.log("createBill", data);
-
       // Count existing bills to determine the next bill number
       const lastBill = await BillsModel.findOne()
         .sort({ createdAt: -1 }) // Or sort by numeric bill number if you store that separately
@@ -40,27 +38,44 @@ export function BillsRouter() {
 
       // Reduce stock_qty for each item in the billing list
       for (const item of itemsList) {
-        const existingItem = await Item.findOne({ unique_id: item.unique_id });
+        console.log("item list ", item);
+        const existingItem: any = await Item.findOne({
+          unique_id: item.unique_id,
+        });
 
         if (!existingItem) {
-          console.error(`Item with unique_id ${item.unique_id} not found`);
-          return {
-            status: 400,
-            message: `Item with unique_id ${item.unique_id} not found.`,
+          let newitemPayload = {
+            item_name: item.item_name,
+            code: item.code,
+            unique_id: item.unique_id,
+            uom: item.uom,
+            qty: 1,
+            purchased_rate: item.purchased_rate,
+            rate: item.rate,
+            amount: item.amount,
+            createdAt: item.createdAt,
+            margin: Number(item.rate) - Number(item.purchased_rate),
+            stock_qty: item.stock_qty,
+            item_expiry_date: "",
+            low_stock_remainder: Math.round(Number(item.qty) / 2),
+            new_stock: [],
           };
+
+          console.log("create new item is not present", newitemPayload);
+          await Item.create(newitemPayload);
+        } else {
+          // Reduce the stock_qty by the billed qty
+          existingItem.stock_qty -= item.qty;
+
+          if (existingItem.stock_qty < 0) {
+            console.warn(
+              `Item ${item.item_name} stock is negative after billing.`
+            );
+            existingItem.stock_qty = 0; // Ensure stock doesn't go negative
+          }
+
+          await existingItem.save();
         }
-
-        // Reduce the stock_qty by the billed qty
-        existingItem.stock_qty -= item.qty;
-
-        if (existingItem.stock_qty < 0) {
-          console.warn(
-            `Item ${item.item_name} stock is negative after billing.`
-          );
-          existingItem.stock_qty = 0; // Ensure stock doesn't go negative
-        }
-
-        await existingItem.save();
       }
 
       // Create new bill
@@ -385,18 +400,40 @@ export function BillsRouter() {
   // Delete Bill
   ipcMain.handle("delete-bill", async (_, data: any) => {
     try {
-      console.log("delete-bill", data);
+      console.log("delete-bill-test", data);
       // Process tempRemoveItem to update stock_qty
       for (const tempItem of data.itemsList) {
+        console.log("entering inside");
         const { unique_id, qty } = tempItem;
 
         // Find the item in the database by unique_id
         const item = await Item.findOne({ unique_id });
 
-        if (item) {
+        console.log("item", item);
+        if (item !== null) {
           // Update stock_qty by adding the qty from tempRemoveItem
           item.stock_qty += qty;
           await item.save();
+        } else {
+          let newitemPayload = {
+            item_name: tempItem.item_name,
+            code: tempItem.code,
+            unique_id: tempItem.unique_id,
+            uom: tempItem.uom,
+            qty: 1,
+            purchased_rate: tempItem.purchased_rate,
+            rate: tempItem.rate,
+            amount: tempItem.amount,
+            createdAt: tempItem.createdAt,
+            margin: Number(tempItem.rate) - Number(tempItem.purchased_rate),
+            stock_qty: tempItem.qty,
+            item_expiry_date: "",
+            low_stock_remainder: Math.round(Number(tempItem.qty) / 2),
+            new_stock: [],
+          };
+
+          console.log("shuhfuhushffs", newitemPayload);
+          await Item.create(newitemPayload);
         }
       }
 
