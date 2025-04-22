@@ -16,7 +16,7 @@ import ReceiptIcon from "@mui/icons-material/ReceiptOutlined";
 import PaymentsIcon from "@mui/icons-material/PaymentsOutlined";
 import ReportIcon from "@mui/icons-material/AssessmentOutlined";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-
+import PasswordIcon from "@mui/icons-material/Password";
 import React, { useEffect } from "react";
 import { Tooltip, IconButton, Menu, MenuItem, Box } from "@mui/material";
 import { Logout } from "@mui/icons-material";
@@ -25,7 +25,9 @@ import {
   logoutAction,
   selectUserName,
   selectUserRole,
+  setUpdateUserModal,
 } from "../../pages/LoginPage/LoginSlice";
+import UpdateUserDetails from "../modals/UpdateUserDetails";
 
 export const drawerWidth = 240;
 
@@ -48,6 +50,10 @@ const Nav = () => {
   const handleLogout = () => {
     dispatch(logoutAction());
     navigate("/login");
+  };
+
+  const ChangePasswordHandler = () => {
+    alert("change password");
   };
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
@@ -181,6 +187,12 @@ const Nav = () => {
               </ListItemIcon>
               Logout
             </MenuItem>
+            <MenuItem onClick={() => dispatch(setUpdateUserModal(true))}>
+              <ListItemIcon>
+                <PasswordIcon fontSize="small" />
+              </ListItemIcon>
+              Change Password
+            </MenuItem>
           </Menu>
         </Toolbar>
 
@@ -193,6 +205,8 @@ const Nav = () => {
                 .map((item) => <NavItem key={item.text} {...item} />)
             : menuItems.map((item) => <NavItem key={item.text} {...item} />)}
         </List>
+
+        <UpdateUserDetails />
       </Drawer>
     </>
   );

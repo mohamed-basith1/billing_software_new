@@ -14,6 +14,22 @@
   box-sizing: border-box;
 }
 
+/* Remove all custom scrollbar styles */
+::-webkit-scrollbar,
+::-webkit-scrollbar-thumb,
+::-webkit-scrollbar-track {
+  /* all: unset; */
+}
+
+::-webkit-scrollbar: {
+  display: "none"; // Chrome, Safari, Edge
+}
+,
+/* Enable smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
 a {
   font-weight: 500;
   color: #646cff;

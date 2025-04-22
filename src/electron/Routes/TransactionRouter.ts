@@ -243,7 +243,10 @@ export function TransactionRouter() {
       }
 
       const lastBill: any = await BillsModel.findOne().sort({ createdAt: -1 }); // Get latest bill
-      let finalData = { ...data, bill_no: lastBill.bill_number };
+      let finalData = {
+        ...data,
+        bill_no: data.bill_no === "" ? lastBill.bill_number : data.bill_no,
+      };
       // 3. Create and save transaction
       const newTransaction = new TransactionSchema(finalData);
 

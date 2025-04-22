@@ -106,8 +106,8 @@ const ItemsLowStock = () => {
         <DataGrid
           rows={lowStockItemList}
           columns={columns}
-          disableColumnMenu
-          hideFooter
+          // disableColumnMenu
+          // hideFooter
           sx={{
             minHeight: "400px", // Ensure it has a scrollable area
 

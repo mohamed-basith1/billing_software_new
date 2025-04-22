@@ -278,9 +278,9 @@ const CustomerDetails = () => {
     <Box
       sx={{
         height: "100%",
-        width: "60%",
+        width: "100%",
         minWidth: "400px",
-        maxWidth: "900px",
+        // maxWidth: "900px",
         p: 2,
         // borderRadius: "8px",
         borderLeft: ".1px solid lightgrey",

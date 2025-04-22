@@ -97,8 +97,9 @@ const TopCustomer = ({ topCustomer }: any) => {
       disableColumnFilter
       disableColumnSelector
       sx={{
+        // mt: 2,
         // border: "none",
-        mt: 1,
+        mr: 0.1,
         "& .MuiDataGrid-columnSeparator": {
           display: "none", // Removes the column separators
         },

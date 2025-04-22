@@ -13,12 +13,16 @@ import {
   selectItemList,
   selectItemListSearch,
   selectItemSearch,
+  selectSelectedItem,
   setEditItemModal,
   setItemList,
   setItemListSearch,
   setSelectItemName,
   setSelectedItem,
 } from "../../pages/ItemsPage/ItemsSlice";
+import { setCustomerDeleteModal } from "../../pages/CustomersPage/CustomersSlice";
+import DeleteModal from "../modals/DeleteModal";
+import { toast } from "react-toastify";
 
 const ItemsListTable = () => {
   const columns = [
@@ -46,29 +50,51 @@ const ItemsListTable = () => {
     {
       field: "item_expiry_date",
       headerName: "ACTION",
-      flex: 1,
+
+      flex: 1.5,
+      headerAlign: "center",
       renderCell: (params) => {
         try {
           console.log("testing ", params.row);
           return (
-            <Button
-              onClick={() => {
-                dispatch(setSelectedItem(params.row));
-                dispatch(setSelectItemName(params.row.item_name));
-                dispatch(setEditItemModal(true));
-              }}
-              sx={{
-                height: "2rem",
-                bgcolor: "white",
-                color: "black",
-                "&:hover": {
-                  bgcolor: "white", // Change this to any color you want on hover,
+            <Box>
+              <Button
+                onClick={() => {
+                  dispatch(setSelectedItem(params.row));
+                  dispatch(setSelectItemName(params.row.item_name));
+                  dispatch(setEditItemModal(true));
+                }}
+                sx={{
+                  height: "2rem",
+                  bgcolor: "white",
                   color: "black",
-                },
-              }}
-            >
-              Edit
-            </Button>
+                  mr: 1,
+                  "&:hover": {
+                    bgcolor: "white", // Change this to any color you want on hover,
+                    color: "black",
+                  },
+                }}
+              >
+                Edit
+              </Button>
+              <Button
+                onClick={() => {
+                  dispatch(setSelectedItem(params.row));
+                  dispatch(setCustomerDeleteModal(true));
+                }}
+                sx={{
+                  height: "2rem",
+                  bgcolor: "white",
+                  color: "black",
+                  "&:hover": {
+                    bgcolor: "white", // Change this to any color you want on hover,
+                    color: "black",
+                  },
+                }}
+              >
+                Delete
+              </Button>
+            </Box>
           );
         } catch (err) {
           return <span>Error</span>;
@@ -79,12 +105,12 @@ const ItemsListTable = () => {
   const dispatch = useDispatch();
   const ItemList = useSelector(selectItemList);
   const itemListSearch = useSelector(selectItemListSearch);
+  const selectedItem = useSelector(selectSelectedItem);
   useEffect(() => {
     const fetItemList = async () => {
       //@ts-ignore
       let response: any = await window.electronAPI.getItem();
 
-      console.log("first time", response);
       dispatch(setItemList(response));
     };
     if (itemListSearch === "") {
@@ -96,10 +122,16 @@ const ItemsListTable = () => {
     dispatch(setItemListSearch(data));
     //@ts-ignore
     let response = await window.electronAPI.searchItem(data);
-    console.log("search time", response);
     dispatch(setItemList(response.map((data) => ({ id: data._id, ...data }))));
   };
 
+  const handleDeleteItem = async () => {
+    //@ts-ignore
+    let response = await window.electronAPI.deleteItem(selectedItem.unique_id);
+    if (response.status === 200) {
+      toast.success(`${response.message}`, { position: "bottom-left" });
+    }
+  };
   return (
     <Box
       sx={{
@@ -159,8 +191,8 @@ const ItemsListTable = () => {
         <DataGrid
           rows={ItemList}
           columns={columns}
-          disableColumnMenu
-          hideFooter
+          // disableColumnMenu
+          // hideFooter
           sx={{
             minHeight: "400px", // Ensure it has a scrollable area
 
@@ -180,6 +212,7 @@ const ItemsListTable = () => {
           }}
         />
       </Box>
+      <DeleteModal itemDelete={true} handleDeleteBill={handleDeleteItem} />
     </Box>
   );
 };

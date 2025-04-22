@@ -9,6 +9,7 @@ import {
   setTransactionData,
 } from "../../pages/ReportPage/ReportsSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { generateDummyData } from "../../utils/utils";
 const columns = [
   {
     field: "status",
@@ -235,6 +236,8 @@ const columnsSalary = [
 const TransactionList = ({}: any) => {
   const dispatch = useDispatch();
   const transactionData = useSelector(selectTransactionData);
+  // const transactionData = generateDummyData(100000);
+  console.log("length of the data", transactionData.length, transactionData);
   const transactionHistoryTab = useSelector(selectTransactionHistoryTab);
   const getLastTenTransaction = async () => {
     //@ts-ignore
@@ -270,10 +273,10 @@ const TransactionList = ({}: any) => {
         }
         getRowId={(row) => row._id || row.id} // Use _id if exists, otherwise fallback to id
         columns={transactionHistoryTab === 0 ? columns : columnsSalary}
-        disableColumnMenu
-        hideFooter
-        disableSelectionOnClick
-        disableColumnFilter
+        // disableColumnMenu
+        // hideFooter
+        // disableSelectionOnClick
+        // disableColumnFilter
         disableColumnSelector
         sx={{
           "& .MuiDataGrid-scrollbarFiller": {

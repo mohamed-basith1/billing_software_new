@@ -55,7 +55,7 @@ const Transaction = () => {
         flexDirection: "column",
         justifyContent: "space-between",
         mt: 2,
-        overflow: "scroll",
+        // overflow: "scroll",
       }}
     >
       {/* Main Content Area */}

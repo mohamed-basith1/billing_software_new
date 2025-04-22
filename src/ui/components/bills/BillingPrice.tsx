@@ -103,7 +103,7 @@ const BillingPrice = () => {
     ) {
       let TransactionPayload = {
         status: "Increased",
-        bill_no: "None",
+        bill_no: "",
         customer: "None",
         employee: "",
         method: selectedBill.payment_method,

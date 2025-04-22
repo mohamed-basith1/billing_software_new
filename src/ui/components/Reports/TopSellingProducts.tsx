@@ -96,8 +96,9 @@ const TopSellingProducts = ({ topsellingproduct }: any) => {
       disableColumnFilter
       disableColumnSelector
       sx={{
-        mt: 2,
+        // mt: 2,
         // border: "none",
+        mr:.1,
         "& .MuiDataGrid-columnSeparator": {
           display: "none", // Removes the column separators
         },

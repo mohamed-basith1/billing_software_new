@@ -22,7 +22,7 @@ export const style = {
   px: 4,
   pb: 3,
 };
-const DeleteModal = ({ bill, handleDeleteBill, credit }: any) => {
+const DeleteModal = ({ bill, handleDeleteBill, credit, itemDelete }: any) => {
   const customerDeleteModal = useSelector(selectCustomerDeleteModal);
   const customerDetails = useSelector(selectCustomerDetails);
   const dispatch = useDispatch();
@@ -117,6 +117,8 @@ const DeleteModal = ({ bill, handleDeleteBill, credit }: any) => {
               >
                 {bill === true || credit === true
                   ? "This action cannot be undone. It will permanently delete the bill record."
+                  : itemDelete === true
+                  ? "This action cannot be undone. It will permanently delete the item in the records."
                   : "This action cannot be undone. It will permanently delete the customer."}
               </Typography>
             </Box>
@@ -147,7 +149,7 @@ const DeleteModal = ({ bill, handleDeleteBill, credit }: any) => {
             <Button
               variant="contained"
               onClick={
-                bill === true || credit === true
+                bill === true || credit === true || itemDelete === true
                   ? handleDeleteBill
                   : handleCustomerDelete
               }

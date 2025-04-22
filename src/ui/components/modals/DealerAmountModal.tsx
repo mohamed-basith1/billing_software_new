@@ -31,6 +31,7 @@ import {
   setPayDealerAmountModel,
   setUpdateDealerBill,
 } from "../../pages/ItemsPage/ItemsSlice";
+import { selectUserName } from "../../pages/LoginPage/LoginSlice";
 
 const DealerAmountModal = () => {
   const dispatch = useDispatch();
@@ -38,7 +39,7 @@ const DealerAmountModal = () => {
   const dealerAmountModel = useSelector(selectPayDealerAmountModel);
   const selectedBill = useSelector(selectSelectedBills);
   const dealerHistoryselected = useSelector(selectDealerHistoryselected);
-
+  const username = useSelector(selectUserName);
   const [paymentMethod, setPaymentMethod] = useState<string | null>("");
   const [amount, setAmount] = useState<number>(0);
 
@@ -57,30 +58,58 @@ const DealerAmountModal = () => {
       );
       return;
     }
-
-    let payload = {
-      paymentMethod,
+    let validatorPayload = {
       amount,
-      id: dealerHistoryselected._id,
+      method: paymentMethod,
     };
     //@ts-ignore
-    let response = await window.electronAPI.addDealerBillHistory(payload);
-    if (response.status !== 200) {
-      toast.error(`${response.message}`, { position: "bottom-left" });
-    } else {
-      toast.success(`${response.message}`, { position: "bottom-left" });
-      setAmount(0);
-      setPaymentMethod("");
-      console.log("new response data", response.data);
-      dispatch(setPayDealerAmountModel(false));
-      dispatch(setUpdateDealerBill(response.data));
-      const getDealerBillSummaryHandler = async () => {
-        //@ts-ignore
-        let response = await window.electronAPI.getDealerBillSummary();
-
-        dispatch(setDealerHistorySummary(response.data));
+    let amountAvalaible = await window.electronAPI.amountValidator(
+      validatorPayload
+    );
+    if (amountAvalaible.status === 200) {
+      let payload = {
+        paymentMethod,
+        amount,
+        id: dealerHistoryselected._id,
       };
-      getDealerBillSummaryHandler();
+      //@ts-ignore
+      let response = await window.electronAPI.addDealerBillHistory(payload);
+      if (response.status !== 200) {
+        toast.error(`${response.message}`, { position: "bottom-left" });
+      } else {
+        let TransactionPayload = {
+          status: "Decreased",
+          bill_no: "None",
+          customer: `Dealer ${dealerHistoryselected.dealerName}`,
+          employee: "None",
+          method: paymentMethod,
+          reason: `Amount transfer to dealer ${dealerHistoryselected.dealerName}`,
+          amount: Number(amount),
+          handler: username,
+          billtransactionhistory: true,
+          password: "",
+        };
+
+        console.log("TransactionPayload mohamed", TransactionPayload);
+
+        //@ts-ignore
+        await window.electronAPI.addTransactionHistory(TransactionPayload);
+        toast.success(`${response.message}`, { position: "bottom-left" });
+        setAmount(0);
+        setPaymentMethod("");
+        console.log("new response data", response.data);
+        dispatch(setPayDealerAmountModel(false));
+        dispatch(setUpdateDealerBill(response.data));
+        const getDealerBillSummaryHandler = async () => {
+          //@ts-ignore
+          let response = await window.electronAPI.getDealerBillSummary();
+
+          dispatch(setDealerHistorySummary(response.data));
+        };
+        getDealerBillSummaryHandler();
+      }
+    } else {
+      toast.error(`${amountAvalaible.message}`, { position: "bottom-left" });
     }
   };
   return (

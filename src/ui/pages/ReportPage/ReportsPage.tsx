@@ -9,8 +9,9 @@ import Transaction from "./Transaction";
 const ReportsPage = () => {
   const CurrentReportsTab = useSelector(selectCurrentReportsTab);
   return (
-    <Box sx={{ height: "100%", width: "100%" }}>
+    <Box sx={{ height: "100%", width: "100%"}}>
       <ReportsTabs />
+
       {CurrentReportsTab === 0 ? <Dashboard /> : <Transaction />}
     </Box>
   );

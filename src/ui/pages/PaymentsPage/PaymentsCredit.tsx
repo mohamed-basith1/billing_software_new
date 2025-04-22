@@ -34,12 +34,14 @@ import {
   clearReturnBillDetail,
   removeBill,
   selectBillSearch,
+  selectCreditBillFilter,
   selectFromDate,
   selectSelectedBills,
   selectTempRemoveItem,
   selectToDate,
   selectUPIBillsList,
   setBillSearch,
+  setCreditBillFilter,
   setFromDate,
   setItemRemove,
   setPayCreditBalanceModal,
@@ -152,6 +154,8 @@ const PaymentsCredit = () => {
   const selectedBills: any = useSelector(selectSelectedBills);
   const tempRemoveItem: any = useSelector(selectTempRemoveItem);
   const billSearch: any = useSelector(selectBillSearch);
+  const creditBillFilter: any = useSelector(selectCreditBillFilter);
+
   const dispatch: any = useDispatch();
   const userName = useSelector(selectUserName);
   const deleteModalvalue = useSelector(selectCustomerDeleteModal);
@@ -329,7 +333,6 @@ const PaymentsCredit = () => {
         toast.error(`${amountAvalaible.message}`, { position: "bottom-left" });
       }
     } else {
-  
       //this is for delete whole bill
       let validatorPayload = {
         amount: Number(selectedBills?.amount_paid),
@@ -371,7 +374,6 @@ const PaymentsCredit = () => {
   };
 
   const handleDeleteBill = async () => {
- 
     let payload: any = UPIBillsList.find(
       (data: any) => data.bill_number === selectedBills.bill_number
     );
@@ -670,6 +672,36 @@ const PaymentsCredit = () => {
         >
           <Box
             sx={{
+              bgcolor: "lightgrey",
+              width: "100%",
+              display: "flex",
+              // justifyContent: "space-between",
+            }}
+          >
+            {["NOT PAID", "PARTIAL PAID", "PAID"].map((data) => {
+              return (
+                <Box
+                  onClick={() => dispatch(setCreditBillFilter(data))}
+                  sx={{
+                    bgcolor: creditBillFilter === data ? "black" : "#F7F7FE",
+                    color: creditBillFilter === data ? "white" : "black",
+                    width: "34%",
+                    py: 1,
+                    textAlign: "center",
+                    borderBottom: ".1px solid lightgrey",
+                    fontSize: ".7rem",
+                    cursor: "pointer",
+                    borderRight: ".1px solid lightgrey",
+                  }}
+                >
+                  {data}
+                </Box>
+              );
+            })}
+          </Box>
+
+          <Box
+            sx={{
               height: "100%",
               width: "100%",
               display: "flex",
@@ -678,78 +710,94 @@ const PaymentsCredit = () => {
               borderRight: ".1px solid lightgrey",
             }}
           >
-            {UPIBillsList?.map((data: any) => {
-              return (
-                <Box
-                  onClick={() => dispatch(setSelectedBills(data))}
-                  sx={{
-                    padding: "20px 15px",
-                    width: "100%",
-
-                    bgcolor:
-                      selectedBills?.bill_number === data.bill_number
-                        ? "#F7F7FE"
-                        : "white",
-
-                    borderBottom: ".1px solid lightgrey",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    cursor: "pointer",
-                  }}
-                >
-                  <Box>
-                    <Typography sx={{ fontWeight: 600 }}>
-                      {data.bill_number}
-                    </Typography>
-                    <Typography
-                      sx={{ opacity: ".5", mt: 1, fontSize: ".8rem" }}
-                    >
-                      Total Items {data.itemsList.length} -{" "}
-                      {data?.createdAt
-                        ? new Date(data.createdAt).toLocaleDateString("en-GB", {
-                            timeZone: "UTC",
-                          })
-                        : ""}
-                    </Typography>
-                  </Box>
+            {[...UPIBillsList]
+              ?.filter((data) => {
+                if (creditBillFilter === "PAID") {
+                  return data.paid === true;
+                }
+                if (creditBillFilter === "PARTIAL PAID") {
+                  return data.paid !== true && data.amount_paid !== 0;
+                }
+                if (creditBillFilter === "NOT PAID") {
+                  return data.amount_paid === 0;
+                }
+              })
+              .reverse()
+              .map((data: any) => {
+                return (
                   <Box
+                    onClick={() => dispatch(setSelectedBills(data))}
                     sx={{
+                      padding: "20px 15px",
+                      width: "100%",
+
+                      bgcolor:
+                        selectedBills?.bill_number === data.bill_number
+                          ? "#F7F7FE"
+                          : "white",
+
+                      borderBottom: ".1px solid lightgrey",
                       display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-end",
                       justifyContent: "space-between",
+                      cursor: "pointer",
                     }}
                   >
-                    <Typography sx={{ fontWeight: 600 }}>
-                      ₹ {data.total_amount}
-                    </Typography>{" "}
-                    <Typography
+                    <Box>
+                      <Typography sx={{ fontWeight: 600 }}>
+                        {data.bill_number}
+                      </Typography>
+                      <Typography
+                        sx={{ opacity: ".5", mt: 1, fontSize: ".8rem" }}
+                      >
+                        Total Items {data.itemsList.length} -{" "}
+                        {data?.createdAt
+                          ? new Date(data.createdAt).toLocaleDateString(
+                              "en-GB",
+                              {
+                                timeZone: "UTC",
+                              }
+                            )
+                          : ""}
+                      </Typography>
+                    </Box>
+                    <Box
                       sx={{
-                        fontWeight: 600,
-                        fontSize: ".6rem",
-                        color:
-                          data.amount_paid === 0
-                            ? "rgb(193,9,21)"
-                            : "rgb(30, 120, 80)",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "flex-end",
+                        justifyContent: "space-between",
                       }}
                     >
-                      {data.paid
-                        ? "PAID"
-                        : data.amount_paid === 0
-                        ? "NOT PAID"
-                        : "PARTIALLY PAID"}
-                    </Typography>{" "}
-                    {data.return_amount > 0 ? (
+                      <Typography sx={{ fontWeight: 600 }}>
+                        ₹ {data.total_amount}
+                      </Typography>{" "}
                       <Typography
-                        sx={{ fontWeight: 600, color: "rgb(193,9,21)" }}
+                        sx={{
+                          fontWeight: 600,
+                          fontSize: ".6rem",
+                          color:
+                            data.amount_paid === 0
+                              ? "rgb(193,9,21)"
+                              : "rgb(30, 120, 80)",
+                        }}
                       >
-                        ₹ {data.return_amount}
-                      </Typography>
-                    ) : null}
+                        {data.paid
+                          ? "PAID"
+                          : data.amount_paid === 0
+                          ? "NOT PAID"
+                          : "PARTIALLY PAID"}
+                      </Typography>{" "}
+                      {data.return_amount > 0 ? (
+                        <Typography
+                          sx={{ fontWeight: 600, color: "rgb(193,9,21)" }}
+                        >
+                          ₹ {data.return_amount}
+                        </Typography>
+                      ) : null}
+                    </Box>
                   </Box>
-                </Box>
-              );
-            })}
+                );
+              })}
           </Box>
         </Box>
 
@@ -759,7 +807,11 @@ const PaymentsCredit = () => {
               width: "70%",
               height: "100%",
               boxSizing: "border-box",
-              overflow: "scroll",
+              overflow: "auto",
+              scrollbarWidth: "none", // Firefox
+              "&::-webkit-scrollbar": {
+                display: "none", // Chrome, Safari, Edge
+              },
             }}
           >
             <Box

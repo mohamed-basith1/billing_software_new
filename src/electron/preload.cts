@@ -23,8 +23,12 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
   // Authentication API
   createAccount: (data) => ipcRenderer.invoke("create-account", data),
+  updateAccount: (data) => ipcRenderer.invoke("update-account", data),
   loginAPI: (data) => ipcRenderer.invoke("login-api", data),
   getEmployee: () => ipcRenderer.invoke("get-employee-list"),
+  sendLicenseKey: (key) => ipcRenderer.invoke("send-key",key),
+
+  //send-key
 
   // Customers API
   createCustomer: (data) => ipcRenderer.invoke("create-customer", data),

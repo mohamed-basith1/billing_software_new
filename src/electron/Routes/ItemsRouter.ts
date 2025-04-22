@@ -3,7 +3,7 @@ import Item from "../models/ItemsModel.js";
 export function ItemsRouter() {
   ipcMain.handle("insert-item", async (_, data) => {
     try {
-      // Check if an item with the same item_name 
+      // Check if an item with the same item_name
       const normalizeString = (str) => str.replace(/\s+/g, "").toLowerCase();
       const normalizedInput = normalizeString(data.item_name);
 
@@ -32,7 +32,7 @@ export function ItemsRouter() {
   });
 
   ipcMain.handle("exist-item-validate", async (_, data) => {
-    // Check if an item with the same item_name 
+    // Check if an item with the same item_name
     const normalizeString = (str) => str.replace(/\s+/g, "").toLowerCase();
     const normalizedInput = normalizeString(data.item_name);
 
@@ -188,11 +188,26 @@ export function ItemsRouter() {
 
   ipcMain.handle("delete-item", async (_, id) => {
     try {
-      const deletedItem = await Item.findByIdAndDelete(id);
-      return deletedItem ? JSON.parse(JSON.stringify(deletedItem)) : null;
+      const deletedItem = await Item.findOneAndDelete({ unique_id: id });
+
+      if (!deletedItem) {
+        return {
+          status: 404,
+          message: "Item not found.",
+        };
+      }
+
+      return {
+        status: 200,
+        message: "The item has been successfully deleted.",
+      };
     } catch (error: any) {
-      console.error("Error deleting data:", error);
-      throw error;
+      console.error("Error deleting item:", error);
+      return {
+        status: 500,
+        message: "An error occurred while deleting the item.",
+        error: error.message,
+      };
     }
   });
 

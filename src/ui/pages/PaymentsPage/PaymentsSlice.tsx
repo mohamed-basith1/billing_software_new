@@ -15,6 +15,7 @@ const initialState: any = {
   returnBillHistoryModal: false,
   returnBillHistoryList: [],
   returnAmountModel: false,
+  creditBillFilter:"NOT PAID"
 };
 
 const paymentSlice = createSlice({
@@ -23,6 +24,9 @@ const paymentSlice = createSlice({
   reducers: {
     setCurrentPaymentsTab: (state, action) => {
       state.currentPaymentsTab = action.payload;
+    },
+    setCreditBillFilter: (state, action) => {
+      state.creditBillFilter = action.payload;
     },
     setUPIBillsList: (state, action) => {
       state.UPIBillsList = action.payload;
@@ -234,7 +238,8 @@ export const {
   setReturnBillHistoryModal,
   setReturnBillHistoryList,
   clearReturnBillDetail,
-  removeBill
+  removeBill,
+  setCreditBillFilter
 } = paymentSlice.actions;
 
 // Selectors
@@ -255,6 +260,9 @@ export const selectReturnBillHistoryModal = (state: any) =>
   state.payments.returnBillHistoryModal;
 export const selectReturnBillHistoryList = (state: any) =>
   state.payments.returnBillHistoryList;
+export const selectCreditBillFilter = (state: any) =>
+  state.payments.creditBillFilter;
+
 
 export const selectReturnAmountModel = (state: any) =>
   state.payments.returnAmountModel;

@@ -302,42 +302,56 @@ const PaymentsCash = () => {
   };
 
   const handleChangePaymentMethod = async () => {
-    let TransactionPayload = {
-      status: "Decreased",
-      bill_no: selectedBills.bill_number,
-      customer: "None",
-      employee: "",
+    let validatorPayload = {
+      amount: Number(selectedBills.total_amount),
       method: selectedBills.payment_method,
-      reason: "Bill method changed from Cash to UPI.",
-      amount: Number(selectedBills.total_amount),
-      handler: userName,
-      billtransactionhistory: true,
-      password: "",
     };
     //@ts-ignore
-    await window.electronAPI.addTransactionHistory(TransactionPayload);
-
-    //@ts-ignore
-    let response: any = await window.electronAPI.updateBillPaymentMethod(
-      selectedBills._id,
-      "UPI Paid"
+    let amountAvalaible = await window.electronAPI.amountValidator(
+      validatorPayload
     );
-    let TransactionPayloadAfter = {
-      status: "Increased",
-      bill_no: selectedBills.bill_number,
-      customer: "None",
-      employee: "",
-      method: "UPI Paid",
-      reason: "Bill method changed from Cash to UPI.",
-      amount: Number(selectedBills.total_amount),
-      handler: userName,
-      billtransactionhistory: true,
-      password: "",
-    };
-    //@ts-ignore
-    await window.electronAPI.addTransactionHistory(TransactionPayloadAfter);
-    dispatch(setPaymentChange(response.data));
-    toast.success(`${response.message}`, { position: "bottom-left" });
+    if (amountAvalaible.status === 200) {
+      let TransactionPayload = {
+        status: "Decreased",
+        bill_no: selectedBills.bill_number,
+        customer: "None",
+        employee: "",
+        method: selectedBills.payment_method,
+        reason: "Bill method changed from Cash to UPI.",
+        amount: Number(selectedBills.total_amount),
+        handler: userName,
+        billtransactionhistory: true,
+        password: "",
+      };
+      //@ts-ignore
+      await window.electronAPI.addTransactionHistory(TransactionPayload);
+
+      //@ts-ignore
+      let response: any = await window.electronAPI.updateBillPaymentMethod(
+        selectedBills._id,
+        "UPI Paid"
+      );
+      let TransactionPayloadAfter = {
+        status: "Increased",
+        bill_no: selectedBills.bill_number,
+        customer: "None",
+        employee: "",
+        method: "UPI Paid",
+        reason: "Bill method changed from Cash to UPI.",
+        amount: Number(selectedBills.total_amount),
+        handler: userName,
+        billtransactionhistory: true,
+        password: "",
+      };
+      //@ts-ignore
+      await window.electronAPI.addTransactionHistory(TransactionPayloadAfter);
+      dispatch(setPaymentChange(response.data));
+      toast.success(`${response.message}`, { position: "bottom-left" });
+    } else {
+      toast.error("Cash not available to transfer to UPI.", {
+        position: "bottom-left",
+      });
+    }
   };
 
   console.log("selectesdhsuiddBills", selectedBills);
@@ -627,7 +641,7 @@ const PaymentsCash = () => {
               borderRight: ".1px solid lightgrey",
             }}
           >
-            {UPIBillsList?.map((data: any) => {
+            {[...UPIBillsList]?.reverse()?.map((data: any) => {
               return (
                 <Box
                   onClick={() => dispatch(setSelectedBills(data))}
@@ -783,7 +797,6 @@ const PaymentsCash = () => {
                   },
                   fontSize: ".7rem",
                 }}
-              
                 onClick={() => dispatch(setCustomerDeleteModal(true))}
               >
                 <DeleteOutlineOutlinedIcon

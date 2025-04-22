@@ -25,7 +25,8 @@ import { selectUserName } from "../LoginPage/LoginSlice";
 import TopSellingProducts from "../../components/Reports/TopSellingProducts";
 import TopCustomer from "../../components/Reports/TopCustomer";
 import dayjs from "dayjs";
-
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 export const AnimatedCounter = ({ value, isCurrency = false }) => {
   const [displayValue, setDisplayValue] = useState(0);
   const duration = 500; // Animation duration in ms
@@ -65,6 +66,8 @@ export const AnimatedCounter = ({ value, isCurrency = false }) => {
 };
 
 const Dashboard = () => {
+  dayjs.extend(utc);
+  dayjs.extend(timezone);
   const dispatch = useDispatch();
   const fromDate = useSelector(selectReportsFromDate);
   const toDate = useSelector(selectReportsToDate);
@@ -72,10 +75,11 @@ const Dashboard = () => {
   const dashboard = useSelector(selectDashboardData);
   useEffect(() => {
     const getDashboardHandler = async () => {
-      let from: any =dayjs().subtract(1, "month").tz("Asia/Kolkata").add(1, "day");
+      let from: any = dayjs()
+        .subtract(1, "month")
+        .tz("Asia/Kolkata")
+        .add(1, "day");
       let to: any = dayjs().tz("Asia/Kolkata").add(1, "day");
-      // dayjs().subtract(1, "month").tz("Asia/Kolkata").add(1, "day"),
-      // dayjs().tz("Asia/Kolkata").add(1, "day"),
       const fromDateFormat = from?.toISOString();
       const toDateFormat = to?.toISOString();
 
@@ -90,17 +94,26 @@ const Dashboard = () => {
     getDashboardHandler();
   }, []);
 
-  const getDashboardData = async () => {
+  const getDashboardDataHanlder = async () => {
     if (!fromDate || !toDate) {
       console.warn("Date range not set yet");
       return;
     }
     // dayjs.utc(fromDate).tz("Asia/Kolkata").add(1, "day"),
     // dayjs.utc(toDate).tz("Asia/Kolkata").add(1, "day"),
-    const fromDateFormat = dayjs.utc(fromDate).tz("Asia/Kolkata").add(1, "day").toISOString();
-    const toDateFormat =  dayjs.utc(toDate).tz("Asia/Kolkata").add(1, "day").toISOString();
+    const fromDateFormat = dayjs
+      .utc(fromDate)
+      .tz("Asia/Kolkata")
+      .add(1, "day")
+      .toISOString();
+    const toDateFormat = dayjs
+      .utc(toDate)
+      .tz("Asia/Kolkata")
+      .add(1, "day")
+      .toISOString();
 
     try {
+      alert("api");
       // @ts-ignore
       const response: any = await window.electronAPI.getDashboardData(
         fromDateFormat,
@@ -126,7 +139,7 @@ const Dashboard = () => {
         flexDirection: "column",
         justifyContent: "space-between",
         mt: 2,
-        overflow: "scroll",
+        // overflow: "scroll",
       }}
     >
       {/* Header Section */}
@@ -137,6 +150,7 @@ const Dashboard = () => {
           alignItems: "center",
           borderRadius: 1,
           height: { xs: "auto", md: "3.5rem" },
+          width: "100%",
         }}
       >
         <Box>
@@ -175,7 +189,7 @@ const Dashboard = () => {
             />
           </LocalizationProvider>
 
-          <Button sx={{ px: 3 }} onClick={() => getDashboardData()}>
+          <Button sx={{ px: 3 }} onClick={() => getDashboardDataHanlder()}>
             Search
           </Button>
         </Box>
@@ -187,7 +201,9 @@ const Dashboard = () => {
           flex: 1,
           display: "flex",
           gap: 2,
-          overflow: "hidden",
+          overflow: "auto",
+
+          width: "100%",
         }}
       >
         {/* Left Column (70%) */}
@@ -212,21 +228,21 @@ const Dashboard = () => {
             {[
               {
                 name: "Total Revenue",
-                amount: dashboard?.totalRevenue ? dashboard?.totalRevenue : 0,
+                amount: dashboard?.totalRevenue || 0,
                 icon: <CurrencyRupeeOutlinedIcon fontSize="large" />,
                 bgColor: "rgba(34, 179, 120, 0.2)", // Green
                 color: "#22b378",
               },
               {
                 name: "Total Profits",
-                amount: dashboard?.totalProfit ? dashboard?.totalProfit : 0,
+                amount: dashboard?.totalProfit || 0,
                 icon: <ProfitIcon fontSize="large" />,
                 bgColor: "rgba(66, 153, 225, 0.2)", // Blue
                 color: "#4299e1",
               },
               {
                 name: "Total Orders",
-                amount: dashboard?.totalorder ? dashboard?.totalorder : 0,
+                amount: dashboard?.totalorder || 0,
                 icon: <OrdersIcon fontSize="large" />,
                 bgColor: "rgba(246, 173, 85, 0.2)", // Amber
                 color: "#f6ad55",
@@ -269,7 +285,6 @@ const Dashboard = () => {
                   </Box>
                   <Box
                     sx={{
-                      height: "100%",
                       display: "flex",
                       flexDirection: "column",
                     }}
@@ -295,45 +310,33 @@ const Dashboard = () => {
             ))}
           </Box>
 
-          {/* Chart Container */}
+          {/* Sales Graph */}
           <Box
             sx={{
-              flex: 1,
+              flex: "1 1 65%",
+              minHeight: "100px",
+            }}
+          >
+            <Typography sx={{ fontWeight: 600, mb: 1 }}>Sales Graph</Typography>
+            <SalesGraph data={dashboard?.salegraphdata || []} />
+          </Box>
+
+          {/* High Value Customers */}
+          <Box
+            sx={{
+              flex: "1 1 35%",
               display: "flex",
               flexDirection: "column",
-              gap: 2,
+              // gap: 2,
+              mt: 3,
               overflow: "auto",
             }}
           >
-            <Box
-              sx={{
-                // bgcolor: "success.light",
-                borderRadius: 1,
-                // p: 2,
-                flex: "1 1 60%",
-                minHeight: "300px",
-              }}
-            >
-              Sales Graph
-              <SalesGraph
-                data={dashboard?.salegraphdata ? dashboard?.salegraphdata : []}
-              />
-            </Box>
-
-            <Box
-              sx={{
-                borderRadius: 1,
-                minHeight: "10rem",
-                mt: 2,
-                fontWeight: 600,
-              }}
-            >
+            <Typography sx={{ fontWeight: 600, mb: 1 }}>
               High Value Customers
-              <TopCustomer
-                topCustomer={
-                  dashboard?.topcustomer ? dashboard?.topcustomer : []
-                }
-              />
+            </Typography>
+            <Box sx={{ flex: 1, minHeight: 0 }}>
+              <TopCustomer topCustomer={dashboard?.topcustomer || []} />
             </Box>
           </Box>
         </Box>
@@ -341,47 +344,52 @@ const Dashboard = () => {
         {/* Right Column (30%) */}
         <Box
           sx={{
-            width: "30%",
+            width: { xs: "100%", md: "30%" }, // responsive width
             display: "flex",
             flexDirection: "column",
             gap: 2,
             height: "100%",
+            minHeight: 0, // important for nested scroll
           }}
         >
           <Box
             sx={{
-              // bgcolor: "pink",
               borderRadius: 1,
-              // p: 2,
               flex: 1,
-              overflow: "auto",
-              // fontWeight: 600,
+              overflow: "hidden",
+              minHeight: 0, // ensures scroll works inside
+              display: "flex",
+              flexDirection: "column",
             }}
           >
-            <Box sx={{ fontWeight: 600 }}> Payments Types</Box>
+            <Box sx={{ fontWeight: 600, mb: 1 }}>Payments Types</Box>
 
-            <PaymentMethodCharts
-              paymentSummary={
-                dashboard?.paymentSummary ? dashboard?.paymentSummary : []
-              }
-            />
+            <Box sx={{ flex: 1, minHeight: 0 }}>
+              <PaymentMethodCharts
+                paymentSummary={dashboard?.paymentSummary || []}
+              />
+            </Box>
           </Box>
 
           <Box
             sx={{
               borderRadius: 1,
-
               flex: 1,
               overflow: "auto",
-              fontWeight: 600,
+              minHeight: 0,
+              display: "flex",
+              flexDirection: "column",
             }}
           >
-            Top Selling Products
-            <TopSellingProducts
-              topsellingproduct={
-                dashboard?.topsellingproduct ? dashboard?.topsellingproduct : []
-              }
-            />
+            <Typography sx={{ fontWeight: 600, mb: 1 }}>
+              Top Selling Products
+            </Typography>
+
+            <Box sx={{ flex: 1, minHeight: 0 }}>
+              <TopSellingProducts
+                topsellingproduct={dashboard?.topsellingproduct || []}
+              />
+            </Box>
           </Box>
         </Box>
       </Box>

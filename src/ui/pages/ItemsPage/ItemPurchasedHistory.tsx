@@ -250,7 +250,7 @@ const ItemPurchasedHistory = () => {
                 width: "100%",
                 display: "flex",
                 flexDirection: "column",
-                overflow: "scroll",
+                // overflow: "scroll",
                 borderRight: ".1px solid lightgrey",
               }}
             >

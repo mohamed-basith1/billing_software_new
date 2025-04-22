@@ -69,22 +69,28 @@ const ItemsNewEntry = () => {
           value: Math.round(calculatedPerKgPrice),
         })
       );
+      dispatch(
+        setField({
+          field: "sellingPricePerUOM",
+          value: 0,
+        })
+      );
 
       // Update selling price only if it was calculated automatically before
-      if (
-        marginPerUOM &&
-        sellingPricePerUOM ===
-          Number(perKgPurchasedPrice) + Number(marginPerUOM)
-      ) {
-        dispatch(
-          setField({
-            field: "sellingPricePerUOM",
-            value: Math.round(
-              Number(calculatedPerKgPrice) + Number(marginPerUOM)
-            ),
-          })
-        );
-      }
+      // if (
+      //   marginPerUOM &&
+      //   sellingPricePerUOM ===
+      //     Number(perKgPurchasedPrice) + Number(marginPerUOM)
+      // ) {
+      //   dispatch(
+      //     setField({
+      //       field: "sellingPricePerUOM",
+      //       value: Math.round(
+      //         Number(calculatedPerKgPrice) + Number(marginPerUOM)
+      //       ),
+      //     })
+      //   );
+      // }
     }
 
     if (field === "perKgPurchasedPrice") {
@@ -165,9 +171,9 @@ const ItemsNewEntry = () => {
         return false;
       }
       if (numValue < 0) {
-        toast.error(`${fieldName} cannot be negative!`, {
-          position: "bottom-left",
-        });
+        // toast.error(`${fieldName} cannot be negative!`, {
+        //   position: "bottom-left",
+        // });
         return false;
       }
     }
@@ -333,6 +339,7 @@ const ItemsNewEntry = () => {
               })`}
               variant="outlined"
               type="number"
+              disabled
               value={marginPerUOM}
               onChange={(e) => handleChange("marginPerUOM", e.target.value)}
             />

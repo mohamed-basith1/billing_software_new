@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-
+import { backgroundImage } from "./image";
+import { v4 as uuidv4 } from "uuid";
 export const calculateAmount = (
   uom: string,
   qty: number,
@@ -33,6 +34,27 @@ export const getGreeting = () => {
   return "Good Evening , ";
 };
 
+function formatDateToReadable(isoDateStr) {
+  const date = new Date(isoDateStr);
+
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  const month = date.toLocaleString("en-GB", {
+    month: "long",
+    timeZone: "UTC",
+  });
+  const year = date.getUTCFullYear();
+
+  return `${day} ${month}, ${year}`;
+}
+
+//2025-04-22T22:22:45.495+00:00
+function capitalizeWords(str) {
+  return str
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 export const generateInvoicePDF = (
   items,
   subAmount,
@@ -42,36 +64,53 @@ export const generateInvoicePDF = (
 ) => {
   const doc = new jsPDF();
   console.log("fulldata", fulldata);
+  doc.addImage(backgroundImage, "PNG", 0, 0, 210, 297);
   // Company Name (Centered Top)
-  doc.setFontSize(40);
-  doc.text("INVOICE", 165, 28, { align: "center" });
+  doc.setFontSize(22);
+  doc.text("New Grocery Shop", 195, 28, { align: "right" });
+  doc.setFontSize(10);
+  doc.setTextColor(177, 177, 177);
+  doc.text("4/53,west street, Vadakku Mangudi Main Rd", 195, 36, {
+    align: "right",
+  });
+  doc.setFontSize(10);
+  doc.text("Tel: +91 7010809398", 195, 41, { align: "right" });
+  doc.setFontSize(10);
+  doc.text("Tel: +91 7010809398", 195, 46, { align: "right" });
 
   // Invoice Details (Left)
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(40);
+  doc.text(`INVOICE`, 14, 65);
+  doc.setTextColor(177, 177, 177);
   doc.setFontSize(10);
-  doc.text(`INVOICE N0 :`, 14, 51);
-  doc.text(`${new Date().getTime()}`, 38, 51);
-  doc.text(`ISSUE DATE :`, 14, 57);
-  doc.text(`${new Date().toLocaleDateString()}`, 38, 57);
-
-  // From Company Details
-  doc.text("FROM :", 14, 75);
-  doc.text(`${fulldata.customer_name}`, 14, 82);
-  doc.text("123 Street, City, Country", 14, 87);
-  doc.text("Phone: +91 9876543210", 14, 92);
+  doc.setTextColor(0, 0, 0);
+  doc.text(`Invoice No : `, 14, 82);
+  doc.setTextColor(177, 177, 177);
+  doc.text(`${fulldata.bill_number}`, 38, 82, { align: "left" });
+  doc.setTextColor(0, 0, 0);
+  doc.text("Bill To :", 14, 90);
+  doc.setTextColor(177, 177, 177);
+  doc.text(`${capitalizeWords(fulldata.customer_name)}`, 38, 90, {
+    align: "left",
+  });
+  // doc.text(`Customer Adress`, 38, 95, { align: "left" });
+  // doc.text(`7010809392`, 38, 100, { align: "left" });
 
   // Customer Details (Right)
-  doc.text("BILL TO :", 195, 75, { align: "right" });
-  doc.text(`${fulldata.customer_name}`, 195, 82, { align: "right" });
-  doc.text("Customer Address", 195, 87, { align: "right" });
-  doc.text("Phone: +91 9876543210", 195, 92, { align: "right" });
-
+  doc.setTextColor(0, 0, 0);
+  doc.text(`Date : `, 165, 82, { align: "right" });
+  doc.setTextColor(177, 177, 177);
+  doc.text(`${formatDateToReadable(fulldata.createdAt)}`, 195, 82, {
+    align: "right",
+  });
   // Table Headers
   const headers = [
     ["NO", "CODE", "ITEM NAME", "QUANTITY", "UOM", "RATE", "AMOUNT"],
   ];
 
   // Table Data
-  const rows = items.map((item, index) => [
+  const rows = [...items].map((item, index) => [
     index + 1,
     item.code,
     item.item_name,
@@ -89,10 +128,10 @@ export const generateInvoicePDF = (
     theme: "grid",
     styles: { fontSize: 8 }, // Reduce font size
     headStyles: {
-      fontSize: 9,
-      fillColor: [0, 0, 0],
-      textColor: [255, 255, 255],
-      halign: "left", // Default center alignment for headers
+      fontSize: 8,
+      fillColor: [229, 229, 229],
+      textColor: [0, 0, 0],
+      // halign: "left", // Default center alignment for headers
     },
     columnStyles: {
       5: { halign: "right" }, // RATE column right-aligned
@@ -110,17 +149,19 @@ export const generateInvoicePDF = (
 
   // Summary Section (Below Table)
   const finalY = doc.lastAutoTable.finalY + 10;
-  doc.setFontSize(10);
-  doc.text(`SUB TOTAL:`, 150, finalY, { align: "right" });
+  doc.setFontSize(12);
+  doc.setTextColor(0, 0, 0);
+  doc.text(`Total`, 170, finalY, { align: "right" });
   doc.text(`${subAmount}`, 195, finalY, { align: "right" });
-  doc.text(`DISCOUNT:`, 150, finalY + 6, { align: "right" });
-  doc.text(`${discount}`, 195, finalY + 6, { align: "right" });
-  doc.text(`TOTAL:`, 150, finalY + 12, { align: "right" });
-  doc.setFontSize(13);
-  doc.text(`${TotalAmount}`, 195, finalY + 12, { align: "right" });
+  doc.text(`Paid Amount`, 170, finalY + 7, { align: "right" });
+  doc.text(`${fulldata.amount_paid}`, 195, finalY + 7, { align: "right" });
+  doc.text(`Balance`, 170, finalY + 14, { align: "right" });
+  doc.text(`${fulldata.balance}`, 195, finalY + 14, { align: "right" });
+
+  // amount_paid
 
   // Save PDF
-  doc.save("invoice.pdf");
+  doc.save(`${fulldata.bill_number}-Invoice.pdf`);
 };
 
 export async function addData(itemData: any) {
@@ -133,6 +174,28 @@ export async function addData(itemData: any) {
     console.error("Error inserting item:", error);
   }
 }
+
+export const generateDummyData = (length = 10000) => {
+  return Array.from({ length }).map((_, i) => ({
+    _id: uuidv4(),
+    status: i % 2 === 0 ? "Increased" : "Decreased",
+    createdAt: `2025-04-${String((i % 30) + 1).padStart(2, "0")}`,
+    bill_no: `BILL${i}`,
+    customer: `Customer ${i}`,
+    method: i % 2 === 0 ? "Cash" : "Card",
+    handler: `Handler ${i}`,
+    reason: i % 3 === 0 ? "Salary" : "Purchase",
+    amount: i % 2 === 0 ? `+${i * 10}` : `-${i * 5}`,
+  }));
+};
+export const generateRandomKey = (length = 8) => {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+};
 
 const renameIdField = (array) => {
   return array.map((obj) => {

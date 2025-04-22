@@ -31,6 +31,7 @@ app.on("ready", async () => {
       preload: getPreloadPath(),
       nodeIntegration: false,
       contextIsolation: true,
+      // devTools: false, 
     },
   });
   if (isDev()) {
