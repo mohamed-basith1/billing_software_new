@@ -9,58 +9,10 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-//   {
-//     date: "12/01/25",
-//     amount: 1250,
-//   },
-//   {
-//     date: "13/02/25",
-//     amount: 1875,
-//   },
-//   {
-//     date: "14/03/25",
-//     amount: 2340,
-//   },
-//   {
-//     date: "15/04/25",
-//     amount: 1820, // Dip after Q1
-//   },
-//   {
-//     date: "16/05/25",
-//     amount: 2100,
-//   },
-//   {
-//     date: "17/06/25",
-//     amount: 3250, // End of Q2 spike
-//   },
-//   {
-//     date: "18/07/25",
-//     amount: 2875,
-//   },
-//   {
-//     date: "18/08/25",
-//     amount: 3100,
-//   },
-//   {
-//     date: "18/09/25",
-//     amount: 4200, // Quarterly peak
-//   },
-//   {
-//     date: "18/10/25",
-//     amount: 3800,
-//   },
-//   {
-//     date: "18/11/25",
-//     amount: 4950, // Pre-holiday surge
-//   },
-//   {
-//     date: "18/12/25",
-//     amount: 6750, // Year-end peak
-//   },
-// ];
+
 
 const SalesGraph = ({ data }: any) => {
-  console.log("sale graph data", data);
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <AreaChart

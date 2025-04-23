@@ -1,11 +1,10 @@
 import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
-import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
-import PublishedWithChangesIcon from "@mui/icons-material/PublishedWithChanges";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
+import PublishedWithChangesIcon from "@mui/icons-material/PublishedWithChanges";
 import QrCode2Icon from "@mui/icons-material/QrCode2";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
-import { FixedSizeList as List } from "react-window";
 import {
   Box,
   Button,
@@ -18,14 +17,22 @@ import { DataGrid } from "@mui/x-data-grid";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import { FixedSizeList as List } from "react-window";
+import DeleteModal from "../../components/modals/DeleteModal";
+import ReturnAmountModal from "../../components/modals/ReturnAmountModal";
 import {
   fetchBills,
   filterTodayBills,
   getTotalAmount,
 } from "../../utils/utils";
+import { setCustomerDeleteModal } from "../CustomersPage/CustomersSlice";
+import { selectUserName } from "../LoginPage/LoginSlice";
+import { AnimatedCounter } from "../ReportPage/Dashboard";
 import {
   clearPaymentBillsDetail,
   clearReturnBillDetail,
@@ -48,13 +55,6 @@ import {
   setUPIBillsList,
   setnewReturnBill,
 } from "./PaymentsSlice";
-import { selectUserName } from "../LoginPage/LoginSlice";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
-import { AnimatedCounter } from "../ReportPage/Dashboard";
-import ReturnAmountModal from "../../components/modals/ReturnAmountModal";
-import { setCustomerDeleteModal } from "../CustomersPage/CustomersSlice";
-import DeleteModal from "../../components/modals/DeleteModal";
 
 const Row = ({ index, style, data }) => {
   const bill = data.items[index];
@@ -102,7 +102,7 @@ const Row = ({ index, style, data }) => {
 const PaymentsUPI = () => {
   dayjs.extend(utc);
   dayjs.extend(timezone);
-  console.log("render in upi");
+
   const columns: GridColDef[] = [
     {
       field: "action",
@@ -192,7 +192,7 @@ const PaymentsUPI = () => {
   const billSearch: any = useSelector(selectBillSearch);
   const userName = useSelector(selectUserName);
   const dispatch: any = useDispatch();
-  console.log("tempRemoveItem", tempRemoveItem, "selectedBills", selectedBills);
+
   useEffect(() => {
     dispatch(setFromDate(dayjs().tz("Asia/Kolkata").subtract(1, "month")));
     dispatch(setToDate(dayjs().tz("Asia/Kolkata")));
@@ -215,7 +215,7 @@ const PaymentsUPI = () => {
       ...bill,
       // _id: bill._id.toString(),
     }));
-    console.log("serializedData", serializedData);
+  
     dispatch(setUPIBillsList(serializedData));
   };
   const handleBillSearch = async (billnumber: string) => {
@@ -314,7 +314,7 @@ const PaymentsUPI = () => {
           }, 0) - Number(selectedBills?.total_amount),
         returned_by: userName,
       };
-      console.log("returnBillHistoryPayload", returnBillHistoryPayload);
+  
       // createBillReturnHistory
       // @ts-ignore
       await window.electronAPI.createBillReturnHistory(
@@ -927,7 +927,6 @@ const PaymentsUPI = () => {
                     columns={columns}
                     disableColumnMenu
                     processRowUpdate={(newRow) => {
-                      console.log("newRow", newRow, UPIBillsList);
 
                       let oldRow = UPIBillsList.find(
                         (data: any) =>

@@ -40,7 +40,7 @@ export function ItemsRouter() {
     const existingItem = items.find(
       (item) => normalizeString(item.item_name) === normalizedInput
     );
-    console.log("existingItem", existingItem, "data", data);
+ 
     if (existingItem) {
       return {
         status: 404,
@@ -55,7 +55,7 @@ export function ItemsRouter() {
 
   ipcMain.handle("edit-item-details", async (_, updatedData) => {
     try {
-      console.log("updatedData", updatedData);
+
       const customer = await Item.findOneAndUpdate(
         { unique_id: updatedData.unique_id },
         updatedData,
@@ -94,7 +94,7 @@ export function ItemsRouter() {
         .limit(8)
         .lean(); // Convert Mongoose documents to plain objects
 
-      console.log("items", items);
+     
       return JSON.parse(JSON.stringify(items));
     } catch (error: any) {
       console.error("Error searching items:", error);
@@ -104,7 +104,7 @@ export function ItemsRouter() {
 
   ipcMain.handle("get-item", async () => {
     try {
-      console.log("item list api");
+  
       const items = await Item.find();
       return JSON.parse(JSON.stringify(items)); // No need for .toObject()
     } catch (error: any) {
@@ -115,7 +115,7 @@ export function ItemsRouter() {
 
   ipcMain.handle("get-low-stock-item", async () => {
     try {
-      console.log("item list api");
+   
 
       // Fetch only items where stock_qty is lower than low_stock_remainder
       const items = await Item.find({
@@ -214,7 +214,7 @@ export function ItemsRouter() {
   ipcMain.handle("filter-items-by-date", async (_, createdAtFilter) => {
     try {
       if (!createdAtFilter) {
-        console.log("❌ Invalid date filter provided!");
+      
         return {
           status: 400,
           message: "Invalid date filter!",
@@ -242,7 +242,7 @@ export function ItemsRouter() {
       const items = await Item.find(query).lean();
 
       if (!items.length) {
-        console.log("⚠️ No items found for the selected date.");
+       
         return {
           status: 200,
           message: "No items found for the selected date.",

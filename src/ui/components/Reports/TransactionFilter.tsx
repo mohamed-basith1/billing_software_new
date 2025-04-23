@@ -1,5 +1,5 @@
 import * as React from "react";
-import { styled, alpha } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import Menu, { MenuProps } from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
@@ -127,14 +127,11 @@ export default function CustomizedMenus() {
     handleClose();
 
     // Here you can trigger your data filtering logic
-    console.log(`Filter: ${range}`, {
-      from: newFromDate.format("YYYY-MM-DD"),
-      to: today.format("YYYY-MM-DD"),
-    });
+   
   };
   const handleDateRangeSelect = () => {
     setDateDialogOpen(true);
-    console.log("fromDate", fromDate, "toDate", toDate);
+   
     handleClose();
   };
 
@@ -243,7 +240,7 @@ export default function CustomizedMenus() {
                 value={fromDate}
                 onChange={(newValue) => {
                   const istDate = dayjs(newValue).tz("Asia/Kolkata");
-                  console.log("Selected IST date:", istDate.format()); // or .toISOString() if needed
+                
                   return setFromDate(istDate);
                 }}
                 maxDate={toDate || undefined}

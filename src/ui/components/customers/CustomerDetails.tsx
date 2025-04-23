@@ -225,7 +225,7 @@ const CustomerDetails = () => {
         toast.error(`${response.message}`, { position: "bottom-left" });
       } else {
         dispatch(setCustomerBillHistory(response.data));
-        console.log("response data for customer bill history", response.data);
+     
       }
     };
     if (selectedCustomer) {

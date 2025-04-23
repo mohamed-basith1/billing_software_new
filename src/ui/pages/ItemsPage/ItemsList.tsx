@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
-import { Grid, Card, CardContent, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { Box } from "@mui/system";
-import { blue, green, orange } from "@mui/material/colors";
 import { useDispatch, useSelector } from "react-redux";
 import InventoryIcon from "@mui/icons-material/Inventory2Outlined";
 import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 import LayersIcon from "@mui/icons-material/Layers";
-import EventBusyIcon from "@mui/icons-material/EventBusy";
 import ItemsListTable from "../../components/items/ItemsListTable";
 import { selectItemsTab, setItemsTab } from "./ItemsSlice";
 
@@ -27,7 +25,7 @@ const ItemsList = () => {
         // toast.error(`${response.message}`, { position: "bottom-left" });
       } else {
         setItemSummary(response?.data);
-        console.log(" response?.data", response?.data);
+  
       }
     };
     itemSummaryHandle();

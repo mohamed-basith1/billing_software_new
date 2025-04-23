@@ -38,7 +38,7 @@ export function BillsRouter() {
 
       // Reduce stock_qty for each item in the billing list
       for (const item of itemsList) {
-        console.log("item list ", item);
+     
         const existingItem: any = await Item.findOne({
           unique_id: item.unique_id,
         });
@@ -61,16 +61,14 @@ export function BillsRouter() {
             new_stock: [],
           };
 
-          console.log("create new item is not present", newitemPayload);
+      
           await Item.create(newitemPayload);
         } else {
           // Reduce the stock_qty by the billed qty
           existingItem.stock_qty -= item.qty;
 
           if (existingItem.stock_qty < 0) {
-            console.warn(
-              `Item ${item.item_name} stock is negative after billing.`
-            );
+         
             existingItem.stock_qty = 0; // Ensure stock doesn't go negative
           }
 
@@ -94,7 +92,7 @@ export function BillsRouter() {
         billed_by,
       });
 
-      console.log("Billing ItemsList", itemsList);
+
 
       return {
         status: 201,
@@ -115,7 +113,7 @@ export function BillsRouter() {
     "get-bills",
     async (_event, { fromDate, toDate, payment_method }) => {
       try {
-        console.log("getting trigger", fromDate, toDate, payment_method);
+      
 
         // Construct the query object dynamically
         const query: any = {
@@ -155,12 +153,7 @@ export function BillsRouter() {
   ipcMain.handle(
     "return-bill",
     async (_, { id, updatedData, tempRemoveItem }) => {
-      console.log(
-        "tempRemoveItem =>",
-        tempRemoveItem,
-        "updatedData",
-        updatedData
-      );
+   
       try {
         // Update the bill
         const bill = await BillsModel.findOneAndReplace(
@@ -212,7 +205,7 @@ export function BillsRouter() {
   ipcMain.handle(
     "get-bill-by-search",
     async (_, { bill_number, payment_method }) => {
-      console.log("");
+     
       try {
         if (!bill_number || !payment_method) {
           return {
@@ -318,7 +311,7 @@ export function BillsRouter() {
     "update-bill-payment-method",
     async (_, { id, payment_method }) => {
       try {
-        console.log("id and payment method", id, payment_method);
+       
         const bill = await BillsModel.findByIdAndUpdate(
           id,
           { payment_method: payment_method },
@@ -352,7 +345,7 @@ export function BillsRouter() {
     "pay-credit-bill-balance",
     async (_, { bill_number, received_amount }) => {
       try {
-        console.log("pay-credit-bill-balance", bill_number, received_amount);
+     
 
         // Find the bill by bill_number using .lean() to get a plain JavaScript object
         const bill = await BillsModel.findOne({ bill_number }).lean();
@@ -400,16 +393,16 @@ export function BillsRouter() {
   // Delete Bill
   ipcMain.handle("delete-bill", async (_, data: any) => {
     try {
-      console.log("delete-bill-test", data);
+    
       // Process tempRemoveItem to update stock_qty
       for (const tempItem of data.itemsList) {
-        console.log("entering inside");
+     
         const { unique_id, qty } = tempItem;
 
         // Find the item in the database by unique_id
         const item = await Item.findOne({ unique_id });
 
-        console.log("item", item);
+      
         if (item !== null) {
           // Update stock_qty by adding the qty from tempRemoveItem
           item.stock_qty += qty;
@@ -432,7 +425,7 @@ export function BillsRouter() {
             new_stock: [],
           };
 
-          console.log("shuhfuhushffs", newitemPayload);
+       
           await Item.create(newitemPayload);
         }
       }
@@ -462,7 +455,7 @@ export function BillsRouter() {
 
 ipcMain.handle("create-return-bill-history", async (_, data) => {
   try {
-    console.log("Creating return bill:", data);
+   
 
     const newReturnBill = new ReturnBillsHistoryModel(data);
     await newReturnBill.save();
@@ -484,7 +477,7 @@ ipcMain.handle("create-return-bill-history", async (_, data) => {
 
 ipcMain.handle("get-return-bills-history", async (_, { bill_number }) => {
   try {
-    console.log("Fetching return bills for:", bill_number);
+   
 
     const returnBills = await ReturnBillsHistoryModel.find({
       bill_number,
@@ -513,15 +506,7 @@ ipcMain.handle("get-return-bills-history", async (_, { bill_number }) => {
 });
 
 ipcMain.handle("get-dashboard-data", async (_event, { fromDate, toDate }) => {
-  console.log(
-    "fromData",
-    fromDate,
-    toDate,
-    "====>",
-    new Date(fromDate).setUTCHours(0, 0, 0, 0),
-    "shiushd=>",
-    new Date(toDate).setUTCHours(23, 59, 59, 999)
-  );
+
 
   // Construct the query object dynamically
   const query: any = {
@@ -533,7 +518,7 @@ ipcMain.handle("get-dashboard-data", async (_event, { fromDate, toDate }) => {
   };
 
   const bills = await BillsModel.find(query).lean(); // Use lean() for better performance
-  console.log("bills list", bills);
+
   let totalRevenue = 0;
   let totalProfit = 0;
 
@@ -684,7 +669,6 @@ ipcMain.handle("get-dashboard-data", async (_event, { fromDate, toDate }) => {
     paymentSummary,
   };
 
-  console.log("dashboard data", data);
   return {
     status: 200,
     message: "Bill updated successfully, and stock quantities adjusted.",

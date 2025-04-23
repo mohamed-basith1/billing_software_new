@@ -1,22 +1,22 @@
+import { CircularProgress } from "@mui/material";
+import Box from "@mui/material/Box";
+import { Suspense, lazy, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
+  Navigate,
+  Route,
   BrowserRouter as Router,
   Routes,
-  Route,
-  Navigate,
 } from "react-router-dom";
-import Box from "@mui/material/Box";
-import { lazy, Suspense, useEffect } from "react";
-import Nav, { drawerWidth } from "./components/nav/Nav.js";
-import { useDispatch, useSelector } from "react-redux";
-import "./assets/fonts/fonts.css";
-import { CircularProgress } from "@mui/material";
 import { ToastContainer } from "react-toastify";
+import "./assets/fonts/fonts.css";
+import Nav, { drawerWidth } from "./components/nav/Nav.js";
+import LicenseKeyInput from "./pages/LicenseKeyPage/LicenseKeyPage.js";
 import {
   selectAuthenticate,
   selectLicenseAuth,
   setLicenseAuth,
 } from "./pages/LoginPage/LoginSlice.js";
-import LicenseKeyInput from "./pages/LicenseKeyPage/LicenseKeyPage.js";
 
 // Lazy load components
 const BillsPage = lazy(() => import("./pages/BillsPage/BillsPage.js"));

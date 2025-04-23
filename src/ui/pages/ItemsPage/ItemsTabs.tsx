@@ -40,11 +40,10 @@ const ItemsTabs = () => {
   return (
     <Box
       sx={{
-        // borderBottom: 1,
         borderColor: "divider",
         height: "3rem",
         background: "white",
-        // border: ".1px solid lightgrey",
+
         borderRadius: "8px",
       }}
     >
@@ -54,7 +53,7 @@ const ItemsTabs = () => {
         aria-label="basic tabs example"
       >
         <Tab label="Items" {...a11yProps(0)} />
-       
+
         <Tab label="Items Entry" {...a11yProps(1)} />
         <Tab label="Items Purchased History" {...a11yProps(2)} />
         <Tab label="Expired Item" {...a11yProps(3)} />

@@ -34,7 +34,6 @@ import {
   setTransactionData,
   setTransactionSummary,
 } from "../../pages/ReportPage/ReportsSlice";
-import { Padding } from "@mui/icons-material";
 import { selectUserName } from "../../pages/LoginPage/LoginSlice";
 import { toast } from "react-toastify";
 export const style = {
@@ -151,7 +150,7 @@ const AddTransactionModal = () => {
       toast.success(`${response.message}`, { position: "bottom-left" });
       let finallist = [...response.data, ...transactionHistoryList];
 
-      console.log("finallist", finallist);
+  
       dispatch(
         setTransactionData([...response.data, ...transactionHistoryList])
       );
@@ -197,7 +196,7 @@ const AddTransactionModal = () => {
         >
           <Tabs
             value={transactionAmountTakeTab}
-            onChange={(e, value) =>
+            onChange={(_e, value) =>
               dispatch(setTransactionAmountTakeTab(value))
             }
             aria-label="basic tabs example"
@@ -209,7 +208,7 @@ const AddTransactionModal = () => {
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 4 }}>
             <Tabs
               value={methodTab}
-              onChange={(e, value) => setMethodTab(value)}
+              onChange={(_e, value) => setMethodTab(value)}
               aria-label="basic tabs example"
               sx={{
                 "& .MuiTabs-indicator": {
@@ -274,7 +273,7 @@ const AddTransactionModal = () => {
             ) : (
               <Tabs
                 value={insideTab}
-                onChange={(e, value) => setInsideTab(value)}
+                onChange={(_e, value) => setInsideTab(value)}
                 aria-label="basic tabs example"
                 sx={{
                   "& .MuiTabs-indicator": {

@@ -1,5 +1,5 @@
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, IconButton } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import {
   removeItem,
@@ -8,7 +8,6 @@ import {
   setItem,
 } from "../../pages/BillsPage/BillsSlice";
 import { useEffect, useRef } from "react";
-import { toast } from "react-toastify";
 import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
 export const calculateAmount = (
   uom: string,
@@ -40,7 +39,7 @@ const BillingItems = () => {
       align: "center",
       headerAlign: "center",
       renderCell: (params: any) => {
-        console.log("sysguyd", params);
+    
         return (
           <IconButton
             onClick={() => dispatch(removeItem({ unique_id: params.id }))}
@@ -91,14 +90,7 @@ const BillingItems = () => {
       return { ...modifiedBill[0] };
     }
 
-    // console.log(Number(newRow.qty), modifiedBill[0], "super");
-    // if (Number(newRow.qty) > modifiedBill[0].stock_qty) {
-    //   toast.warning(
-    //     `Entered quantity exceeds available stock. We only have ${modifiedBill[0].stock_qty} ${modifiedBill[0].uom} of ${modifiedBill[0].item_name}`,
-    //     { position: "bottom-left" }
-    //   );
-    //   return { ...modifiedBill[0] };
-    // }
+
     // Recalculate the amount when qty is edited
     const updatedAmount = calculateAmount(newRow.uom, newRow.qty, newRow.rate);
     const updatedRow: any = { ...newRow, amount: updatedAmount };
@@ -106,7 +98,6 @@ const BillingItems = () => {
     return updatedRow;
   };
 
-  console.log("modifiedBill", modifiedBill);
   useEffect(() => {
     const scrollToBottom = () => {
       if (gridRef.current) {
@@ -123,7 +114,7 @@ const BillingItems = () => {
 
     scrollToBottom();
   }, [modifiedBill.length]); // Trigger scroll when new rows are added
-  console.log("selectBill", selectBill);
+
   return (
     <Box sx={{ height: "calc(100% - 17rem)", width: "100%" }}>
       <div ref={gridRef} style={{ height: "100%", overflow: "hidden" }}>

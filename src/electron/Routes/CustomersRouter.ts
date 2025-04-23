@@ -30,10 +30,7 @@ export function CustomersRouter() {
         customerPrimaryContact,
       });
 
-      console.log(
-        "existingCustomerByPrimaryContact",
-        existingCustomerByPrimaryContact
-      );
+    
 
       if (existingCustomerByPrimaryContact) {
         if (existingCustomerByPrimaryContact?.customerPrimaryContact !== "") {

@@ -1,5 +1,4 @@
 import { Modal, Box, Typography, Button } from "@mui/material";
-import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   clearCustomerDetails,

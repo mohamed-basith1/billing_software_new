@@ -9,7 +9,6 @@ import {
   Tabs,
   TextField,
 } from "@mui/material";
-import React from "react";
 import { a11yProps } from "../../pages/ReportPage/ReportsTabs";
 
 const AmountTaking = () => {

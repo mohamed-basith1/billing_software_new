@@ -2,15 +2,11 @@ import * as React from "react";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
-import ItemsNewEntry from "./ItemsNewEntry";
-import ItemsDailyEntry from "./ItemsDailyEntry";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectItemsEntryTab,
   setItemsEntryTab,
 } from "../../pages/ItemsPage/ItemsSlice";
-import { OutlinedInput } from "@mui/material";
-import DealerInfoForm from "./DealerInfoForm";
 
 function a11yProps(index: number) {
   return {
@@ -22,7 +18,7 @@ function a11yProps(index: number) {
 export default function ItemsEntryTab() {
   const ItemsEntryTab = useSelector(selectItemsEntryTab);
   const dispatch = useDispatch();
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     dispatch(setItemsEntryTab(newValue));
   };
 

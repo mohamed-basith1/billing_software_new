@@ -1,5 +1,5 @@
 import { Modal, Box, Typography } from "@mui/material";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { style } from "./CustomerCreateModal";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -76,7 +76,7 @@ const ReturnBillHistoryModal = () => {
     }
   }, [returnBillHistoryModal]);
 
-  console.log("returnBillHistoryList", returnBillHistoryList);
+
   return (
     <Modal
       open={returnBillHistoryModal}

@@ -104,7 +104,7 @@ const CustomerSelectModal = () => {
       toast.success(`${response.message}`, { position: "bottom-left" });
     }
   };
-  console.log("selectedBill1", selectedBill);
+
   return (
     <Modal
       open={customerSelectModal}
@@ -161,7 +161,7 @@ const CustomerSelectModal = () => {
                 customer_name: value,
                 customer_id: selectedCustomer ? selectedCustomer.id : null,
               };
-              console.log("payload action", payload);
+
               dispatch(setBillCustomerDetails(payload));
             }}
             renderInput={(params) => (

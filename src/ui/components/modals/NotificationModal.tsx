@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { getTimeSlot } from "../../utils/utils";
 import Modal from "@mui/material/Modal";
-import { Box, Button, Typography } from "@mui/material";
-import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
+import { Box, Button } from "@mui/material";
 
 export const style = {
   position: "absolute",
@@ -17,38 +16,13 @@ export const style = {
   pb: 3,
 };
 const NotificationModal: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [message, setMessage] = useState("");
-  const [count,setCount]=useState(0)
+  const [isOpen, setIsOpen] = useState(false);
 
-  //   useEffect(() => {
-  //     const checkAndShowModal = () => {
-  //       console.log("loading...");
-  //       const now = new Date();
-  //       const slot = getTimeSlot();
-
-  //       if (slot) {
-  //         const key = `${now.toDateString()}-${slot}`;
-  //         const alreadyShown = localStorage.getItem(key);
-
-  //         if (!alreadyShown) {
-  //           setMessage(
-  //             slot === "morning" ? "Good Morning! ☀️" : "Good Evening! 🌙"
-  //           );
-  //           setIsOpen(true);
-  //           localStorage.setItem(key, "true");
-  //         }
-  //       }
-  //     };
-  //     console.log("useffect");
-  //     // Check every minute
-  //     const interval = setInterval(checkAndShowModal, 60 * 1000);
-  //     return () => clearInterval(interval);
-  //   }, []);
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
     const checkAndShowModal = () => {
-      console.log("Checking scheduled modal...");
+
       const slot = getTimeSlot();
 
       if (slot) {
@@ -56,15 +30,11 @@ const NotificationModal: React.FC = () => {
         const alreadyShown = localStorage.getItem(key);
 
         if (!alreadyShown) {
-          setMessage(
-            slot === "morning" ? "Good Morning! ☀️" : "Good Evening! 🌙"
-          );
-
           const fetchLowStockItemList = async () => {
             //@ts-ignore
             let response: any = await window.electronAPI.getLowStockItem();
             if (response.data.length !== 0) {
-              setCount(response.data.length)
+              setCount(response.data.length);
               setIsOpen(true);
             }
           };
@@ -115,12 +85,14 @@ const NotificationModal: React.FC = () => {
           ⚠️ Low Stock Alert
         </h2>
         <p style={{ fontSize: "16px", lineHeight: "1.5" }}>
-          There are <strong>10 items</strong> in low stock. <br />
+          There are <strong>{count} items</strong> in low stock. <br />
           To check, go to the <strong>Items</strong> tab and click the{" "}
           <strong>"Low Stock"</strong> container. <br />
           You can see the full list of low stock items there.
         </p>
-        <Button onClick={() => setIsOpen(false)} sx={{px:10,mt:2}}>Close</Button>
+        <Button onClick={() => setIsOpen(false)} sx={{ px: 10, mt: 2 }}>
+          Close
+        </Button>
       </Box>
     </Modal>
   );

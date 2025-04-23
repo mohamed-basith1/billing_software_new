@@ -1,13 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import TextField from "@mui/material/TextField";
-import dayjs from "dayjs";
 import { Box, Button, IconButton, Typography } from "@mui/material";
+import dayjs from "dayjs";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
-import utc from "dayjs/plugin/utc";
+import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
 import { DataGrid } from "@mui/x-data-grid";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+import { useDispatch, useSelector } from "react-redux";
 import {
   clearDealerDetails,
   removeEnteredListedItem,
@@ -17,9 +17,6 @@ import {
   selectLoadItemWithDealer,
   selectNewItemWithDealer,
 } from "../../pages/ItemsPage/ItemsSlice";
-import { useDispatch, useSelector } from "react-redux";
-import timezone from "dayjs/plugin/timezone";
-import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
 
 const ItemEntryHistory = () => {
   const columns = [
@@ -68,52 +65,8 @@ const ItemEntryHistory = () => {
   const dealerPurchasedPrice = useSelector(selectDealerPurchasedPrice);
 
   const dispatch = useDispatch();
-  console.log(
-    "loadItemWithDealer",
-    loadItemWithDealer,
-    "newItemWithDealer",
-    newItemWithDealer,
-    dealerDetails.dealerName,
-    dealerDetails.dealerPurchasedPrice
-  );
+ 
   // 📌 Handle Date Selection & API Call (Only when Date Changes)
-  const handleDateChange = async (date: Dayjs | null) => {
-    if (!date) return;
-
-    const formattedDate = dayjs(date)
-      .tz("Asia/Kolkata")
-      .startOf("day")
-      .format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
-    console.log("📅 Selected Date (UTC):", formattedDate);
-
-    try {
-      const response: any = await window.electronAPI.filterByData(
-        formattedDate
-      );
-
-      if (response.status !== 200) {
-        toast.error(`${response.message}`, { position: "bottom-left" });
-        return;
-      }
-
-      if (!response.data || response.data.length === 0) {
-        setEntryHistory([]);
-        return;
-      }
-
-      setEntryHistory(
-        response.data.map((item: any, index: number) => ({
-          ...item,
-          id: index + 1,
-        }))
-      );
-
-      console.log("✅ Filtered Items Response:", response.data);
-    } catch (error) {
-      console.error("❌ Error fetching items by date:", error);
-      toast.error("Failed to fetch items.", { position: "bottom-left" });
-    }
-  };
 
   // 📌 Call handleDateChange when `selectedDate` updates
   useEffect(() => {
@@ -155,15 +108,9 @@ const ItemEntryHistory = () => {
   }
 
   const submitStockUpload = async () => {
-    console.log(
-      "loadItemWithDealer",
-      loadItemWithDealer,
-      "newItemWithDealer",
-      newItemWithDealer
-    );
+
     const combine = [...loadItemWithDealer, ...newItemWithDealer];
 
-    console.log("combine", combine);
     let totalItemPrice = calculateTotalAmount(combine);
     if (totalItemPrice !== Number(dealerPurchasedPrice)) {
       toast.error(

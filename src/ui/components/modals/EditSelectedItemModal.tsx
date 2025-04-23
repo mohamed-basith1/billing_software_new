@@ -1,18 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, {  } from "react";
 import { useSelector } from "react-redux";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Button from "@mui/material/Button";
 import { useDispatch } from "react-redux";
 import { Grid, TextField, Typography } from "@mui/material";
-import {
-  clearCustomerDetails,
-  selectCustomerDetails,
-  selectCustomerEditModal,
-  setCustomerDetails,
-  setCustomerEditModal,
-  setSelectedCustomer,
-} from "../../pages/CustomersPage/CustomersSlice";
 
 import { toast } from "react-toastify";
 import {
@@ -55,12 +47,7 @@ const EditSelectedItemModal = () => {
     //@ts-ignore
     dispatch(setEditSelectItem({ field, value }));
   };
-  console.log(
-    "selectedItem.item_name",
-    selectedItem.item_name,
-    "selectedItemName",
-    selectedItemName
-  );
+ 
   const handleEditSubmit = async () => {
     try {
       const normalizeString = (str: string) =>
@@ -69,13 +56,13 @@ const EditSelectedItemModal = () => {
         normalizeString(selectedItemName) ===
         normalizeString(selectedItem.item_name)
       ) {
-        console.log("value for updation", selectedItem);
+       
         // @ts-ignore
         const response: any = await window.electronAPI.editItemDetails(
           selectedItem
         );
 
-        console.log("tesyer", response.data);
+       
         dispatch(updateItemList(response.data));
         toast.success(response.message, { position: "bottom-left" });
         handleCloseCustomerEditModal();
@@ -94,7 +81,7 @@ const EditSelectedItemModal = () => {
           selectedItem
         );
 
-        console.log("response response", response.data);
+        
 
         dispatch(updateItemList(response.data));
         toast.success(response.message, { position: "bottom-left" });
@@ -108,7 +95,7 @@ const EditSelectedItemModal = () => {
     }
   };
 
-  console.log("selectedItem", selectedItem);
+
   return (
     <React.Fragment>
       <Modal

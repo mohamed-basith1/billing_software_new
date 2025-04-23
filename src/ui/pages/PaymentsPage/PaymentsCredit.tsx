@@ -25,7 +25,6 @@ import { toast } from "react-toastify";
 import CreditCardOutlinedIcon from "@mui/icons-material/CreditCardOutlined";
 import {
   fetchBills,
-  filterTodayBills,
   generateInvoicePDF,
   getTotalAmount,
 } from "../../utils/utils";
@@ -45,7 +44,6 @@ import {
   setFromDate,
   setItemRemove,
   setPayCreditBalanceModal,
-  setPaymentChange,
   setReturnAmountModel,
   setReturnBillHistoryModal,
   setReturnItem,
@@ -138,7 +136,7 @@ const Row = ({ index, style, data }) => {
 const PaymentsCredit = () => {
   dayjs.extend(utc);
   dayjs.extend(timezone);
-  console.log("render in credit");
+
   const columns: GridColDef[] = [
     {
       field: "action",
@@ -229,7 +227,7 @@ const PaymentsCredit = () => {
   const dispatch: any = useDispatch();
   const userName = useSelector(selectUserName);
   const deleteModalvalue = useSelector(selectCustomerDeleteModal);
-  console.log("UPIBillsList", UPIBillsList);
+
   useEffect(() => {
     dispatch(setFromDate(dayjs().tz("Asia/Kolkata").subtract(1, "month")));
     dispatch(setToDate(dayjs().tz("Asia/Kolkata")));
@@ -299,7 +297,7 @@ const PaymentsCredit = () => {
       returned_by: userName,
     };
 
-    console.log("returnBillHistoryPayload", returnBillHistoryPayload);
+   
     if (
       UPIBillsList?.find(
         (data: any) => data.bill_number === selectedBills.bill_number
@@ -311,7 +309,7 @@ const PaymentsCredit = () => {
       );
     }
 
-    console.log("selectedBills return bill", selectedBills);
+
     //@ts-ignore
     let response: any = await window.electronAPI.returnBill(
       selectedBills._id,
@@ -321,21 +319,13 @@ const PaymentsCredit = () => {
     dispatch(setnewReturnBill(response.data));
     toast.success(`${response.message}`, { position: "bottom-left" });
     dispatch(clearReturnBillDetail());
-    console.log("return bill response", response);
+
   };
   const handleReturnPendingAmount = async () => {
     dispatch(setReturnAmountModel(true));
 
-    console.log("selectedBills?.return_amount", selectedBills?.return_amount);
-    // //@ts-ignore
-    // let response: any = await window.electronAPI.returnPendingAmount(
-    //   selectedBills._id,
-    //   selectedBills.total_amount
-    // );
-
-    // console.log("response", response);
-    // dispatch(setnewReturnBill(response.data));
-    // dispatch(setSelectedBills(response.data));
+   
+ 
   };
 
   const finalBillHanlder = async (method) => {
@@ -362,12 +352,7 @@ const PaymentsCredit = () => {
           returned_by: userName,
         };
 
-        console.log("returnBillHistoryPayload", returnBillHistoryPayload);
-        // if (
-        //   UPIBillsList?.find(
-        //     (data: any) => data.bill_number === selectedBills.bill_number
-        //   ).total_amount !== selectedBills?.total_amount
-        // ) {
+       
 
         // @ts-ignore
         await window.electronAPI.createBillReturnHistory(
@@ -395,7 +380,7 @@ const PaymentsCredit = () => {
         };
         //@ts-ignore
         await window.electronAPI.addTransactionHistory(TransactionPayload);
-        console.log("response", response);
+    
         dispatch(setnewReturnBill(response.data));
         dispatch(setSelectedBills(response.data));
         dispatch(setReturnAmountModel(false));
@@ -1171,7 +1156,7 @@ const PaymentsCredit = () => {
                     columns={columns}
                     disableColumnMenu
                     processRowUpdate={(newRow) => {
-                      console.log("newRow", newRow, UPIBillsList);
+        
 
                       let oldRow = UPIBillsList.find(
                         (data: any) =>

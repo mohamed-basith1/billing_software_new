@@ -182,7 +182,7 @@ export function AuthenticationRouter() {
 
   ipcMain.handle("send-key", async (_, key) => {
     try {
-      console.log("key", key);
+    
       let transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
@@ -199,13 +199,13 @@ export function AuthenticationRouter() {
       };
 
       let test = await transporter.sendMail(mailOptions);
-      console.log("suscdfj", test);
+     
       return {
         status: 200,
         message: "key successfully sended",
       };
     } catch (error) {
-      console.log("error", error);
+     
       return {
         status: 500,
         message: "Failed to send key",

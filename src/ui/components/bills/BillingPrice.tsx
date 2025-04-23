@@ -7,7 +7,7 @@ import {
 } from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
@@ -36,7 +36,7 @@ const BillingPrice = () => {
 
   const theme: any = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  console.log("paymentMethod", paymentMethod);
+
   useEffect(() => {
     const selectedBill =
       selectBill.find((data: any) => data.bill_number === selectCurrentTab) ||
@@ -93,7 +93,7 @@ const BillingPrice = () => {
       billed_by: userName,
     };
 
-    console.log("create bill payload", payload);
+
     //@ts-ignore
     let response = await window.electronAPI.createBill(payload);
     //

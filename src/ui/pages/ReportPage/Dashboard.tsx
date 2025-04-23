@@ -1,7 +1,7 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectDashboardData,
@@ -20,7 +20,7 @@ import {
   TrendingUp as ProfitIcon,
   ShoppingCart as OrdersIcon,
 } from "@mui/icons-material";
-import { getDaysDifference, getGreeting } from "../../utils/utils";
+import { getDaysDifference } from "../../utils/utils";
 import { selectUserName } from "../LoginPage/LoginSlice";
 import TopSellingProducts from "../../components/Reports/TopSellingProducts";
 import TopCustomer from "../../components/Reports/TopCustomer";
@@ -113,13 +113,13 @@ const Dashboard = () => {
       .toISOString();
 
     try {
-      alert("api");
+    
       // @ts-ignore
       const response: any = await window.electronAPI.getDashboardData(
         fromDateFormat,
         toDateFormat
       );
-      console.log("response", response.data);
+
       dispatch(setDashboardData(response.data));
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);

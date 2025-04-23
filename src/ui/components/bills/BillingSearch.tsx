@@ -25,7 +25,6 @@ const BillingSearch = () => {
   const enterPressCount = useRef(0);
   const [suggestions, setSuggestions] = useState<[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
-  const [trigger, setTrigger] = useState(true);
 
   const billingSearch = useSelector(selectBillValue).find(
     (bill: any) => bill.bill_number === currentTab
@@ -98,7 +97,7 @@ const BillingSearch = () => {
               stock_qty,
               unique_id,
             };
-            console.log("payload setitem top", payload);
+
             dispatch(setItem(payload));
             enterPressCount.current = 0; // Reset count after logging
             if (inputRef.current) {
@@ -187,7 +186,7 @@ const BillingSearch = () => {
     createdAt: any;
     purchased_rate: number;
     stock_qty: number;
-    unique_id:string
+    unique_id: string;
   }) => {
     dispatch(
       setBillingField({
@@ -296,7 +295,7 @@ const BillingSearch = () => {
   };
 
   const handleQtyKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    const { qty, uom }: any = billingSearch;
+    const { qty }: any = billingSearch;
 
     // // Prevent entry if qty is 0
     if (qty === 0 || qty === "0" || qty === null || qty === undefined) {
@@ -318,7 +317,7 @@ const BillingSearch = () => {
         stock_qty,
         unique_id,
       }: any = billingSearch;
-      console.log("stock_qty", stock_qty);
+
       // Check if all required fields are filled
       const allFieldsFilled: boolean = Object.entries({
         bill_number,
@@ -368,7 +367,7 @@ const BillingSearch = () => {
           unique_id,
         };
 
-        console.log("payload setitem", payload);
+       
         dispatch(setItem(payload));
         enterPressCount.current = 0; // Reset counter after logging
       } else if (enterPressCount.current === 2) {
@@ -485,10 +484,10 @@ const BillingSearch = () => {
                 billingSearch.rate
               );
 
-              console.log("amount uom", billingSearch.uom, amount);
+           
               updatedBillingSearch.amount = amount;
             }
-            console.log("updatedBillingSearch", updatedBillingSearch);
+         
             dispatch(
               setBillingField({
                 bill_number: billingSearch.bill_number,

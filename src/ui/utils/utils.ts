@@ -63,7 +63,7 @@ export const generateInvoicePDF = (
   fulldata
 ) => {
   const doc = new jsPDF();
-  console.log("fulldata", fulldata);
+
   doc.addImage(backgroundImage, "PNG", 0, 0, 210, 297);
   // Company Name (Centered Top)
   doc.setFontSize(22);
@@ -232,7 +232,6 @@ export const fetchBills = async (
 };
 
 export const aggregateItemsByCode = (data) => {
-  console.log("data agrregateItem", JSON.stringify(data));
   const aggregated: any = {};
 
   data.forEach((item: any) => {

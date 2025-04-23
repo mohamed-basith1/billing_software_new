@@ -40,7 +40,7 @@ export function DealerBillRouter() {
   //get Dealer Bill
   ipcMain.handle("get-dealer-bill", async () => {
     try {
-      console.log("htting");
+     
       const DealerBillList = await TestDealerBillHistoryModel.find().lean(); // Use lean() for better performance
       return {
         status: 200,
@@ -59,7 +59,7 @@ export function DealerBillRouter() {
   // Create Dealer Bill
   ipcMain.handle("create-dealer-bill", async (_, data) => {
     try {
-      console.log("Creating Dealer Bill:", data);
+    
       const newDealerBill = await TestDealerBillHistoryModel.create(data);
       return {
         status: 201,
@@ -145,7 +145,7 @@ export function DealerBillRouter() {
         data._id
       );
 
-      console.log("purchasedItemList", data.purchasedItemList);
+     
 
       if (!deletedDealerBill) {
         return {
@@ -171,7 +171,7 @@ export function DealerBillRouter() {
 
 ipcMain.handle("delete-dealer-payment-history", async (_, data) => {
   try {
-    console.log("Received delete history request:", data);
+   
     const { _id, amount } = data;
 
     if (!_id || typeof amount !== "number") {

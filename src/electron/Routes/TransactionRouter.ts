@@ -13,7 +13,7 @@ export function TransactionRouter() {
 
         const endDate = new Date(toDate);
         endDate.setUTCHours(23, 59, 59, 999);
-        console.log("start date", startDate, "end Date", endDate);
+      
         const query = {
           createdAt: {
             $gte: startDate,
@@ -24,7 +24,7 @@ export function TransactionRouter() {
         const transactions = await TransactionSchema.find(query).sort({
           createdAt: -1,
         }); // Sort by newest firstlean();
-        // console.log("transactions", transactions);
+      
         // Transform the data
         const formattedTransactions = transactions.map(
           (transaction, index) => ({
@@ -51,7 +51,7 @@ export function TransactionRouter() {
           })
         );
 
-        console.log("formattedTransactions", formattedTransactions);
+      
         return {
           status: 200,
           message: "Transaction History List",

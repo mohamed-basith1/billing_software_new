@@ -1,27 +1,19 @@
 import {
   Modal,
   Box,
-  Typography,
-  TextField,
-  Button,
+  Typography, Button,
   OutlinedInput,
   InputAdornment,
   FormControl,
   InputLabel,
   FormControlLabel,
-  Checkbox,
+  Checkbox
 } from "@mui/material";
-import React, { useState } from "react";
+import { useState } from "react";
 import { style } from "./CustomerCreateModal";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  selectPayCreditBalance,
-  selectPayCreditBalanceModal,
-  selectSelectedBills,
-  setPayCreditBalance,
-  setPayCreditBalanceModal,
-  setSelectedBills,
-  setnewReturnBill,
+  selectPayCreditBalance, selectSelectedBills
 } from "../../pages/PaymentsPage/PaymentsSlice";
 import { toast } from "react-toastify";
 import {
@@ -35,9 +27,7 @@ import { selectUserName } from "../../pages/LoginPage/LoginSlice";
 
 const DealerAmountModal = () => {
   const dispatch = useDispatch();
-  const payCreditBalance = useSelector(selectPayCreditBalance);
   const dealerAmountModel = useSelector(selectPayDealerAmountModel);
-  const selectedBill = useSelector(selectSelectedBills);
   const dealerHistoryselected = useSelector(selectDealerHistoryselected);
   const username = useSelector(selectUserName);
   const [paymentMethod, setPaymentMethod] = useState<string | null>("");
@@ -90,14 +80,14 @@ const DealerAmountModal = () => {
           password: "",
         };
 
-        console.log("TransactionPayload mohamed", TransactionPayload);
+
 
         //@ts-ignore
         await window.electronAPI.addTransactionHistory(TransactionPayload);
         toast.success(`${response.message}`, { position: "bottom-left" });
         setAmount(0);
         setPaymentMethod("");
-        console.log("new response data", response.data);
+
         dispatch(setPayDealerAmountModel(false));
         dispatch(setUpdateDealerBill(response.data));
         const getDealerBillSummaryHandler = async () => {

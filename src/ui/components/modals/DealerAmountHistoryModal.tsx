@@ -1,27 +1,21 @@
 import { Box, Button, Modal, Typography } from "@mui/material";
-import React from "react";
 import { style } from "./CustomerCreateModal";
-import ItemsNewEntry from "../items/ItemsNewEntry";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  selectDealerHistoryselected,
-  selectNewItemEntryModel,
-  selectPayDealerAmountHistoryModel,
-  setDeleteDealerPaymentHistory,
-  setNewItemEntryModel,
-  setPayDealerAmountHistoryModel,
+  selectDealerHistoryselected, selectPayDealerAmountHistoryModel,
+  setDeleteDealerPaymentHistory, setPayDealerAmountHistoryModel
 } from "../../pages/ItemsPage/ItemsSlice";
 import { DataGrid } from "@mui/x-data-grid";
 import { selectUserName } from "../../pages/LoginPage/LoginSlice";
 const DealerAmountHistoryModal = () => {
   const username = useSelector(selectUserName);
   const handleDeleteAmount = async (data) => {
-    console.log("handleDeleteAmount", data);
+  
     //@ts-ignore
     let response = await window.electronAPI.deleteDealerPaymentHistory(data);
 
     if (response.status === 200) {
-      // console.log("ressdsjdponse", response, data);
+
       let TransactionPayload = {
         status: "Decreased",
         bill_no: "None",
@@ -36,7 +30,6 @@ const DealerAmountHistoryModal = () => {
         password: "",
       };
 
-      console.log("TransactionPayload", TransactionPayload);
       //@ts-ignore
       let responsess = await window.electronAPI.addTransactionHistory(
         TransactionPayload
@@ -126,7 +119,7 @@ const DealerAmountHistoryModal = () => {
 
   const dispatch = useDispatch();
 
-  console.log("hiisid", dealerHistoryselected);
+
   return (
     <Modal
       open={payDealerAmountHistoryModel}

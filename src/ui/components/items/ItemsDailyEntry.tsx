@@ -12,7 +12,7 @@ import {
   Typography,
   Button,
 } from "@mui/material";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -20,20 +20,14 @@ import {
   selectFilterSearchItem,
   selectItemSearch,
   selectItems,
-  setClearFilterData,
-  setClearItems,
-  setClearItemsearch,
-  setDateTigger,
-  setFilterSearchItem,
+  setClearFilterData, setClearItemsearch, setFilterSearchItem,
   setItemSearch,
   setLoadItemWithDealer,
-  setNewItemEntryModel,
+  setNewItemEntryModel
 } from "../../pages/ItemsPage/ItemsSlice";
-import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs from "dayjs";
 import { toast } from "react-toastify";
-import { v4 as uuidv4 } from "uuid";
 
 const ItemsDailyEntry = () => {
   const itemSearchRef = useRef<HTMLInputElement>(null);
@@ -44,7 +38,6 @@ const ItemsDailyEntry = () => {
   const dealerPurchasedPrice = useSelector(selectDealerPurchasedPrice);
   const [suggestions, setSuggestions] = useState<any>([]);
   const [selectedFlag, setSelectFlag] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
   const [uploadStock, setUplaodStock] = useState("");
 
   useEffect(() => {
@@ -58,7 +51,7 @@ const ItemsDailyEntry = () => {
         //@ts-ignore
         const results = await window.electronAPI.searchItem(itemsearch);
         setSuggestions(results);
-        console.log("suggestion data", results);
+    
       };
 
       if (selectedFlag === false) getSuggestionsHandle();
@@ -75,7 +68,7 @@ const ItemsDailyEntry = () => {
   }, []);
 
   const handleSelect = (item: any) => {
-    console.log("item suggestiojg", item);
+
     dispatch(setItemSearch(item.item_name)); // Update search first
     setSelectFlag(true);
     setTimeout(() => {
@@ -119,10 +112,7 @@ const ItemsDailyEntry = () => {
           ? (Number(uploadStock) / 1000) * Number(selectedItem.purchased_rate)
           : Number(uploadStock) * Number(selectedItem.purchased_rate),
     };
-    console.log(
-      "newStockQtyAndExpirynewStockQtyAndExpirynewStockQtyAndExpirynewStockQtyAndExpiry",
-      newStockQtyAndExpiry
-    );
+ 
     dispatch(setLoadItemWithDealer(newStockQtyAndExpiry));
     dispatch(setClearFilterData());
     setUplaodStock(0);
@@ -135,7 +125,7 @@ const ItemsDailyEntry = () => {
       Number(dealerDetails.dealerPurchasedPrice) < 1
     );
   };
-  console.log("suggestions list", suggestions);
+
   return (
     <Box
       sx={{

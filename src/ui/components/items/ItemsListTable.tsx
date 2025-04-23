@@ -5,20 +5,18 @@ import {
   InputAdornment,
   TextField,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import { useDispatch, useSelector } from "react-redux";
 import {
   selectItemList,
-  selectItemListSearch,
-  selectItemSearch,
-  selectSelectedItem,
+  selectItemListSearch, selectSelectedItem,
   setEditItemModal,
   setItemList,
   setItemListSearch,
   setSelectItemName,
-  setSelectedItem,
+  setSelectedItem
 } from "../../pages/ItemsPage/ItemsSlice";
 import { setCustomerDeleteModal } from "../../pages/CustomersPage/CustomersSlice";
 import DeleteModal from "../modals/DeleteModal";
@@ -55,7 +53,7 @@ const ItemsListTable = () => {
       headerAlign: "center",
       renderCell: (params) => {
         try {
-          console.log("testing ", params.row);
+
           return (
             <Box>
               <Button

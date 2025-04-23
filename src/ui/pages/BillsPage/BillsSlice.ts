@@ -125,7 +125,7 @@ const billsSlice = createSlice({
         stock_qty,
         unique_id,
       } = action.payload;
-      console.log("action.payload set item", action.payload);
+    
       // Find the bill with the given bill_number
       const bill = state.bills.find((b) => b.bill_number === state.currentTab);
 

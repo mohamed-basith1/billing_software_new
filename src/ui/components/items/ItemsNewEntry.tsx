@@ -17,10 +17,7 @@ import {
   FormControl,
   InputLabel,
 } from "@mui/material";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { toast } from "react-toastify";
-import dayjs from "dayjs";
 import { v4 as uuidv4 } from "uuid";
 
 const ItemsNewEntry = () => {
@@ -103,7 +100,7 @@ const ItemsNewEntry = () => {
     }
 
     if (field === "sellingPrice") {
-      console.log("value selling price", value);
+     
 
       dispatch(
         setField({
@@ -218,7 +215,7 @@ const ItemsNewEntry = () => {
         ],
       };
       const sanitizedData = JSON.parse(JSON.stringify(itemPayload)); // Removes undefined & BigInt
-      console.log("insertItem upload data", sanitizedData);
+     
       if (ItemsEntryTab === 0) {
         //@ts-ignore
         let response = await window.electronAPI.existItemValidate(

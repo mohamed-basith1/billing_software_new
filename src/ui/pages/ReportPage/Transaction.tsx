@@ -35,7 +35,7 @@ const Transaction = () => {
       //@ts-ignore
       let response = await window.electronAPI.getEmployee();
 
-      console.log("response employee list", response);
+  
       dispatch(setEmployeeList(response.data));
     };
 
@@ -206,7 +206,7 @@ const Transaction = () => {
           >
             <Tabs
               value={transactionHistoryTab}
-              onChange={(e, value) => dispatch(setTransactionHistoryTab(value))}
+              onChange={(_e, value) => dispatch(setTransactionHistoryTab(value))}
               aria-label="basic tabs example"
             >
               <Tab label="Transaction" {...a11yProps(0)} />

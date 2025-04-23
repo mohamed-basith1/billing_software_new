@@ -1,11 +1,11 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState: any = {
   isAuthenticate: false,
   licenseAuth: false,
   username: "",
   role: "",
-  updateUserModal:false
+  updateUserModal: false,
 };
 
 const loginSlice = createSlice({
@@ -35,13 +35,19 @@ const loginSlice = createSlice({
 });
 
 // Actions
-export const { setAuthenticate, setUserName, logoutAction,setLicenseAuth,setUpdateUserModal } =
-  loginSlice.actions;
+export const {
+  setAuthenticate,
+  setUserName,
+  logoutAction,
+  setLicenseAuth,
+  setUpdateUserModal,
+} = loginSlice.actions;
 
 // Selectors
 export const selectAuthenticate = (state: any) => state.login.isAuthenticate;
 export const selectLicenseAuth = (state: any) => state.login.licenseAuth;
-export const selectUpdateUserModal = (state: any) => state.login.updateUserModal;
+export const selectUpdateUserModal = (state: any) =>
+  state.login.updateUserModal;
 
 export const selectUserName = (state: any) => state.login.username;
 //

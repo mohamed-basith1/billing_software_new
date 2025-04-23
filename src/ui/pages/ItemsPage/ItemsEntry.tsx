@@ -1,15 +1,10 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { Box, Typography } from "@mui/material";
+import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import customerImage from "../../assets/Image/Illustrate/customer.png";
-import { getGreeting } from "../../utils/utils";
 import WavingHandOutlinedIcon from "@mui/icons-material/WavingHandOutlined";
 
 import ItemsEntryTab from "../../components/items/ItemsEntryTab";
 import ItemEntryHistory from "../../components/items/ItemEntryHistory";
-import { AnimatedCounter } from "../ReportPage/Dashboard";
-import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
-import BalanceIcon from "@mui/icons-material/Balance";
 import { useSelector } from "react-redux";
 import { selectUserName } from "../LoginPage/LoginSlice";
 import DealerInfoForm from "../../components/items/DealerInfoForm";

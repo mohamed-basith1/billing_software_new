@@ -2,7 +2,6 @@ import {
   Modal,
   Box,
   Typography,
-  TextField,
   Button,
   OutlinedInput,
   InputAdornment,
@@ -11,7 +10,7 @@ import {
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { style } from "./CustomerCreateModal";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -39,7 +38,7 @@ const PayCreditBillModal = () => {
     };
   }, [payCreditBalanceModal]);
   const handlePayCreditBalance = async () => {
-    console.log("handlePayCreditBalance", selectedBill);
+
 
     if (selectedBill.balance < payCreditBalance) {
       toast.warning(
@@ -73,7 +72,7 @@ const PayCreditBillModal = () => {
     } else {
       toast.success(`${response.message}`, { position: "bottom-left" });
 
-      console.log("new response data", response.data);
+
       dispatch(setSelectedBills(response.data));
       dispatch(setnewReturnBill(response.data));
       dispatch(setPayCreditBalanceModal(false));

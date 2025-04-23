@@ -47,7 +47,7 @@ const PaymentMethodCharts = ({ paymentSummary }: any) => {
             paddingAngle={0}
             dataKey="value"
           >
-            {paymentSummary.map((entry, index) => (
+            {paymentSummary.map((_entry, index) => (
               <Cell
                 key={`cell-${index}`}
                 fill={COLORS[index % COLORS.length]}

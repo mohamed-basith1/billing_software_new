@@ -1,5 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { stringify } from "querystring";
+import { createSlice } from "@reduxjs/toolkit";
 import { aggregateItemsByCode } from "../../utils/utils";
 
 const initialState: any = {
@@ -36,7 +35,7 @@ const paymentSlice = createSlice({
     },
 
     setSelectedBills: (state, action) => {
-      console.log("duhiushdi", action.payload);
+
       state.tempRemoveItem = [];
       state.selectedBills = action.payload;
     },
@@ -48,7 +47,7 @@ const paymentSlice = createSlice({
       state.selectedBills={}
     },
     setItemRemove: (state, action) => {
-      console.log("remove unique_id", action.payload);
+
       const codeToRemove = action.payload;
 
       if (!state.selectedBills) return; // Prevent errors if `selectedBills` is undefined
@@ -72,15 +71,11 @@ const paymentSlice = createSlice({
         return sum + quantity * item.rate;
       }, 0);
 
-      console.log("Total amount after reduce:", totalAmount);
+
       let total_amount = totalAmount - (state.selectedBills.discount || 0);
       let balance_amount = totalAmount - state.selectedBills.amount_paid;
 
-      console.log(
-        "balance_amount checking",
-        balance_amount,
-        state.selectedBills.amount_paid
-      );
+  
       // Update state correctly
       state.selectedBills.itemsList = updatedItems;
       state.selectedBills.sub_amount = totalAmount;
@@ -131,11 +126,7 @@ const paymentSlice = createSlice({
         }, 0);
         let total_amount = totalAmount - (state.selectedBills.discount || 0);
         let balance_amount = totalAmount - state.selectedBills.amount_paid;
-        console.log(
-          "balance_amount checking",
-          balance_amount,
-          state.selectedBills.amount_paid
-        );
+       
         state.selectedBills.sub_amount = totalAmount;
         state.selectedBills.total_amount = total_amount;
         state.selectedBills.return_amount = Math.max(
@@ -198,7 +189,7 @@ const paymentSlice = createSlice({
       state.returnBillHistoryModal = action.payload;
     },
     setReturnBillHistoryList: (state, action) => {
-      console.log("Action action.payload", action.payload);
+     
       state.returnBillHistoryList = action.payload;
     },
 

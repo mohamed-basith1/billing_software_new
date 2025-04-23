@@ -1,5 +1,4 @@
 import { Box } from "@mui/material";
-import React from "react";
 import ReportsTabs from "./ReportsTabs";
 import { useSelector } from "react-redux";
 import { selectCurrentReportsTab } from "./ReportsSlice";

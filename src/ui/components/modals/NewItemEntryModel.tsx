@@ -1,5 +1,4 @@
 import { Box, Modal, Typography } from "@mui/material";
-import React from "react";
 import { style } from "./CustomerCreateModal";
 import ItemsNewEntry from "../items/ItemsNewEntry";
 import { useDispatch, useSelector } from "react-redux";

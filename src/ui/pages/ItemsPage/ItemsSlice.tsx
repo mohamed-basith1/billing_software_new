@@ -56,7 +56,7 @@ const itemsSlice = createSlice({
       state.dealerPurchasedDeleteModel = action.payload;
     },
     setItemSearch: (state, action) => {
-      console.log("teftsgyudg", action.payload);
+  
       state.itemSearch = action.payload;
     },
     setItemListSearch: (state, action) => {
@@ -215,7 +215,7 @@ const itemsSlice = createSlice({
       state.dealerHistoryselected = action.payload;
     },
     updateItemList: (state, action) => {
-      console.log("");
+
       const Income_unique_id = action.payload.unique_id;
       const existingItemIndex = state.itemList.findIndex(
         (item) => item.unique_id === Income_unique_id
@@ -237,7 +237,7 @@ const itemsSlice = createSlice({
     },
 
     setDeleteDealerPaymentHistory: (state, action) => {
-      console.log("redux", action.payload);
+
       const Income_unique_id = action.payload.data._id;
       //dealerHistoryselected
       // This is for remove exist item in the list
@@ -259,7 +259,7 @@ const itemsSlice = createSlice({
       state.dealerHistorySummary = action.payload;
     },
 
-    clearDealerDetails: (state, action) => {
+    clearDealerDetails: (state) => {
       state.dealerName = "";
       state.dealerPurchasedPrice = "";
       state.loadItemWithDealer = [];

@@ -1,10 +1,6 @@
-import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
-import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
-import PublishedWithChangesIcon from "@mui/icons-material/PublishedWithChanges";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import { FixedSizeList as List } from "react-window";
 
-import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import {
   Box,
@@ -38,18 +34,12 @@ import {
   selectToDate,
   selectUPIBillsList,
   setBillSearch,
-  setFromDate,
-  setItemRemove,
-  setPaymentChange,
-  setReturnBillHistoryModal,
-  setReturnItem,
-  setSelectedBills,
+  setFromDate, setPaymentChange, setSelectedBills,
   setToDate,
   setUPIBillsList,
-  setnewReturnBill,
+  setnewReturnBill
 } from "./PaymentsSlice";
 
-import { batch } from "react-redux";
 import { selectUserName } from "../LoginPage/LoginSlice";
 import utc from "dayjs/plugin/utc";
 
@@ -105,7 +95,7 @@ const PaymentsSelfUse = () => {
   dayjs.extend(utc);
   dayjs.extend(timezone);
 
-  console.log("render in cash");
+
   const columns: GridColDef[] = [
     { field: "item_name", headerName: "ITEM NAME", flex: 3 },
     {
@@ -152,10 +142,10 @@ const PaymentsSelfUse = () => {
   const billSearch: any = useSelector(selectBillSearch);
   const dispatch: any = useDispatch();
   const userName = useSelector(selectUserName);
-  console.log("fromDate", fromDate, toDate);
+
 
   useEffect(() => {
-    dispatch((dispatch, getState) => {
+    dispatch((dispatch) => {
       dispatch(setFromDate(dayjs().tz("Asia/Kolkata").subtract(1, "month")));
       dispatch(setToDate(dayjs().tz("Asia/Kolkata")));
 
@@ -208,49 +198,6 @@ const PaymentsSelfUse = () => {
       "Self Use"
     );
     dispatch(setUPIBillsList(response.data));
-  };
-  const handleReturnBill = async () => {
-    let returnBillHistoryPayload = {
-      bill_number: selectedBills.bill_number,
-      previous_bill_amount: UPIBillsList?.find(
-        (data: any) => data.bill_number === selectedBills.bill_number
-      ).total_amount,
-      returned_items: tempRemoveItem,
-      returned_amount:
-        UPIBillsList.find(
-          (data: any) => data.bill_number === selectedBills.bill_number
-        )?.itemsList?.reduce((sum, item) => {
-          const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
-          return sum + quantity * item.rate;
-        }, 0) - Number(selectedBills?.total_amount),
-      returned_by: userName,
-    };
-
-    console.log("returnBillHistoryPayload", returnBillHistoryPayload);
-    // createBillReturnHistory
-    // @ts-ignore
-    await window.electronAPI.createBillReturnHistory(returnBillHistoryPayload);
-
-    //@ts-ignore
-    let response: any = await window.electronAPI.returnBill(
-      selectedBills._id,
-      selectedBills,
-      tempRemoveItem
-    );
-    dispatch(setnewReturnBill(response.data));
-    toast.success(`${response.message}`, { position: "bottom-left" });
-    dispatch(clearReturnBillDetail());
-    console.log("return bill response", response);
-  };
-  const handleChangePaymentMethod = async () => {
-    //@ts-ignore
-    let response: any = await window.electronAPI.updateBillPaymentMethod(
-      selectedBills._id,
-      "UPI Paid"
-    );
-
-    dispatch(setPaymentChange(response.data));
-    toast.success(`${response.message}`, { position: "bottom-left" });
   };
 
   const handleDeleteBill = async () => {

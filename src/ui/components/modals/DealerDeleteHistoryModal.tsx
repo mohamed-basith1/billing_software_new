@@ -1,10 +1,5 @@
 import { Modal, Box, Typography, Button } from "@mui/material";
-import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  selectCustomerDetails,
-  setCustomerDeleteModal,
-} from "../../pages/CustomersPage/CustomersSlice";
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 
 import { toast } from "react-toastify";
@@ -36,7 +31,7 @@ const DealerDeleteHistoryModal = () => {
     dispatch(setDealerPurchasedDeleteModel(false));
   };
 
-  console.log("dealerHistoryselected", dealerHistoryselected);
+
   const handleCustomerDelete = async () => {
     //@ts-ignore
     let response: any = await window.electronAPI.deleteDealerBillHistory(

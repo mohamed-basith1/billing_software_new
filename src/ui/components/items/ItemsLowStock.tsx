@@ -39,7 +39,7 @@ const ItemsLowStock = () => {
     const fetchLowStockItemList = async () => {
       //@ts-ignore
       let response: any = await window.electronAPI.getLowStockItem();
-      console.log("low stock list", response);
+
       dispatch(setLowStockItemList(response));
     };
 
@@ -84,7 +84,7 @@ const ItemsLowStock = () => {
           }}
           value={""}
           size="small"
-          onChange={(e) => console.log("")}
+          onChange={() => console.log("")}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">

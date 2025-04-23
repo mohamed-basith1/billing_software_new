@@ -40,7 +40,7 @@ const CustomersCreate = () => {
     }
   };
 
-  console.log("customerDetails", customerDetails);
+
 
   function isCustomerDataValid(state) {
     const requiredFields = [
@@ -75,7 +75,7 @@ const CustomersCreate = () => {
     );
   }
 
-  console.log("isCustomerDataValid", isCustomerDataValid(customerDetails));
+
   const handleChange = (field: any, value: any) => {
     setError(false);
     //@ts-ignore

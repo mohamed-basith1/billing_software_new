@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Box, TextField, Button, Typography } from "@mui/material";
-import { generateRandomKey } from "../../utils/utils";
-import { toast } from "react-toastify";
+import { Box, Button, TextField, Typography } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
+import { toast } from "react-toastify";
+import { generateRandomKey } from "../../utils/utils";
 import { setLicenseAuth } from "../LoginPage/LoginSlice";
 
 const LicenseKeyInput = () => {
@@ -170,16 +170,4 @@ const LicenseKeyInput = () => {
 
 export default LicenseKeyInput;
 
-//    const randomKey = generateRandomKey();
-//       // sendLicenseKeyHandle(randomKey);
-//   const sendLicenseKeyHandle = async (key) => {
-//     console.log("generated key ", key);
-//     //@ts-ignore
-//     let response = await window.electronAPI.sendLicenseKey(key);
-//   };
-//   // console.log(encription_key.key); // { name: "Basith", age: 23 }
 
-//   const handleLicenseKey = (license_key) => {
-//     console.log("license_key", license_key);
-//     //  localStorage.setItem("encription_key", JSON.stringify({ key: "Basith" }));
-//   };

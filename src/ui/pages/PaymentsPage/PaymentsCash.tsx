@@ -106,7 +106,7 @@ const PaymentsCash = () => {
   dayjs.extend(utc);
   dayjs.extend(timezone);
 
-  console.log("render in cash");
+ 
   const columns: GridColDef[] = [
     {
       field: "action",
@@ -134,7 +134,7 @@ const PaymentsCash = () => {
               style={{ outline: "none", border: "none", padding: 0 }}
               disabled={selectedBills.itemsList.length === 1 ? true : false}
               onClick={(e) => {
-                console.log("params usihsd", params);
+             
                 e.stopPropagation(); // Stops focus from moving to the cell
                 dispatch(setItemRemove(params.row.unique_id));
               }}
@@ -197,10 +197,10 @@ const PaymentsCash = () => {
   const billSearch: any = useSelector(selectBillSearch);
   const dispatch: any = useDispatch();
   const userName = useSelector(selectUserName);
-  console.log("fromDate", fromDate, toDate);
+
 
   useEffect(() => {
-    dispatch((dispatch, getState) => {
+    dispatch((dispatch) => {
       dispatch(setFromDate(dayjs().tz("Asia/Kolkata").subtract(1, "month")));
       dispatch(setToDate(dayjs().tz("Asia/Kolkata").add(0, "day")));
       // Call getUPIBills after Redux state is updated
@@ -325,7 +325,7 @@ const PaymentsCash = () => {
           }, 0) - Number(selectedBills?.total_amount),
         returned_by: userName,
       };
-      console.log("returnBillHistoryPayload", returnBillHistoryPayload);
+
       // createBillReturnHistory
       // @ts-ignore
       await window.electronAPI.createBillReturnHistory(
@@ -399,7 +399,7 @@ const PaymentsCash = () => {
     }
   };
 
-  console.log("selectesdhsuiddBills", selectedBills);
+
 
   const handleDeleteBill = async () => {
     let payload: any = UPIBillsList.find(
@@ -882,7 +882,7 @@ const PaymentsCash = () => {
                     columns={columns}
                     disableColumnMenu
                     processRowUpdate={(newRow) => {
-                      console.log("newRow", newRow, UPIBillsList);
+              
 
                       let oldRow = UPIBillsList.find(
                         (data: any) =>

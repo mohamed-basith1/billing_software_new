@@ -1,15 +1,15 @@
 import Box from "@mui/material/Box";
 import ItemsTabs from "./ItemsTabs";
 
-import ItemsEntry from "./ItemsEntry";
-import { useDispatch, useSelector } from "react-redux";
-import { selectCurrentTab } from "./ItemsSlice";
-import ItemsList from "./ItemsList";
+import { useSelector } from "react-redux";
 import ItemPurchasedHistory from "./ItemPurchasedHistory";
+import ItemsEntry from "./ItemsEntry";
+import ItemsList from "./ItemsList";
+import { selectCurrentTab } from "./ItemsSlice";
 
 export default function ItemsPage() {
   const currentTab = useSelector(selectCurrentTab);
-  const dispatch = useDispatch();
+
 
   return (
     <Box
