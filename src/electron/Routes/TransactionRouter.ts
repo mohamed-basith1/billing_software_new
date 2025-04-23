@@ -30,7 +30,15 @@ export function TransactionRouter() {
           (transaction, index) => ({
             id: index + 1, // Sequential ID
             status: transaction.status,
-            createdAt: transaction.createdAt.toISOString().split("T")[0], // Format date
+            createdAt: new Date(transaction.createdAt).toLocaleString("en-GB", {
+              timeZone: "UTC",
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true, // For AM/PM format
+            }), // Format date
             bill_no: transaction.bill_no || "", // Handle empty bill_no
             customer: transaction.customer || "", // Handle empty customer
             method: transaction.method,
@@ -42,6 +50,8 @@ export function TransactionRouter() {
             }`,
           })
         );
+
+        console.log("formattedTransactions", formattedTransactions);
         return {
           status: 200,
           message: "Transaction History List",
@@ -65,7 +75,16 @@ export function TransactionRouter() {
       const formattedTransactions = transactions.map((transaction, index) => ({
         id: index + 1, // Sequential ID
         status: transaction.status,
-        createdAt: transaction.createdAt.toISOString().split("T")[0], // Format date
+        // createdAt: transaction.createdAt.toISOString().split("T")[0], // Format date
+        createdAt: new Date(transaction.createdAt).toLocaleString("en-GB", {
+          timeZone: "UTC",
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true, // For AM/PM format
+        }), // Format date
         bill_no: transaction.bill_no || "", // Handle empty bill_no
         customer: transaction.customer || "", // Handle empty customer
         method: transaction.method,

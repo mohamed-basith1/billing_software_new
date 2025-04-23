@@ -2,6 +2,7 @@ import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import PublishedWithChangesIcon from "@mui/icons-material/PublishedWithChanges";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import { FixedSizeList as List } from "react-window";
 
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
@@ -56,6 +57,50 @@ import timezone from "dayjs/plugin/timezone";
 import { AnimatedCounter } from "../ReportPage/Dashboard";
 import DeleteModal from "../../components/modals/DeleteModal";
 import { setCustomerDeleteModal } from "../CustomersPage/CustomersSlice";
+const Row = ({ index, style, data }) => {
+  const bill = data.items[index];
+  const selectedBills = data.selectedBills;
+  const dispatch = data.dispatch;
+
+  return (
+    <Box
+      style={style}
+      onClick={() => dispatch(setSelectedBills(bill))}
+      sx={{
+        padding: "20px 15px",
+        width: "100%",
+        bgcolor:
+          selectedBills?.bill_number === bill.bill_number ? "#F7F7FE" : "white",
+        borderBottom: ".1px solid lightgrey",
+        display: "flex",
+        justifyContent: "space-between",
+        cursor: "pointer",
+      }}
+    >
+      <Box>
+        <Typography sx={{ fontWeight: 600 }}>{bill.bill_number}</Typography>
+        <Typography sx={{ opacity: ".5", mt: 1, fontSize: ".8rem" }}>
+          Total Items {bill.itemsList.length} -{" "}
+          {bill?.createdAt
+            ? new Date(bill.createdAt).toLocaleString("en-GB", {
+                timeZone: "UTC",
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+              })
+            : ""}
+        </Typography>
+      </Box>
+      <Box>
+        <Typography sx={{ fontWeight: 600 }}>₹ {bill.total_amount}</Typography>
+      </Box>
+    </Box>
+  );
+};
+
 const PaymentsSelfUse = () => {
   dayjs.extend(utc);
   dayjs.extend(timezone);
@@ -209,7 +254,6 @@ const PaymentsSelfUse = () => {
   };
 
   const handleDeleteBill = async () => {
- 
     let payload: any = UPIBillsList.find(
       (data: any) => data.bill_number === selectedBills.bill_number
     );
@@ -465,7 +509,20 @@ const PaymentsSelfUse = () => {
               borderRight: ".1px solid lightgrey",
             }}
           >
-            {UPIBillsList?.map((data: any) => {
+            <List
+              height={window.innerHeight * 0.7} // match 70% height
+              itemCount={[...UPIBillsList].length}
+              itemSize={90} // Estimate height of each item
+              width="100%"
+              itemData={{
+                items: [...UPIBillsList].reverse(),
+                selectedBills,
+                dispatch,
+              }}
+            >
+              {Row}
+            </List>
+            {/* {UPIBillsList?.map((data: any) => {
               return (
                 <Box
                   onClick={() => dispatch(setSelectedBills(data))}
@@ -506,7 +563,7 @@ const PaymentsSelfUse = () => {
                   </Box>
                 </Box>
               );
-            })}
+            })} */}
           </Box>
         </Box>
 

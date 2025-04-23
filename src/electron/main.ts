@@ -10,6 +10,7 @@ import { CustomersRouter } from "./Routes/CustomersRouter.js";
 import { BillsRouter } from "./Routes/BillsRouter.js";
 import { TransactionRouter } from "./Routes/TransactionRouter.js";
 import { DealerBillRouter } from "./Routes/DealerBillHistory.js";
+import startMongo from "./startMongo.js";
 
 app.commandLine.appendSwitch("disable-features", "AutofillServerCommunication");
 app.commandLine.appendSwitch(
@@ -17,6 +18,10 @@ app.commandLine.appendSwitch(
   "AutofillAddressServerSuggestion"
 );
 app.on("ready", async () => {
+  startMongo(); // ✅ Ensure MongoDB is running before connecting
+
+  // Wait a couple seconds to allow MongoDB to spin up
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   await connectDB();
 
   ItemsRouter();
@@ -31,7 +36,7 @@ app.on("ready", async () => {
       preload: getPreloadPath(),
       nodeIntegration: false,
       contextIsolation: true,
-      // devTools: false, 
+      // devTools: false,
     },
   });
   if (isDev()) {

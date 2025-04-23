@@ -28,6 +28,7 @@ import {
   setUpdateUserModal,
 } from "../../pages/LoginPage/LoginSlice";
 import UpdateUserDetails from "../modals/UpdateUserDetails";
+import NotificationModal from "../modals/NotificationModal";
 
 export const drawerWidth = 240;
 
@@ -207,6 +208,7 @@ const Nav = () => {
         </List>
 
         <UpdateUserDetails />
+        <NotificationModal />
       </Drawer>
     </>
   );

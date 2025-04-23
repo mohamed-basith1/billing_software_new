@@ -5,6 +5,7 @@ import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import QrCode2Icon from "@mui/icons-material/QrCode2";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import { FixedSizeList as List } from "react-window";
 import {
   Box,
   Button,
@@ -55,6 +56,49 @@ import ReturnAmountModal from "../../components/modals/ReturnAmountModal";
 import { setCustomerDeleteModal } from "../CustomersPage/CustomersSlice";
 import DeleteModal from "../../components/modals/DeleteModal";
 
+const Row = ({ index, style, data }) => {
+  const bill = data.items[index];
+  const selectedBills = data.selectedBills;
+  const dispatch = data.dispatch;
+
+  return (
+    <Box
+      style={style}
+      onClick={() => dispatch(setSelectedBills(bill))}
+      sx={{
+        padding: "20px 15px",
+        width: "100%",
+        bgcolor:
+          selectedBills?.bill_number === bill.bill_number ? "#F7F7FE" : "white",
+        borderBottom: ".1px solid lightgrey",
+        display: "flex",
+        justifyContent: "space-between",
+        cursor: "pointer",
+      }}
+    >
+      <Box>
+        <Typography sx={{ fontWeight: 600 }}>{bill.bill_number}</Typography>
+        <Typography sx={{ opacity: ".5", mt: 1, fontSize: ".8rem" }}>
+          Total Items {bill.itemsList.length} -{" "}
+          {bill?.createdAt
+            ? new Date(bill.createdAt).toLocaleString("en-GB", {
+                timeZone: "UTC",
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+              })
+            : ""}
+        </Typography>
+      </Box>
+      <Box>
+        <Typography sx={{ fontWeight: 600 }}>₹ {bill.total_amount}</Typography>
+      </Box>
+    </Box>
+  );
+};
 const PaymentsUPI = () => {
   dayjs.extend(utc);
   dayjs.extend(timezone);
@@ -631,7 +675,20 @@ const PaymentsUPI = () => {
               borderRight: ".1px solid lightgrey",
             }}
           >
-            {[...UPIBillsList]?.reverse().map((data: any) => {
+            <List
+              height={window.innerHeight * 0.7} // match 70% height
+              itemCount={[...UPIBillsList].length}
+              itemSize={90} // Estimate height of each item
+              width="100%"
+              itemData={{
+                items: [...UPIBillsList].reverse(),
+                selectedBills,
+                dispatch,
+              }}
+            >
+              {Row}
+            </List>
+            {/* {[...UPIBillsList]?.reverse().map((data: any) => {
               return (
                 <Box
                   onClick={() => dispatch(setSelectedBills(data))}
@@ -659,8 +716,14 @@ const PaymentsUPI = () => {
                     >
                       Total Items {data.itemsList.length} -{" "}
                       {data?.createdAt
-                        ? new Date(data.createdAt).toLocaleDateString("en-GB", {
+                        ? new Date(data.createdAt).toLocaleString("en-GB", {
                             timeZone: "UTC",
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: true, // This gives you AM/PM
                           })
                         : ""}
                     </Typography>
@@ -672,7 +735,7 @@ const PaymentsUPI = () => {
                   </Box>
                 </Box>
               );
-            })}
+            })} */}
           </Box>
         </Box>
 

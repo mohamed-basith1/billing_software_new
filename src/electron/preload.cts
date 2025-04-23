@@ -10,7 +10,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
   editItemDetails: (updatedData) =>
     ipcRenderer.invoke("edit-item-details", updatedData),
 
-  //update-item
+  
 
   // exist-item-validate
   updateItem: (id, newData) => ipcRenderer.invoke("update-item", id, newData),
@@ -28,7 +28,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
   getEmployee: () => ipcRenderer.invoke("get-employee-list"),
   sendLicenseKey: (key) => ipcRenderer.invoke("send-key",key),
 
-  //send-key
+ 
 
   // Customers API
   createCustomer: (data) => ipcRenderer.invoke("create-customer", data),

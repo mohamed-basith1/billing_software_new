@@ -1,8 +1,9 @@
 import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
-import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
-import PublishedWithChangesIcon from "@mui/icons-material/PublishedWithChanges";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
+import PaymentsIcon from "@mui/icons-material/PaymentsOutlined";
+import PublishedWithChangesIcon from "@mui/icons-material/PublishedWithChanges";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import {
   Box,
@@ -19,7 +20,7 @@ import dayjs from "dayjs";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import PaymentsIcon from "@mui/icons-material/PaymentsOutlined";
+import { FixedSizeList as List } from "react-window";
 import {
   fetchBills,
   filterTodayBills,
@@ -48,15 +49,59 @@ import {
   setnewReturnBill,
 } from "./PaymentsSlice";
 
-import { batch } from "react-redux";
-import { selectUserName } from "../LoginPage/LoginSlice";
 import utc from "dayjs/plugin/utc";
+import { selectUserName } from "../LoginPage/LoginSlice";
 
 import timezone from "dayjs/plugin/timezone";
-import { AnimatedCounter } from "../ReportPage/Dashboard";
-import ReturnAmountModal from "../../components/modals/ReturnAmountModal";
 import DeleteModal from "../../components/modals/DeleteModal";
+import ReturnAmountModal from "../../components/modals/ReturnAmountModal";
 import { setCustomerDeleteModal } from "../CustomersPage/CustomersSlice";
+import { AnimatedCounter } from "../ReportPage/Dashboard";
+
+const Row = ({ index, style, data }) => {
+  const bill = data.items[index];
+  const selectedBills = data.selectedBills;
+  const dispatch = data.dispatch;
+
+  return (
+    <Box
+      style={style}
+      onClick={() => dispatch(setSelectedBills(bill))}
+      sx={{
+        padding: "20px 15px",
+        width: "100%",
+        bgcolor:
+          selectedBills?.bill_number === bill.bill_number ? "#F7F7FE" : "white",
+        borderBottom: ".1px solid lightgrey",
+        display: "flex",
+        justifyContent: "space-between",
+        cursor: "pointer",
+      }}
+    >
+      <Box>
+        <Typography sx={{ fontWeight: 600 }}>{bill.bill_number}</Typography>
+        <Typography sx={{ opacity: ".5", mt: 1, fontSize: ".8rem" }}>
+          Total Items {bill.itemsList.length} -{" "}
+          {bill?.createdAt
+            ? new Date(bill.createdAt).toLocaleString("en-GB", {
+                timeZone: "UTC",
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+              })
+            : ""}
+        </Typography>
+      </Box>
+      <Box>
+        <Typography sx={{ fontWeight: 600 }}>₹ {bill.total_amount}</Typography>
+      </Box>
+    </Box>
+  );
+};
+
 const PaymentsCash = () => {
   dayjs.extend(utc);
   dayjs.extend(timezone);
@@ -629,61 +674,22 @@ const PaymentsCash = () => {
             width: "30%",
             display: "flex",
             flexDirection: "column",
+            borderRight: ".1px solid lightgrey",
           }}
         >
-          <Box
-            sx={{
-              height: "100%",
-              width: "100%",
-              display: "flex",
-              flexDirection: "column",
-              overflow: "scroll",
-              borderRight: ".1px solid lightgrey",
+          <List
+            height={window.innerHeight * 0.7} // match 70% height
+            itemCount={[...UPIBillsList].length}
+            itemSize={90} // Estimate height of each item
+            width="100%"
+            itemData={{
+              items: [...UPIBillsList].reverse(),
+              selectedBills,
+              dispatch,
             }}
           >
-            {[...UPIBillsList]?.reverse()?.map((data: any) => {
-              return (
-                <Box
-                  onClick={() => dispatch(setSelectedBills(data))}
-                  sx={{
-                    padding: "20px 15px",
-                    width: "100%",
-
-                    bgcolor:
-                      selectedBills?.bill_number === data.bill_number
-                        ? "#F7F7FE"
-                        : "white",
-
-                    borderBottom: ".1px solid lightgrey",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    cursor: "pointer",
-                  }}
-                >
-                  <Box>
-                    <Typography sx={{ fontWeight: 600 }}>
-                      {data.bill_number}
-                    </Typography>
-                    <Typography
-                      sx={{ opacity: ".5", mt: 1, fontSize: ".8rem" }}
-                    >
-                      Total Items {data.itemsList.length} -{" "}
-                      {data?.createdAt
-                        ? new Date(data.createdAt).toLocaleDateString("en-GB", {
-                            timeZone: "UTC",
-                          })
-                        : ""}
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Typography sx={{ fontWeight: 600 }}>
-                      ₹ {data.total_amount}
-                    </Typography>{" "}
-                  </Box>
-                </Box>
-              );
-            })}
-          </Box>
+            {Row}
+          </List>
         </Box>
 
         {Object.keys(selectedBills).length !== 0 ? (

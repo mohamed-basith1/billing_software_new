@@ -274,3 +274,27 @@ export const filterTodayBills = (bills: any) => {
 
   return bills.filter((bill) => bill.createdAt.startsWith(today));
 };
+
+export const getTimeSlot = (): "morning" | "night" | null => {
+  const now = new Date();
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+  const totalMinutes = hours * 60 + minutes;
+
+  // Morning slot: 10:00 (600 mins) to 12:00 (720 mins)
+  if (totalMinutes >= 600 && totalMinutes < 720) return "morning";
+  if (totalMinutes > 720 && totalMinutes < 960) {
+    localStorage.removeItem("notification");
+  }
+
+  // Afternoon slot: 4:00 PM to 6:00 PM
+  if (totalMinutes >= 960 && totalMinutes < 1080) return "morning";
+  if (totalMinutes > 1080 && totalMinutes < 1200) {
+    localStorage.removeItem("notification");
+  }
+
+  // Night slot: 20:00 (1200 mins) to 22:00 (1320 mins)
+  if (totalMinutes >= 1200 && totalMinutes < 1320) return "night";
+
+  return null;
+};

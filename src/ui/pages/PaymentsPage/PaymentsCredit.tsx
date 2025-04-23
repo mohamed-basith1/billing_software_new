@@ -64,7 +64,77 @@ import {
   selectCustomerDeleteModal,
   setCustomerDeleteModal,
 } from "../CustomersPage/CustomersSlice";
+import { FixedSizeList as List } from "react-window";
 
+const Row = ({ index, style, data }) => {
+  const bill = data.items[index];
+  const selectedBills = data.selectedBills;
+  const dispatch = data.dispatch;
+
+  return (
+    <Box
+      style={style}
+      onClick={() => dispatch(setSelectedBills(bill))}
+      sx={{
+        padding: "20px 15px",
+        width: "100%",
+        bgcolor:
+          selectedBills?.bill_number === bill.bill_number ? "#F7F7FE" : "white",
+        borderBottom: ".1px solid lightgrey",
+        display: "flex",
+        justifyContent: "space-between",
+        cursor: "pointer",
+      }}
+    >
+      <Box>
+        <Typography sx={{ fontWeight: 600 }}>{bill.bill_number}</Typography>
+        <Typography sx={{ opacity: ".5", mt: 1, fontSize: ".8rem" }}>
+          Total Items {bill.itemsList.length} -{" "}
+          {bill?.createdAt
+            ? new Date(bill.createdAt).toLocaleString("en-GB", {
+                timeZone: "UTC",
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+              })
+            : ""}
+        </Typography>
+      </Box>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-end",
+          justifyContent: "space-between",
+        }}
+      >
+        <Typography sx={{ fontWeight: 600 }}>₹ {bill.total_amount}</Typography>
+        <Typography
+          sx={{
+            fontWeight: 600,
+            fontSize: ".6rem",
+            color:
+              bill.amount_paid === 0 ? "rgb(193,9,21)" : "rgb(30, 120, 80)",
+          }}
+        >
+          {bill.paid
+            ? "PAID"
+            : bill.amount_paid === 0
+            ? "NOT PAID"
+            : "PARTIALLY PAID"}
+        </Typography>
+        {bill.return_amount > 0 ? (
+          <Typography sx={{ fontWeight: 600, color: "rgb(193,9,21)" }}>
+            ₹ {bill.return_amount}
+          </Typography>
+        ) : null}
+      </Box>
+    </Box>
+  );
+};
 const PaymentsCredit = () => {
   dayjs.extend(utc);
   dayjs.extend(timezone);
@@ -391,6 +461,16 @@ const PaymentsCredit = () => {
     }
   };
 
+  const filteredBills = [...UPIBillsList]
+    .filter((data) => {
+      if (creditBillFilter === "PAID") return data.paid === true;
+      if (creditBillFilter === "PARTIAL PAID")
+        return data.paid !== true && data.amount_paid !== 0;
+      if (creditBillFilter === "NOT PAID") return data.amount_paid === 0;
+      return true;
+    })
+    .reverse();
+
   return (
     <Box
       sx={{
@@ -710,7 +790,20 @@ const PaymentsCredit = () => {
               borderRight: ".1px solid lightgrey",
             }}
           >
-            {[...UPIBillsList]
+            <List
+              height={window.innerHeight * 0.7} // match 70% height
+              itemCount={filteredBills.length}
+              itemSize={90} // Estimate height of each item
+              width="100%"
+              itemData={{
+                items: filteredBills,
+                selectedBills,
+                dispatch,
+              }}
+            >
+              {Row}
+            </List>
+            {/* {[...UPIBillsList]
               ?.filter((data) => {
                 if (creditBillFilter === "PAID") {
                   return data.paid === true;
@@ -751,12 +844,15 @@ const PaymentsCredit = () => {
                       >
                         Total Items {data.itemsList.length} -{" "}
                         {data?.createdAt
-                          ? new Date(data.createdAt).toLocaleDateString(
-                              "en-GB",
-                              {
-                                timeZone: "UTC",
-                              }
-                            )
+                          ? new Date(data.createdAt).toLocaleString("en-GB", {
+                              timeZone: "UTC",
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              hour12: true, // This gives you AM/PM
+                            })
                           : ""}
                       </Typography>
                     </Box>
@@ -797,7 +893,7 @@ const PaymentsCredit = () => {
                     </Box>
                   </Box>
                 );
-              })}
+              })} */}
           </Box>
         </Box>
 
