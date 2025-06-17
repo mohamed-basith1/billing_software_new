@@ -35,7 +35,6 @@ const Transaction = () => {
       //@ts-ignore
       let response = await window.electronAPI.getEmployee();
 
-  
       dispatch(setEmployeeList(response.data));
     };
 
@@ -206,7 +205,9 @@ const Transaction = () => {
           >
             <Tabs
               value={transactionHistoryTab}
-              onChange={(_e, value) => dispatch(setTransactionHistoryTab(value))}
+              onChange={(_e, value) =>
+                dispatch(setTransactionHistoryTab(value))
+              }
               aria-label="basic tabs example"
             >
               <Tab label="Transaction" {...a11yProps(0)} />
@@ -220,7 +221,7 @@ const Transaction = () => {
                   gap: 10,
                 }}
               >
-                <CustomizedMenus />
+                {/* <CustomizedMenus /> */}
                 <Button
                   sx={{ height: "1rem", p: 2 }}
                   onClick={() => dispatch(setAddTransactionModal(true))}

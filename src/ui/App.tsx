@@ -94,6 +94,7 @@ export default function CustomSidebar() {
                         <Route path="/items" element={<ItemsPage />} />
                         <Route path="/payments" element={<PaymentsPage />} />
                         <Route path="/reports" element={<ReportsPage />} />
+                        {/* <Route path="/reports" element={<Box>hi</Box>} /> */}
                       </>
                     )}
                   </Routes>

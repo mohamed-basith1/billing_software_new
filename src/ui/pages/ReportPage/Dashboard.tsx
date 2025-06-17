@@ -113,7 +113,6 @@ const Dashboard = () => {
       .toISOString();
 
     try {
-    
       // @ts-ignore
       const response: any = await window.electronAPI.getDashboardData(
         fromDateFormat,

@@ -58,14 +58,14 @@ const ItemsLowStock = () => {
       {/* Search Bar */}
       <Box
         sx={{
-          height: "5rem",
+          height: "2rem",
           display: "flex",
           alignItems: "center",
           justifyContent: "flex-start",
           borderBottom: ".1px solid lightgrey",
         }}
       >
-        <TextField
+        {/* <TextField
           placeholder="Item Search"
           variant="outlined"
           sx={{
@@ -96,20 +96,23 @@ const ItemsLowStock = () => {
               </InputAdornment>
             ),
           }}
-        />
+        /> */}
       </Box>
 
       {/* Data Grid Wrapper */}
       <Box
-        sx={{ flexGrow: 1, maxHeight: "calc(100% - 6rem)", overflow: "auto" }}
+        sx={{ flexGrow: 1, maxHeight: "calc(100% - 3rem)", overflow: "auto" }}
       >
         <DataGrid
           rows={lowStockItemList}
           columns={columns}
           // disableColumnMenu
-          // hideFooter
+
           sx={{
             minHeight: "400px", // Ensure it has a scrollable area
+            "& .MuiDataGrid-columnMenuButton": {
+              color: "white", // Set the column menu button's color to white for visibility
+            },
 
             "& .MuiDataGrid-columnSeparator": {
               display: "none",

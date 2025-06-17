@@ -34,10 +34,12 @@ import {
   selectToDate,
   selectUPIBillsList,
   setBillSearch,
-  setFromDate, setPaymentChange, setSelectedBills,
+  setFromDate,
+  setPaymentChange,
+  setSelectedBills,
   setToDate,
   setUPIBillsList,
-  setnewReturnBill
+  setnewReturnBill,
 } from "./PaymentsSlice";
 
 import { selectUserName } from "../LoginPage/LoginSlice";
@@ -95,7 +97,6 @@ const PaymentsSelfUse = () => {
   dayjs.extend(utc);
   dayjs.extend(timezone);
 
-
   const columns: GridColDef[] = [
     { field: "item_name", headerName: "ITEM NAME", flex: 3 },
     {
@@ -142,7 +143,6 @@ const PaymentsSelfUse = () => {
   const billSearch: any = useSelector(selectBillSearch);
   const dispatch: any = useDispatch();
   const userName = useSelector(selectUserName);
-
 
   useEffect(() => {
     dispatch((dispatch) => {
@@ -521,6 +521,7 @@ const PaymentsSelfUse = () => {
               height: "100%",
               boxSizing: "border-box",
               overflow: "scroll",
+              bgcolor: "white",
             }}
           >
             <Box
@@ -557,153 +558,158 @@ const PaymentsSelfUse = () => {
                 />
                 DELETE
               </Box>
-              <Box
-                sx={{
-                  bgcolor: "white",
 
-                  py: 10,
-
-                  px: 8,
-                }}
-              >
+              <Box sx={{ bgcolor: "white", height: "100%" }}>
                 <Box
                   sx={{
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
+                    bgcolor: "white",
+                    py: 10,
+                    px: 8,
                   }}
                 >
                   <Box
                     sx={{
+                      width: "100%",
                       display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "flex-start",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                      bgcolor: "white",
                     }}
                   >
-                    <Typography>Order Date</Typography>
-                    <Typography
-                      sx={{ fontSize: ".7rem", color: "grey", mt: 1 }}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "flex-start",
+                      }}
                     >
-                      {selectedBills?.createdAt
-                        ? new Date(selectedBills.createdAt).toLocaleDateString(
-                            "en-GB",
-                            {
+                      <Typography>Order Date</Typography>
+                      <Typography
+                        sx={{ fontSize: ".7rem", color: "grey", mt: 1 }}
+                      >
+                        {selectedBills?.createdAt
+                          ? new Date(
+                              selectedBills.createdAt
+                            ).toLocaleDateString("en-GB", {
                               timeZone: "UTC",
-                            }
-                          )
-                        : ""}
-                    </Typography>
-                    <Typography sx={{ mt: 2 }}>Billed BY</Typography>
-                    <Typography
-                      sx={{ fontSize: ".7rem", color: "grey", mt: 1 }}
+                            })
+                          : ""}
+                      </Typography>
+                      <Typography sx={{ mt: 2 }}>Billed BY</Typography>
+                      <Typography
+                        sx={{ fontSize: ".7rem", color: "grey", mt: 1 }}
+                      >
+                        {selectedBills?.billed_by}
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+
+                        justifyContent: "space-between",
+                        textAlign: "start",
+                        alignItems: "flex-end",
+                      }}
                     >
-                      {selectedBills?.billed_by}
-                    </Typography>
+                      <Typography sx={{ fontSize: "3rem", lineHeight: 1.5 }}>
+                        INVOICE
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontSize: ".7rem",
+                          color: "grey",
+                          fontWeight: 600,
+                        }}
+                      >
+                        BILL NUMBER - {selectedBills?.bill_number}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box sx={{ mt: 5 }}>
+                    <DataGrid
+                      rows={
+                        selectedBills?.itemsList?.map((data) => ({
+                          ...data,
+                          id: data.unique_id,
+                        })) || []
+                      }
+                      columns={columns}
+                      disableColumnMenu
+                      hideFooter
+                      sx={{
+                        borderRadius: 0,
+
+                        "& .MuiDataGrid-columnSeparator": {
+                          display: "none",
+                        },
+                        "& .MuiDataGrid-columnHeader": {
+                          backgroundColor: "#1E1E2D !important",
+                          color: "white",
+                          maxHeight: "50px",
+                          border: "none",
+                        },
+                        "& .MuiDataGrid-cell": {
+                          border: "none",
+                        },
+                      }}
+                    />
                   </Box>
                   <Box
                     sx={{
+                      width: "100%",
                       display: "flex",
                       flexDirection: "column",
-
-                      justifyContent: "space-between",
-                      textAlign: "start",
                       alignItems: "flex-end",
+                      gap: "10px",
+                      mt: 3,
                     }}
                   >
-                    <Typography sx={{ fontSize: "3rem", lineHeight: 1.5 }}>
-                      INVOICE
-                    </Typography>
-                    <Typography
-                      sx={{ fontSize: ".7rem", color: "grey", fontWeight: 600 }}
+                    <Box
+                      sx={{
+                        width: "30%",
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
                     >
-                      BILL NUMBER - {selectedBills?.bill_number}
-                    </Typography>
-                  </Box>
-                </Box>
-                <Box sx={{ mt: 5 }}>
-                  <DataGrid
-                    rows={
-                      selectedBills?.itemsList?.map((data) => ({
-                        ...data,
-                        id: data.unique_id,
-                      })) || []
-                    }
-                    columns={columns}
-                    disableColumnMenu
-                    hideFooter
-                    sx={{
-                      borderRadius: 0,
-
-                      "& .MuiDataGrid-columnSeparator": {
-                        display: "none",
-                      },
-                      "& .MuiDataGrid-columnHeader": {
-                        backgroundColor: "#1E1E2D !important",
-                        color: "white",
-                        maxHeight: "50px",
-                        border: "none",
-                      },
-                      "& .MuiDataGrid-cell": {
-                        border: "none",
-                      },
-                    }}
-                  />
-                </Box>
-                <Box
-                  sx={{
-                    width: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-end",
-                    gap: "10px",
-                    mt: 3,
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: "30%",
-                      display: "flex",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Typography sx={{ fontSize: ".7rem" }}>
-                      Sub Total{" "}
-                    </Typography>
-                    <Typography sx={{ fontSize: ".7rem" }}>
-                      {selectedBills?.sub_amount}
-                      {/* {selectedBills?.itemsList?.reduce((sum, item) => {
+                      <Typography sx={{ fontSize: ".7rem" }}>
+                        Sub Total{" "}
+                      </Typography>
+                      <Typography sx={{ fontSize: ".7rem" }}>
+                        {selectedBills?.sub_amount}
+                        {/* {selectedBills?.itemsList?.reduce((sum, item) => {
                         const quantity =
                           item.uom === "gram" ? item.qty / 1000 : item.qty;
                         return sum + quantity * item.rate;
                       }, 0)} */}
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      width: "30%",
-                      display: "flex",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Typography sx={{ fontSize: ".7rem" }}>
-                      Discount{" "}
-                    </Typography>
-                    <Typography sx={{ fontSize: ".7rem" }}>
-                      {selectedBills?.discount}
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      width: "30%",
-                      display: "flex",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <Typography sx={{ fontSize: ".7rem" }}>Total </Typography>
-                    <Typography sx={{ fontSize: ".7rem", fontWeight: 600 }}>
-                      ₹ {selectedBills?.total_amount}
-                    </Typography>
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        width: "30%",
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Typography sx={{ fontSize: ".7rem" }}>
+                        Discount{" "}
+                      </Typography>
+                      <Typography sx={{ fontSize: ".7rem" }}>
+                        {selectedBills?.discount}
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        width: "30%",
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Typography sx={{ fontSize: ".7rem" }}>Total </Typography>
+                      <Typography sx={{ fontSize: ".7rem", fontWeight: 600 }}>
+                        ₹ {selectedBills?.total_amount}
+                      </Typography>
+                    </Box>
                   </Box>
                 </Box>
               </Box>

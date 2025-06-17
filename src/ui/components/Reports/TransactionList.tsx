@@ -271,10 +271,7 @@ const TransactionList = ({}: any) => {
         }
         getRowId={(row) => row._id || row.id} // Use _id if exists, otherwise fallback to id
         columns={transactionHistoryTab === 0 ? columns : columnsSalary}
-        // disableColumnMenu
-        // hideFooter
-        // disableSelectionOnClick
-        // disableColumnFilter
+  
         disableColumnSelector
         sx={{
           "& .MuiDataGrid-scrollbarFiller": {
@@ -308,9 +305,9 @@ const TransactionList = ({}: any) => {
             fontWeight: 800,
             borderBottom: "none",
           },
-          "& .MuiDataGrid-cell": {
-            border: "none",
-          },
+          // "& .MuiDataGrid-cell": {
+          //   border: "none",
+          // },
           "& .MuiDataGrid-row:hover": {
             backgroundColor: "rgba(0, 0, 0, 0.02)",
           },

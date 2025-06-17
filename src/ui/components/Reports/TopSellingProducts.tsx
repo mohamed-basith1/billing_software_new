@@ -123,18 +123,18 @@ const TopSellingProducts = ({ topsellingproduct }: any) => {
           fontWeight: 800,
         },
 
-        "& .MuiDataGrid-cell": {
-          border: "none", // Removes cell borders
-        },
+        // "& .MuiDataGrid-cell": {
+        //   border: "none", // Removes cell borders
+        // },
         "& .MuiDataGrid-row": {
           border: "none", // Removes row borders
           "&:hover": {
             backgroundColor: "rgba(0, 0, 0, 0.02)", // Keep subtle hover effect
           },
         },
-        "& .MuiDataGrid-virtualScroller": {
-          overflowX: "hidden", // Cleaner scrollbar
-        },
+        // "& .MuiDataGrid-virtualScroller": {
+        //   overflowX: "hidden", // Cleaner scrollbar
+        // },
       }}
     />
   );

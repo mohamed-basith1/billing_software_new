@@ -297,7 +297,6 @@ const PaymentsCredit = () => {
       returned_by: userName,
     };
 
-   
     if (
       UPIBillsList?.find(
         (data: any) => data.bill_number === selectedBills.bill_number
@@ -309,7 +308,6 @@ const PaymentsCredit = () => {
       );
     }
 
-
     //@ts-ignore
     let response: any = await window.electronAPI.returnBill(
       selectedBills._id,
@@ -319,13 +317,9 @@ const PaymentsCredit = () => {
     dispatch(setnewReturnBill(response.data));
     toast.success(`${response.message}`, { position: "bottom-left" });
     dispatch(clearReturnBillDetail());
-
   };
   const handleReturnPendingAmount = async () => {
     dispatch(setReturnAmountModel(true));
-
-   
- 
   };
 
   const finalBillHanlder = async (method) => {
@@ -351,8 +345,6 @@ const PaymentsCredit = () => {
           returned_amount: selectedBills?.return_amount,
           returned_by: userName,
         };
-
-       
 
         // @ts-ignore
         await window.electronAPI.createBillReturnHistory(
@@ -380,7 +372,7 @@ const PaymentsCredit = () => {
         };
         //@ts-ignore
         await window.electronAPI.addTransactionHistory(TransactionPayload);
-    
+
         dispatch(setnewReturnBill(response.data));
         dispatch(setSelectedBills(response.data));
         dispatch(setReturnAmountModel(false));
@@ -1156,8 +1148,6 @@ const PaymentsCredit = () => {
                     columns={columns}
                     disableColumnMenu
                     processRowUpdate={(newRow) => {
-        
-
                       let oldRow = UPIBillsList.find(
                         (data: any) =>
                           data.bill_number === selectedBills.bill_number
@@ -1286,7 +1276,7 @@ const PaymentsCredit = () => {
                       Discount{" "}
                     </Typography>
                     <Typography sx={{ fontSize: ".7rem" }}>
-                      {selectedBills?.discount}
+                      {selectedBills?.discount}%
                     </Typography>
                   </Box>
                   <Box

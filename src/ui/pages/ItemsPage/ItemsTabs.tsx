@@ -56,7 +56,7 @@ const ItemsTabs = () => {
 
         <Tab label="Items Entry" {...a11yProps(1)} />
         <Tab label="Items Purchased History" {...a11yProps(2)} />
-        <Tab label="Expired Item" {...a11yProps(3)} />
+        {/* <Tab label="Expired Item" {...a11yProps(3)} /> */}
       </Tabs>
     </Box>
   );

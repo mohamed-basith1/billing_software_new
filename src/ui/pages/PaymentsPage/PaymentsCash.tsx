@@ -106,7 +106,6 @@ const PaymentsCash = () => {
   dayjs.extend(utc);
   dayjs.extend(timezone);
 
- 
   const columns: GridColDef[] = [
     {
       field: "action",
@@ -134,7 +133,6 @@ const PaymentsCash = () => {
               style={{ outline: "none", border: "none", padding: 0 }}
               disabled={selectedBills.itemsList.length === 1 ? true : false}
               onClick={(e) => {
-             
                 e.stopPropagation(); // Stops focus from moving to the cell
                 dispatch(setItemRemove(params.row.unique_id));
               }}
@@ -198,7 +196,6 @@ const PaymentsCash = () => {
   const dispatch: any = useDispatch();
   const userName = useSelector(selectUserName);
 
-
   useEffect(() => {
     dispatch((dispatch) => {
       dispatch(setFromDate(dayjs().tz("Asia/Kolkata").subtract(1, "month")));
@@ -254,14 +251,16 @@ const PaymentsCash = () => {
     dispatch(setUPIBillsList(response.data));
   };
 
-  let returnAmount =
-    UPIBillsList.find(
-      (data: any) => data.bill_number === selectedBills.bill_number
-    )?.itemsList?.reduce((sum, item) => {
-      const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
-      return sum + quantity * item.rate;
-    }, 0) - Number(selectedBills?.total_amount);
-
+  // let returnAmount =
+  //   UPIBillsList.find(
+  //     (data: any) => data.bill_number === selectedBills.bill_number
+  //   )?.itemsList?.reduce((sum, item) => {
+  //     const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
+  //     return sum + quantity * item.rate;
+  //   }, 0) -
+  //   Number(selectedBills?.total_amount) -
+  //   selectedBills?.discount;
+  let returnAmount = selectedBills?.return_amount;
   const handleReturnBill = async () => {
     if (Number(returnAmount) === 0) {
       alert("No Change");
@@ -272,17 +271,21 @@ const PaymentsCash = () => {
 
   const finalBillHanlder = async (method) => {
     let validatorPayload = {
-      amount: Number(
+      // amount: Number(
+      //   UPIBillsList.find(
+      //     (data: any) => data.bill_number === selectedBills.bill_number
+      //   )?.itemsList?.reduce((sum, item) => {
+      //     const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
+      //     return sum + quantity * item.rate;
+      //   }, 0) - Number(selectedBills?.total_amount)
+      // ),
+      amount:
         UPIBillsList.find(
           (data: any) => data.bill_number === selectedBills.bill_number
-        )?.itemsList?.reduce((sum, item) => {
-          const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
-          return sum + quantity * item.rate;
-        }, 0) - Number(selectedBills?.total_amount)
-      ),
+        ).total_amount - selectedBills?.total_amount,
       method: method,
     };
-
+    console.log("validaton", validatorPayload);
     //@ts-ignore
     let amountAvalaible = await window.electronAPI.amountValidator(
       validatorPayload
@@ -295,14 +298,20 @@ const PaymentsCash = () => {
         employee: "",
         method: method,
         reason: "Billed Item Return",
-        amount: Number(
+        // amount: Number(
+        //   UPIBillsList.find(
+        //     (data: any) => data.bill_number === selectedBills.bill_number
+        //   )?.itemsList?.reduce((sum, item) => {
+        //     const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
+        //     return sum + quantity * item.rate;
+        //   }, 0) -
+        //     Number(selectedBills?.total_amount) -
+        //     Number(selectedBills?.discount)
+        // ),
+        amount:
           UPIBillsList.find(
             (data: any) => data.bill_number === selectedBills.bill_number
-          )?.itemsList?.reduce((sum, item) => {
-            const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
-            return sum + quantity * item.rate;
-          }, 0) - Number(selectedBills?.total_amount)
-        ),
+          ).total_amount - selectedBills?.total_amount,
         handler: userName,
         billtransactionhistory: true,
         password: "",
@@ -316,21 +325,31 @@ const PaymentsCash = () => {
         ).total_amount,
         returned_items: tempRemoveItem,
         return_method: method,
+        // returned_amount:
+        //   UPIBillsList.find(
+        //     (data: any) => data.bill_number === selectedBills.bill_number
+        //   )?.itemsList?.reduce((sum, item) => {
+        //     const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
+        //     return sum + quantity * item.rate;
+        //   }, 0) -
+        //   Number(selectedBills?.total_amount) -
+        //   Number(selectedBills?.discount),
+
         returned_amount:
           UPIBillsList.find(
             (data: any) => data.bill_number === selectedBills.bill_number
-          )?.itemsList?.reduce((sum, item) => {
-            const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
-            return sum + quantity * item.rate;
-          }, 0) - Number(selectedBills?.total_amount),
+          ).total_amount - selectedBills?.total_amount,
         returned_by: userName,
       };
 
+      console.log("");
       // createBillReturnHistory
       // @ts-ignore
       await window.electronAPI.createBillReturnHistory(
         returnBillHistoryPayload
       );
+
+      console.log("selectedBills cash", selectedBills);
       //@ts-ignore
       let response: any = await window.electronAPI.returnBill(
         selectedBills._id,
@@ -398,8 +417,6 @@ const PaymentsCash = () => {
       });
     }
   };
-
-
 
   const handleDeleteBill = async () => {
     let payload: any = UPIBillsList.find(
@@ -721,7 +738,15 @@ const PaymentsCash = () => {
                   gap: "10px",
                   borderRight: ".1px solid lightgrey",
                   cursor: "pointer",
-
+                  opacity:
+                    UPIBillsList.find(
+                      (data: any) =>
+                        data.bill_number === selectedBills.bill_number
+                    ).total_amount -
+                      selectedBills?.total_amount ===
+                    0
+                      ? 1
+                      : 0.3,
                   transition: "all 0.3s ease",
                   "&:hover": {
                     backgroundColor: "rgba(34, 179, 120, 0.2)",
@@ -729,7 +754,18 @@ const PaymentsCash = () => {
                   },
                   fontSize: ".7rem",
                 }}
-                onClick={() => handleChangePaymentMethod()}
+                onClick={() => {
+                  if (
+                    UPIBillsList.find(
+                      (data: any) =>
+                        data.bill_number === selectedBills.bill_number
+                    ).total_amount -
+                      selectedBills?.total_amount ===
+                    0
+                  ) {
+                    handleChangePaymentMethod();
+                  }
+                }}
               >
                 <PublishedWithChangesIcon
                   sx={{ fontSize: "1rem", color: "inherit" }}
@@ -746,7 +782,15 @@ const PaymentsCash = () => {
                   gap: "10px",
                   borderRight: ".1px solid lightgrey",
                   cursor: "pointer",
-
+                  opacity:
+                    UPIBillsList.find(
+                      (data: any) =>
+                        data.bill_number === selectedBills.bill_number
+                    ).total_amount -
+                      selectedBills?.total_amount ===
+                    0
+                      ? 1
+                      : 0.3,
                   transition: "all 0.3s ease",
                   "&:hover": {
                     backgroundColor: "rgba(52, 152, 219, 0.2)",
@@ -754,8 +798,7 @@ const PaymentsCash = () => {
                   },
                   fontSize: ".7rem",
                 }}
-
-                //
+                onClick={() => alert("hi")}
               >
                 <FileDownloadOutlinedIcon
                   sx={{ fontSize: "1rem", color: "inherit" }}
@@ -779,7 +822,9 @@ const PaymentsCash = () => {
                   },
                   fontSize: ".7rem",
                 }}
-                onClick={() => dispatch(setReturnBillHistoryModal(true))}
+                onClick={() => {
+                  dispatch(setReturnBillHistoryModal(true));
+                }}
               >
                 <HistoryOutlinedIcon
                   sx={{ fontSize: "1rem", color: "inherit" }}
@@ -796,6 +841,15 @@ const PaymentsCash = () => {
                   gap: "10px",
                   borderRight: ".1px solid lightgrey",
                   cursor: "pointer",
+                  opacity:
+                    UPIBillsList.find(
+                      (data: any) =>
+                        data.bill_number === selectedBills.bill_number
+                    ).total_amount -
+                      selectedBills?.total_amount ===
+                    0
+                      ? 1
+                      : 0.3,
                   transition: "all 0.3s ease",
                   "&:hover": {
                     backgroundColor: "rgba(220, 53, 69, 0.2)", // Light red background
@@ -803,7 +857,18 @@ const PaymentsCash = () => {
                   },
                   fontSize: ".7rem",
                 }}
-                onClick={() => dispatch(setCustomerDeleteModal(true))}
+                onClick={() => {
+                  if (
+                    UPIBillsList.find(
+                      (data: any) =>
+                        data.bill_number === selectedBills.bill_number
+                    ).total_amount -
+                      selectedBills?.total_amount ===
+                    0
+                  ) {
+                    dispatch(setCustomerDeleteModal(true));
+                  }
+                }}
               >
                 <DeleteOutlineOutlinedIcon
                   sx={{ fontSize: "1rem", color: "inherit" }}
@@ -882,8 +947,6 @@ const PaymentsCash = () => {
                     columns={columns}
                     disableColumnMenu
                     processRowUpdate={(newRow) => {
-              
-
                       let oldRow = UPIBillsList.find(
                         (data: any) =>
                           data.bill_number === selectedBills.bill_number
@@ -1013,7 +1076,7 @@ const PaymentsCash = () => {
                       Discount{" "}
                     </Typography>
                     <Typography sx={{ fontSize: ".7rem" }}>
-                      {selectedBills?.discount}
+                      {selectedBills?.discount}%
                     </Typography>
                   </Box>
                   <Box
@@ -1026,11 +1089,6 @@ const PaymentsCash = () => {
                     <Typography sx={{ fontSize: ".7rem" }}>Total </Typography>
                     <Typography sx={{ fontSize: ".7rem", fontWeight: 600 }}>
                       ₹ {selectedBills?.total_amount}
-                      {/* {selectedBills?.itemsList?.reduce((sum, item) => {
-                        const quantity =
-                          item.uom === "gram" ? item.qty / 1000 : item.qty;
-                        return sum + quantity * item.rate;
-                      }, 0)} */}
                     </Typography>
                   </Box>
                   <Box
@@ -1048,11 +1106,18 @@ const PaymentsCash = () => {
                       {UPIBillsList.find(
                         (data: any) =>
                           data.bill_number === selectedBills.bill_number
+                      ).total_amount - selectedBills?.total_amount}
+                      {/* {selectedBills.return_amount} */}
+                      {/* {UPIBillsList.find(
+                        (data: any) =>
+                          data.bill_number === selectedBills.bill_number
                       )?.itemsList?.reduce((sum, item) => {
                         const quantity =
                           item.uom === "gram" ? item.qty / 1000 : item.qty;
                         return sum + quantity * item.rate;
-                      }, 0) - Number(selectedBills?.total_amount)}
+                      }, 0) -
+                        Number(selectedBills?.total_amount) -
+                        selectedBills?.discount} */}
                     </Typography>
                   </Box>
 

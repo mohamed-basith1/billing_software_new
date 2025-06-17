@@ -127,11 +127,10 @@ export default function CustomizedMenus() {
     handleClose();
 
     // Here you can trigger your data filtering logic
-   
   };
   const handleDateRangeSelect = () => {
     setDateDialogOpen(true);
-   
+
     handleClose();
   };
 
@@ -240,7 +239,7 @@ export default function CustomizedMenus() {
                 value={fromDate}
                 onChange={(newValue) => {
                   const istDate = dayjs(newValue).tz("Asia/Kolkata");
-                
+
                   return setFromDate(istDate);
                 }}
                 maxDate={toDate || undefined}

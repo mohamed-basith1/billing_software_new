@@ -215,7 +215,7 @@ const PaymentsUPI = () => {
       ...bill,
       // _id: bill._id.toString(),
     }));
-  
+
     dispatch(setUPIBillsList(serializedData));
   };
   const handleBillSearch = async (billnumber: string) => {
@@ -249,7 +249,9 @@ const PaymentsUPI = () => {
     )?.itemsList?.reduce((sum, item) => {
       const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
       return sum + quantity * item.rate;
-    }, 0) - Number(selectedBills?.total_amount);
+    }, 0) -
+    Number(selectedBills?.total_amount) -
+    selectedBills?.discount;
 
   const handleReturnBill = async () => {
     if (Number(returnAmount) === 0) {
@@ -261,17 +263,21 @@ const PaymentsUPI = () => {
 
   const finalBillHanlder = async (method) => {
     let validatorPayload = {
-      amount: Number(
+      // amount: Number(
+      //   UPIBillsList.find(
+      //     (data: any) => data.bill_number === selectedBills.bill_number
+      //   )?.itemsList?.reduce((sum, item) => {
+      //     const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
+      //     return sum + quantity * item.rate;
+      //   }, 0) - Number(selectedBills?.total_amount)
+      // ),
+      amount:
         UPIBillsList.find(
           (data: any) => data.bill_number === selectedBills.bill_number
-        )?.itemsList?.reduce((sum, item) => {
-          const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
-          return sum + quantity * item.rate;
-        }, 0) - Number(selectedBills?.total_amount)
-      ),
+        ).total_amount - selectedBills?.total_amount,
       method: method,
     };
-
+    console.log("validaton", validatorPayload);
     //@ts-ignore
     let amountAvalaible = await window.electronAPI.amountValidator(
       validatorPayload
@@ -284,14 +290,20 @@ const PaymentsUPI = () => {
         employee: "",
         method: method,
         reason: "Billed Item Return",
-        amount: Number(
-          UPIBillsList.find(
-            (data: any) => data.bill_number === selectedBills.bill_number
-          )?.itemsList?.reduce((sum, item) => {
-            const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
-            return sum + quantity * item.rate;
-          }, 0) - Number(selectedBills?.total_amount)
-        ),
+        // amount: Number(
+        //   UPIBillsList.find(
+        //     (data: any) => data.bill_number === selectedBills.bill_number
+        //   )?.itemsList?.reduce((sum, item) => {
+        //     const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
+        //     return sum + quantity * item.rate;
+        //   }, 0) -
+        //     Number(selectedBills?.total_amount) -
+        //     Number(selectedBills?.discount)
+        // ),
+        amount:
+        UPIBillsList.find(
+          (data: any) => data.bill_number === selectedBills.bill_number
+        ).total_amount - selectedBills?.total_amount,
         handler: userName,
         billtransactionhistory: true,
         password: "",
@@ -311,15 +323,19 @@ const PaymentsUPI = () => {
           )?.itemsList?.reduce((sum, item) => {
             const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
             return sum + quantity * item.rate;
-          }, 0) - Number(selectedBills?.total_amount),
+          }, 0) -
+          Number(selectedBills?.total_amount) -
+          Number(selectedBills?.discount),
         returned_by: userName,
       };
-  
+
       // createBillReturnHistory
       // @ts-ignore
       await window.electronAPI.createBillReturnHistory(
         returnBillHistoryPayload
       );
+
+      console.log("selectedBills in upi", selectedBills);
       //@ts-ignore
       let response: any = await window.electronAPI.returnBill(
         selectedBills._id,
@@ -927,7 +943,6 @@ const PaymentsUPI = () => {
                     columns={columns}
                     disableColumnMenu
                     processRowUpdate={(newRow) => {
-
                       let oldRow = UPIBillsList.find(
                         (data: any) =>
                           data.bill_number === selectedBills.bill_number
@@ -1056,7 +1071,7 @@ const PaymentsUPI = () => {
                       Discount{" "}
                     </Typography>
                     <Typography sx={{ fontSize: ".7rem" }}>
-                      {selectedBills?.discount}
+                      {selectedBills?.discount}%
                     </Typography>
                   </Box>
                   <Box
@@ -1091,11 +1106,17 @@ const PaymentsUPI = () => {
                       {UPIBillsList.find(
                         (data: any) =>
                           data.bill_number === selectedBills.bill_number
+                      ).total_amount - selectedBills?.total_amount}
+                      {/* {UPIBillsList.find(
+                        (data: any) =>
+                          data.bill_number === selectedBills.bill_number
                       )?.itemsList?.reduce((sum, item) => {
                         const quantity =
                           item.uom === "gram" ? item.qty / 1000 : item.qty;
                         return sum + quantity * item.rate;
-                      }, 0) - Number(selectedBills?.total_amount)}
+                      }, 0) -
+                        Number(selectedBills?.total_amount) -
+                        Number(selectedBills?.discount)} */}
                     </Typography>
                   </Box>
 

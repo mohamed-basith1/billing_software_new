@@ -2,22 +2,22 @@ import { Box, Button, Modal, Typography } from "@mui/material";
 import { style } from "./CustomerCreateModal";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  selectDealerHistoryselected, selectPayDealerAmountHistoryModel,
-  setDeleteDealerPaymentHistory, setPayDealerAmountHistoryModel
+  selectDealerHistoryselected,
+  selectPayDealerAmountHistoryModel,
+  setDeleteDealerPaymentHistory,
+  setPayDealerAmountHistoryModel,
 } from "../../pages/ItemsPage/ItemsSlice";
 import { DataGrid } from "@mui/x-data-grid";
 import { selectUserName } from "../../pages/LoginPage/LoginSlice";
 const DealerAmountHistoryModal = () => {
   const username = useSelector(selectUserName);
   const handleDeleteAmount = async (data) => {
-  
     //@ts-ignore
     let response = await window.electronAPI.deleteDealerPaymentHistory(data);
 
     if (response.status === 200) {
-
       let TransactionPayload = {
-        status: "Decreased",
+        status: "Increased",
         bill_no: "None",
         customer: "None",
         employee: "None",
@@ -90,19 +90,20 @@ const DealerAmountHistoryModal = () => {
         return (
           <Button
             variant="error"
-            disabled={dealerHistoryselected.history.length <= 1}
+            // disabled={dealerHistoryselected.history.length <= 1}
             sx={{
               height: "2rem",
-              bgcolor:
-                dealerHistoryselected.history.length <= 1 ? "lightgrey" : "red",
-              opacity: dealerHistoryselected.history.length <= 1 ? ".5" : "1",
-              pointerEvents:
-                dealerHistoryselected.history.length <= 1 ? "none" : "auto",
+              bgcolor: "red",
+              // bgcolor:
+              //   dealerHistoryselected.history.length <= 1 ? "lightgrey" : "red",
+              // opacity: dealerHistoryselected.history.length <= 1 ? ".5" : "1",
+              // pointerEvents:
+              //   dealerHistoryselected.history.length <= 1 ? "none" : "auto",
             }}
             onClick={() => {
-              if (dealerHistoryselected.history.length > 1) {
-                handleDeleteAmount(params.row);
-              }
+              // if (dealerHistoryselected.history.length > 1) {
+              handleDeleteAmount(params.row);
+              // }
             }}
           >
             Delete
@@ -118,7 +119,6 @@ const DealerAmountHistoryModal = () => {
   const dealerHistoryselected = useSelector(selectDealerHistoryselected);
 
   const dispatch = useDispatch();
-
 
   return (
     <Modal

@@ -132,9 +132,9 @@ const TopCustomer = ({ topCustomer }: any) => {
             backgroundColor: "rgba(0, 0, 0, 0.02)", // Keep subtle hover effect
           },
         },
-        "& .MuiDataGrid-virtualScroller": {
-          overflowX: "hidden", // Cleaner scrollbar
-        },
+        // "& .MuiDataGrid-virtualScroller": {
+        //   overflowX: "hidden", // Cleaner scrollbar
+        // },
       }}
     />
   );

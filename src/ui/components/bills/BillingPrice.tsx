@@ -33,6 +33,7 @@ const BillingPrice = () => {
   const [discount, setDiscount] = useState<number>(0);
   const [subAmount, setSubAmount] = useState<number>(0);
   const [TotalAmount, setTotalAmount] = useState<number>(0);
+  const [maxDiscountPercentage, setMaxDiscountPercentage] = useState<number>(0);
 
   const theme: any = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -47,13 +48,35 @@ const BillingPrice = () => {
         ...item,
         no: index + 1, // Adding index starting from 1
       })) || [];
-
+    console.log("updatedItems", updatedItems);
     const calculatedSubAmount = updatedItems.reduce(
       (total: number, item: any) => total + item.amount,
       0
     );
     setSubAmount(calculatedSubAmount);
-    setTotalAmount(calculatedSubAmount - discount);
+    const discountAmount = (calculatedSubAmount * Number(discount)) / 100;
+    setTotalAmount(Math.floor(calculatedSubAmount - discountAmount));
+    const maxDiscount = calculateMaxDiscountPercentage(updatedItems);
+    setMaxDiscountPercentage(maxDiscount);
+    console.log(`Maximum Discount Allowed: ${maxDiscount}%`);
+
+    function calculateMaxDiscountPercentage(items: any) {
+      let totalSellingPrice = 0;
+      let totalCostPrice = 0;
+
+      items.forEach((item) => {
+        const itemSelling = item.qty * item.rate;
+        const itemCost = item.qty * item.purchased_rate;
+        totalSellingPrice += itemSelling;
+        totalCostPrice += itemCost;
+      });
+
+      const profit = totalSellingPrice - totalCostPrice;
+
+      const maxDiscountPercentage = (profit / totalSellingPrice) * 100;
+      // return Math.floor(maxDiscountPercentage * 10) / 10
+      return Math.floor(maxDiscountPercentage);
+    }
   }, [selectBill, selectCurrentTab, discount]);
 
   useEffect(() => {
@@ -93,7 +116,6 @@ const BillingPrice = () => {
       billed_by: userName,
     };
 
-
     //@ts-ignore
     let response = await window.electronAPI.createBill(payload);
     //
@@ -124,6 +146,7 @@ const BillingPrice = () => {
     } else {
       dispatch(setCustomerSelectModal(false));
       dispatch(setClearBill());
+      setDiscount(0);
       toast.success(`${response.message}`, { position: "bottom-left" });
     }
   };
@@ -167,7 +190,14 @@ const BillingPrice = () => {
               alignItems: "center",
             }}
           >
-            <Typography>Discount</Typography>
+            <Box>
+              <Typography fontSize="14px" fontWeight={500}>
+                Discount
+              </Typography>
+              <Typography fontSize="12px" color="text.secondary">
+                Max Discount: {maxDiscountPercentage}%
+              </Typography>
+            </Box>
 
             <Box
               sx={{
@@ -177,11 +207,25 @@ const BillingPrice = () => {
                 alignItems: "center",
               }}
             >
-              ₹
               <TextField
                 variant="outlined"
                 value={discount}
-                onChange={(e: any) => setDiscount(e.target.value)}
+                inputProps={{
+                  inputMode: "numeric",
+                  max: maxDiscountPercentage,
+                  min: 0,
+                }}
+                onChange={(e: any) => {
+                  let value = e.target.value;
+                  // Ensure the value is a number and within the specified range
+                  if (value === "" || !isNaN(value)) {
+                    const numValue = Math.max(
+                      0,
+                      Math.min(Number(maxDiscountPercentage), Number(value))
+                    );
+                    setDiscount(numValue.toString());
+                  }
+                }}
                 sx={{
                   width: "100%",
                   "& .MuiInputBase-root": {

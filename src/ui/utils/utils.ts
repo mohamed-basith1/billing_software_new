@@ -284,16 +284,23 @@ export const getTimeSlot = (): "morning" | "night" | null => {
   if (totalMinutes >= 600 && totalMinutes < 720) return "morning";
   if (totalMinutes > 720 && totalMinutes < 960) {
     localStorage.removeItem("notification");
+    return null;
   }
 
   // Afternoon slot: 4:00 PM to 6:00 PM
   if (totalMinutes >= 960 && totalMinutes < 1080) return "morning";
   if (totalMinutes > 1080 && totalMinutes < 1200) {
     localStorage.removeItem("notification");
+    return null;
   }
 
   // Night slot: 20:00 (1200 mins) to 22:00 (1320 mins)
   if (totalMinutes >= 1200 && totalMinutes < 1320) return "night";
+
+  if (totalMinutes > 360 && totalMinutes < 600) {
+    localStorage.removeItem("notification");
+    return null;
+  }
 
   return null;
 };

@@ -22,7 +22,6 @@ const NotificationModal: React.FC = () => {
 
   useEffect(() => {
     const checkAndShowModal = () => {
-
       const slot = getTimeSlot();
 
       if (slot) {
@@ -33,13 +32,18 @@ const NotificationModal: React.FC = () => {
           const fetchLowStockItemList = async () => {
             //@ts-ignore
             let response: any = await window.electronAPI.getLowStockItem();
-            if (response.data.length !== 0) {
-              setCount(response.data.length);
+
+            let count = response.length;
+            console.log("response", response, response.length);
+
+            if (count > 0) {
+              setCount(response.length);
               setIsOpen(true);
             }
           };
-
-          fetchLowStockItemList();
+          setTimeout(() => {
+            fetchLowStockItemList();
+          }, 9000);
 
           localStorage.setItem(key, "true");
         }

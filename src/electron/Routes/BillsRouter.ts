@@ -38,7 +38,6 @@ export function BillsRouter() {
 
       // Reduce stock_qty for each item in the billing list
       for (const item of itemsList) {
-     
         const existingItem: any = await Item.findOne({
           unique_id: item.unique_id,
         });
@@ -61,14 +60,12 @@ export function BillsRouter() {
             new_stock: [],
           };
 
-      
           await Item.create(newitemPayload);
         } else {
           // Reduce the stock_qty by the billed qty
           existingItem.stock_qty -= item.qty;
 
           if (existingItem.stock_qty < 0) {
-         
             existingItem.stock_qty = 0; // Ensure stock doesn't go negative
           }
 
@@ -92,8 +89,6 @@ export function BillsRouter() {
         billed_by,
       });
 
-
-
       return {
         status: 201,
         message: "Bill created successfully, and stock updated.",
@@ -113,8 +108,6 @@ export function BillsRouter() {
     "get-bills",
     async (_event, { fromDate, toDate, payment_method }) => {
       try {
-      
-
         // Construct the query object dynamically
         const query: any = {
           createdAt: {
@@ -153,7 +146,6 @@ export function BillsRouter() {
   ipcMain.handle(
     "return-bill",
     async (_, { id, updatedData, tempRemoveItem }) => {
-   
       try {
         // Update the bill
         const bill = await BillsModel.findOneAndReplace(
@@ -205,7 +197,6 @@ export function BillsRouter() {
   ipcMain.handle(
     "get-bill-by-search",
     async (_, { bill_number, payment_method }) => {
-     
       try {
         if (!bill_number || !payment_method) {
           return {
@@ -311,7 +302,6 @@ export function BillsRouter() {
     "update-bill-payment-method",
     async (_, { id, payment_method }) => {
       try {
-       
         const bill = await BillsModel.findByIdAndUpdate(
           id,
           { payment_method: payment_method },
@@ -345,8 +335,6 @@ export function BillsRouter() {
     "pay-credit-bill-balance",
     async (_, { bill_number, received_amount }) => {
       try {
-     
-
         // Find the bill by bill_number using .lean() to get a plain JavaScript object
         const bill = await BillsModel.findOne({ bill_number }).lean();
 
@@ -393,16 +381,13 @@ export function BillsRouter() {
   // Delete Bill
   ipcMain.handle("delete-bill", async (_, data: any) => {
     try {
-    
       // Process tempRemoveItem to update stock_qty
       for (const tempItem of data.itemsList) {
-     
         const { unique_id, qty } = tempItem;
 
         // Find the item in the database by unique_id
         const item = await Item.findOne({ unique_id });
 
-      
         if (item !== null) {
           // Update stock_qty by adding the qty from tempRemoveItem
           item.stock_qty += qty;
@@ -425,7 +410,6 @@ export function BillsRouter() {
             new_stock: [],
           };
 
-       
           await Item.create(newitemPayload);
         }
       }
@@ -455,8 +439,6 @@ export function BillsRouter() {
 
 ipcMain.handle("create-return-bill-history", async (_, data) => {
   try {
-   
-
     const newReturnBill = new ReturnBillsHistoryModel(data);
     await newReturnBill.save();
 
@@ -477,8 +459,6 @@ ipcMain.handle("create-return-bill-history", async (_, data) => {
 
 ipcMain.handle("get-return-bills-history", async (_, { bill_number }) => {
   try {
-   
-
     const returnBills = await ReturnBillsHistoryModel.find({
       bill_number,
     }).lean();
@@ -506,8 +486,6 @@ ipcMain.handle("get-return-bills-history", async (_, { bill_number }) => {
 });
 
 ipcMain.handle("get-dashboard-data", async (_event, { fromDate, toDate }) => {
-
-
   // Construct the query object dynamically
   const query: any = {
     createdAt: {
@@ -534,8 +512,15 @@ ipcMain.handle("get-dashboard-data", async (_event, { fromDate, toDate }) => {
         itemRevenue = (item.rate / 1000) * item.qty;
         itemProfit = ((item.rate - item.purchased_rate) / 1000) * item.qty;
       } else {
-        itemRevenue = item.rate * item.qty;
-        itemProfit = (item.rate - item.purchased_rate) * item.qty;
+        itemRevenue =
+          item.rate * item.qty - (item.rate * item.qty * bill.discount) / 100;
+
+        console.log("itemRevenue", itemRevenue);
+        itemProfit =
+          (item.rate - item.purchased_rate) * item.qty -
+          (item.rate * item.qty * bill.discount) / 100;
+
+        console.log("itemProfit", itemProfit);
       }
 
       // Accumulate totals
@@ -668,7 +653,7 @@ ipcMain.handle("get-dashboard-data", async (_event, { fromDate, toDate }) => {
     topcustomer: topCustomers,
     paymentSummary,
   };
-
+  console.log(data);
   return {
     status: 200,
     message: "Bill updated successfully, and stock quantities adjusted.",

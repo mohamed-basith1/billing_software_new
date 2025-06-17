@@ -14,7 +14,7 @@ const initialState: any = {
   returnBillHistoryModal: false,
   returnBillHistoryList: [],
   returnAmountModel: false,
-  creditBillFilter:"NOT PAID"
+  creditBillFilter: "NOT PAID",
 };
 
 const paymentSlice = createSlice({
@@ -35,7 +35,6 @@ const paymentSlice = createSlice({
     },
 
     setSelectedBills: (state, action) => {
-
       state.tempRemoveItem = [];
       state.selectedBills = action.payload;
     },
@@ -43,11 +42,10 @@ const paymentSlice = createSlice({
       const updatedItems = state.UPIBillsList.filter(
         (bill) => bill.bill_number !== action.payload.bill_number
       );
-      state.UPIBillsList=updatedItems
-      state.selectedBills={}
+      state.UPIBillsList = updatedItems;
+      state.selectedBills = {};
     },
     setItemRemove: (state, action) => {
-
       const codeToRemove = action.payload;
 
       if (!state.selectedBills) return; // Prevent errors if `selectedBills` is undefined
@@ -71,22 +69,25 @@ const paymentSlice = createSlice({
         return sum + quantity * item.rate;
       }, 0);
 
-
-      let total_amount = totalAmount - (state.selectedBills.discount || 0);
+      const discountAmount =
+        (totalAmount * Number(state.selectedBills.discount)) / 100;
+      let total_amount = totalAmount - (discountAmount || 0);
+      total_amount = Math.floor(total_amount);
       let balance_amount = totalAmount - state.selectedBills.amount_paid;
-
-  
       // Update state correctly
       state.selectedBills.itemsList = updatedItems;
       state.selectedBills.sub_amount = totalAmount;
       state.selectedBills.total_amount = total_amount;
+      // state.selectedBills.return_amount = Math.max(
+      //   state.selectedBills?.amount_paid -
+      //     updatedItems?.reduce((sum, item) => {
+      //       const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
+      //       return sum + quantity * item.rate;
+      //     }, 0),
+      //   0
+      // );
       state.selectedBills.return_amount = Math.max(
-        state.selectedBills?.amount_paid -
-          updatedItems?.reduce((sum, item) => {
-            const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
-            return sum + quantity * item.rate;
-          }, 0),
-        0
+        state.selectedBills?.amount_paid - total_amount
       );
       state.selectedBills.balance = balance_amount < 0 ? 0 : balance_amount;
       state.selectedBills.paid =
@@ -124,19 +125,23 @@ const paymentSlice = createSlice({
           const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
           return sum + quantity * item.rate;
         }, 0);
-        let total_amount = totalAmount - (state.selectedBills.discount || 0);
+        let total_amount =
+          totalAmount -
+          ((totalAmount * state.selectedBills.discount) / 100 || 0);
+        total_amount = Math.floor(total_amount);
         let balance_amount = totalAmount - state.selectedBills.amount_paid;
-       
+
         state.selectedBills.sub_amount = totalAmount;
         state.selectedBills.total_amount = total_amount;
         state.selectedBills.return_amount = Math.max(
-          state.selectedBills?.amount_paid -
-            state.selectedBills?.itemsList?.reduce((sum, item) => {
-              const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
-              return sum + quantity * item.rate;
-            }, 0),
-          0
+          state.selectedBills?.amount_paid - total_amount
         );
+        //     state.selectedBills?.itemsList?.reduce((sum, item) => {
+        //       const quantity = item.uom === "gram" ? item.qty / 1000 : item.qty;
+        //       return sum + quantity * item.rate;
+        //     }, 0),
+        //   0
+        // ) ;
         state.selectedBills.balance = balance_amount < 0 ? 0 : balance_amount;
         state.selectedBills.paid =
           state.selectedBills.amount_paid >= state.selectedBills.total_amount
@@ -189,7 +194,6 @@ const paymentSlice = createSlice({
       state.returnBillHistoryModal = action.payload;
     },
     setReturnBillHistoryList: (state, action) => {
-     
       state.returnBillHistoryList = action.payload;
     },
 
@@ -230,7 +234,7 @@ export const {
   setReturnBillHistoryList,
   clearReturnBillDetail,
   removeBill,
-  setCreditBillFilter
+  setCreditBillFilter,
 } = paymentSlice.actions;
 
 // Selectors
@@ -253,7 +257,6 @@ export const selectReturnBillHistoryList = (state: any) =>
   state.payments.returnBillHistoryList;
 export const selectCreditBillFilter = (state: any) =>
   state.payments.creditBillFilter;
-
 
 export const selectReturnAmountModel = (state: any) =>
   state.payments.returnAmountModel;
