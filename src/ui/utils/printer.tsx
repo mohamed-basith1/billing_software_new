@@ -1,6 +1,9 @@
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import { backgroundImage } from "./image";
+import { backgroundImage as szImage } from "./szSignageImage";
+import { backgroundImage as stickerZoneImage } from "./stickerZoneImage";
+import { backgroundImage as szImageQuotation } from "./szSignageImageQuotation";
+import { backgroundImage as stickerZoneImageQuotation } from "./stickerZoneImageQuotation";
 
 function capitalizeWords(str) {
   return str
@@ -23,38 +26,65 @@ function formatDateToReadable(isoDateStr) {
 export const generateInvoicePDF = (items, totalAmount, fulldata) => {
   const doc = new jsPDF();
 
-  doc.addImage(backgroundImage, "PNG", 0, 0, 210, 297);
+  doc.addImage(
+    fulldata.format === "INVOICE"
+      ? fulldata.shop === "SZ SIGNAGE"
+        ? szImage
+        : stickerZoneImage
+      : fulldata.shop === "SZ SIGNAGE"
+      ? szImageQuotation
+      : stickerZoneImageQuotation,
+    "PNG",
+    0,
+    0,
+    210,
+    297
+  );
   // Company Header
   doc.setFontSize(22);
   doc.setTextColor(255, 255, 255);
-  doc.text("SZ SIGNAGE", 28, 24, { align: "left" });
+  doc.text(fulldata.shop, 28, 22, { align: "left" });
   doc.setFontSize(10);
-  doc.text("THE COMPLETE SOLUTION", 28, 29, {
+
+  doc.text("THE COMPLETE SOLUTION", 28, 27, {
     align: "left",
   });
+
   //   doc.setTextColor(200, 200, 200);
   doc.setFontSize(8);
 
-  doc.text("AYYAMPET,THANJAVUR - 614201", 28, 34.5, {
+  doc.text("AYYAMPET,THANJAVUR - 614201", 28, 32.5, {
     align: "left",
   });
-  doc.text("Tel: +91 9790343367", 28, 38, { align: "left" });
+  doc.text("Tel: +91 9790343367", 28, 37, { align: "left" });
 
   // Invoice Title & Info
   doc.setTextColor(0, 0, 0);
   doc.setFontSize(40);
-  doc.text(`INVOICE`, 14, 70);
+  doc.text(fulldata.format, 14, 70);
 
   doc.setFontSize(10);
   doc.setTextColor(0, 0, 0);
-  doc.text(`Invoice No : `, 14, 82);
+  doc.text(
+    fulldata.format === "INVOICE" ? `Invoice No : ` : `Quotation to : `,
+    14,
+    82
+  );
   doc.setTextColor(177, 177, 177);
-  doc.text(`${fulldata.invoiceNumber}`, 38, 82);
+  doc.text(
+    fulldata.format === "INVOICE"
+      ? `${fulldata.invoiceNumber}`
+      : `${fulldata.customerName}`,
+    38,
+    82
+  );
 
-  doc.setTextColor(0, 0, 0);
-  doc.text("Bill To :", 14, 90);
-  doc.setTextColor(177, 177, 177);
-  doc.text(`${capitalizeWords(fulldata.customerName)}`, 38, 90);
+  if (fulldata.format === "INVOICE") {
+    doc.setTextColor(0, 0, 0);
+    doc.text("Bill To :", 14, 90);
+    doc.setTextColor(177, 177, 177);
+    doc.text(`${capitalizeWords(fulldata.customerName)}`, 38, 90);
+  }
 
   doc.setTextColor(0, 0, 0);
   doc.text(`Date : `, 165, 82, { align: "right" });
@@ -145,6 +175,19 @@ export const generateInvoicePDF = (items, totalAmount, fulldata) => {
     { align: "right" }
   );
 
+  if (fulldata.format !== "INVOICE") {
+    doc.setTextColor(255, 0, 0);
+    doc.setFontSize(15);
+    doc.text("INSTALLATION AND TRANSPORT CHARGES ARE EXTRA", 176, 260, {
+      align: "right",
+    });
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(10);
+    doc.text("THANK YOU FOR YOUR BUSINESS!", 139, 270, {
+      align: "right",
+    });
+  }
+
   // Save the PDF
-  doc.save(`Sticker_Zone_Invoice.pdf`);
+  doc.save(`Sticker_Zone_${fulldata.format}.pdf`);
 };

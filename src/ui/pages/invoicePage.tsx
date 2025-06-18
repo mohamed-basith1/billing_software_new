@@ -5,7 +5,11 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControl,
+  FormControlLabel,
   IconButton,
+  Radio,
+  RadioGroup,
   TextField,
   Typography,
 } from "@mui/material";
@@ -40,6 +44,8 @@ const InvoicePage = () => {
     customerName: "",
     invoiceNumber: "",
     date: "",
+    shop: "SZ SIGNAGE",
+    format:"INVOICE"
   });
 
   const [newItem, setNewItem] = useState({
@@ -148,9 +154,9 @@ const InvoicePage = () => {
     },
   ];
 
-  // const handleDownload = () => {
-  //   generateInvoicePDF(rows, totalAmount, invoiceData);
-  // };
+  const handleDownload = () => {
+    generateInvoicePDF(rows, totalAmount, invoiceData);
+  };
 
   // Function to generate 100 dummy items
   const generateDummyRows = () => {
@@ -174,18 +180,18 @@ const InvoicePage = () => {
   // Generate and calculate total
 
   // Use in download handler
-  const handleDownload = () => {
-    // Dummy invoiceData
-    const invoiceData = {
-      invoiceNumber: "INV-1001",
-      customerName: "john doe",
-      date: new Date().toISOString(), // current date
-    };
+  // const handleDownload = () => {
+  //   // Dummy invoiceData
+  //   const invoiceData = {
+  //     invoiceNumber: "INV-1001",
+  //     customerName: "john doe",
+  //     date: new Date().toISOString(), // current date
+  //   };
 
-    const rows = generateDummyRows();
-    const totalAmount = rows.reduce((acc, item) => acc + item.amount, 0);
-    generateInvoicePDF(rows, totalAmount, invoiceData);
-  };
+  //   const rows = generateDummyRows();
+  //   const totalAmount = rows.reduce((acc, item) => acc + item.amount, 0);
+  //   generateInvoicePDF(rows, totalAmount, invoiceData);
+  // };
 
   return (
     <Box
@@ -262,6 +268,40 @@ const InvoicePage = () => {
         >
           <EditIcon />
         </IconButton>
+      </Box>
+      <Box
+        sx={{
+          width: "100%",
+
+          height: "50px",
+          display: "flex",
+          justifyContent: "flex-end",
+        }}
+      >
+        <FormControl component="fieldset">
+          <RadioGroup
+            row
+            value={invoiceData.shop}
+            onChange={(e) =>
+              setInvoiceData({ ...invoiceData, shop: e.target.value })
+            }
+          >
+            <FormControlLabel
+              value="SZ SIGNAGE"
+              control={<Radio />}
+              label={
+                <Typography sx={{ fontSize: "13px" }}>SZ SIGNAGE</Typography>
+              }
+            />
+            <FormControlLabel
+              value="STICKER ZONE"
+              control={<Radio />}
+              label={
+                <Typography sx={{ fontSize: "13px" }}>STICKER ZONE</Typography>
+              }
+            />
+          </RadioGroup>
+        </FormControl>
       </Box>
 
       {/* Table */}
