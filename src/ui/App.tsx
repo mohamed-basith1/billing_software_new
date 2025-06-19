@@ -1,11 +1,5 @@
-import * as React from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Link,
-  useLocation,
-} from "react-router-dom";
+import { Routes, Route, Link, useLocation } from "react-router-dom";
+import { HashRouter, BrowserRouter } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -26,7 +20,8 @@ import PaymentsIcon from "@mui/icons-material/PaymentsOutlined";
 import ReportIcon from "@mui/icons-material/AssessmentOutlined";
 import ItemsPage from "./pages/ItemPage.jsx";
 import BillsPage from "./pages/BillsPage.jsx";
-
+const Router =
+  import.meta.env.MODE === "development" ? BrowserRouter : HashRouter;
 const drawerWidth = 240;
 
 // Dummy pages for routing
@@ -67,9 +62,7 @@ export default function CustomSidebar() {
           elevation={1}
         >
           <Toolbar>
-            <Typography variant="h6" noWrap>
-              
-            </Typography>
+            <Typography variant="h6" noWrap></Typography>
           </Toolbar>
         </AppBar>
 
