@@ -86,7 +86,7 @@ const paymentSlice = createSlice({
       //     }, 0),
       //   0
       // );
-      state.selectedBills.return_amount = Math.max(
+      state.selectedBills.return_amount = Math.max(0,
         state.selectedBills?.amount_paid - total_amount
       );
       state.selectedBills.balance = balance_amount < 0 ? 0 : balance_amount;
@@ -133,7 +133,7 @@ const paymentSlice = createSlice({
 
         state.selectedBills.sub_amount = totalAmount;
         state.selectedBills.total_amount = total_amount;
-        state.selectedBills.return_amount = Math.max(
+        state.selectedBills.return_amount = Math.max(0,
           state.selectedBills?.amount_paid - total_amount
         );
         //     state.selectedBills?.itemsList?.reduce((sum, item) => {
