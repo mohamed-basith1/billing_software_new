@@ -1,9 +1,25 @@
 import { formatUOM } from "./utils";
 
 export const handlePrinter = async (printerData: any, balance = 0) => {
-  const formattedDate = new Date(printerData.createdAt).toLocaleDateString(
-    "en-IN"
-  );
+  const date = new Date(printerData.createdAt);
+
+  const day = date.toLocaleString("en-GB", { day: "2-digit", timeZone: "UTC" });
+  const month = date.toLocaleString("en-GB", {
+    month: "numeric",
+    timeZone: "UTC",
+  });
+  const year = date.toLocaleString("en-GB", {
+    year: "numeric",
+    timeZone: "UTC",
+  });
+  const time = date.toLocaleString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "UTC",
+  });
+
+  const formattedDate = `${day}/${month}/${year}, ${time}`;
 
   const itemsBody = printerData.itemsList.map((item: any) => [
     {
@@ -83,7 +99,7 @@ export const handlePrinter = async (printerData: any, balance = 0) => {
       tableHeader: [
         {
           type: "text",
-          value: `Bill No : ${printerData.bill_number}`,
+          value: `Bill No : ${printerData.bill_number.split("-")[1]}`,
           style: { textAlign: "left", fontSize: "10px" },
         },
         {

@@ -16,6 +16,7 @@ import {
 } from "../../pages/BillsPage/BillsSlice";
 import { calculateAmount } from "../../utils/utils";
 import { toast } from "react-toastify";
+import BarcodeScanner from "./BarCodeScanner";
 
 const BillingSearch = () => {
   const dispatch = useDispatch();
@@ -143,8 +144,8 @@ const BillingSearch = () => {
       }
     };
 
-    document.addEventListener("keydown", handleKeyPress);
-    return () => document.removeEventListener("keydown", handleKeyPress);
+    // document.addEventListener("keydown", handleKeyPress);
+    // return () => document.removeEventListener("keydown", handleKeyPress);
   }, [billingSearch, dispatch]);
 
   const handleItemChange = async (
@@ -367,7 +368,6 @@ const BillingSearch = () => {
           unique_id,
         };
 
-       
         dispatch(setItem(payload));
         enterPressCount.current = 0; // Reset counter after logging
       } else if (enterPressCount.current === 2) {
@@ -378,7 +378,9 @@ const BillingSearch = () => {
       enterPressCount.current = 0; // Reset count if a different key is pressed
     }
   };
-
+  const handleScan = (data) => {
+    console.log("Scanned:", data);
+  };
   return (
     <Box
       sx={{
@@ -390,6 +392,7 @@ const BillingSearch = () => {
         position: "relative",
       }}
     >
+      <BarcodeScanner onScan={handleScan} />
       <TextField
         label="Item Name or Code"
         id="item-name-field"
@@ -484,10 +487,9 @@ const BillingSearch = () => {
                 billingSearch.rate
               );
 
-           
               updatedBillingSearch.amount = amount;
             }
-         
+
             dispatch(
               setBillingField({
                 bill_number: billingSearch.bill_number,
