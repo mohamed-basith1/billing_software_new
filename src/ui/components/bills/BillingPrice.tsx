@@ -21,6 +21,7 @@ import { toast } from "react-toastify";
 import { setCustomerSelectModal } from "../../pages/CustomersPage/CustomersSlice";
 import { useTheme } from "@emotion/react";
 import { selectUserName } from "../../pages/LoginPage/LoginSlice";
+import { handlePrinter } from "../../utils/printer";
 
 const BillingPrice = () => {
   const selectCurrentTab = useSelector(selectCurrentTabValue);
@@ -148,6 +149,7 @@ const BillingPrice = () => {
       dispatch(setClearBill());
       setDiscount(0);
       toast.success(`${response.message}`, { position: "bottom-left" });
+      handlePrinter(response.data)
     }
   };
   return (

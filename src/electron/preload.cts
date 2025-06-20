@@ -67,7 +67,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.invoke("create-return-bill-history", data),
   getReturnBillsHistory: (bill_number) =>
     ipcRenderer.invoke("get-return-bills-history", { bill_number }),
-
+  //printer method API
+  printReceipt: (printData) => ipcRenderer.invoke("print-receipt", printData),
   //dashboard
   getDashboardData: (fromDate, toDate) =>
     ipcRenderer.invoke("get-dashboard-data", { fromDate, toDate }),

@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import connectDB from "./db.js";
 
 import { isDev } from "./utils.js";
@@ -11,6 +11,8 @@ import { BillsRouter } from "./Routes/BillsRouter.js";
 import { TransactionRouter } from "./Routes/TransactionRouter.js";
 import { DealerBillRouter } from "./Routes/DealerBillHistory.js";
 import startMongo from "./startMongo.js";
+import posPrinterPkg from "electron-pos-printer"; // ✅ CommonJS fix
+const { PosPrinter } = posPrinterPkg;
 
 app.commandLine.appendSwitch("disable-features", "AutofillServerCommunication");
 app.commandLine.appendSwitch(
@@ -44,4 +46,18 @@ app.on("ready", async () => {
   } else {
     mainWindow.loadFile(getUIPath());
   }
+
+  // ✅ IPC handler for POS print request
+  ipcMain.handle("print-receipt", async (event, printData: any) => {
+    const options: any = {
+      preview: true,
+      margin: "0 0 0 0",
+      copies: 1,
+      printerName: "", // default printer
+      timeOutPerLine: 400,
+      pageSize: "80mm",
+    };
+    await PosPrinter.print(printData, options);
+    return { success: true };
+  });
 });

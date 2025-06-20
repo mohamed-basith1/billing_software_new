@@ -59,7 +59,7 @@ export const generateInvoicePDF = (
   items,
   subAmount,
   discount,
-  TotalAmount,
+  totalAmount,
   fulldata
 ) => {
   const doc = new jsPDF();
@@ -149,14 +149,24 @@ export const generateInvoicePDF = (
 
   // Summary Section (Below Table)
   const finalY = doc.lastAutoTable.finalY + 10;
-  doc.setFontSize(12);
+  // doc.setFontSize(12);
   doc.setTextColor(0, 0, 0);
-  doc.text(`Total`, 170, finalY, { align: "right" });
+  doc.text(`Sub Total`, 170, finalY, { align: "right" });
   doc.text(`${subAmount}`, 195, finalY, { align: "right" });
-  doc.text(`Paid Amount`, 170, finalY + 7, { align: "right" });
-  doc.text(`${fulldata.amount_paid}`, 195, finalY + 7, { align: "right" });
-  doc.text(`Balance`, 170, finalY + 14, { align: "right" });
-  doc.text(`${fulldata.balance}`, 195, finalY + 14, { align: "right" });
+  
+  doc.text(`Discount`, 170, finalY + 7, { align: "right" });
+  doc.text(`${discount}%`, 195, finalY + 7, { align: "right" });
+  
+  doc.text(`Total`, 170, finalY + 14, { align: "right" }); // new line
+  doc.text(`${totalAmount}`, 195, finalY + 14, { align: "right" }); // amount after discount
+  
+  doc.text(`Paid Amount`, 170, finalY + 21, { align: "right" });
+  doc.text(`${fulldata.amount_paid}`, 195, finalY + 21, { align: "right" });
+  
+  doc.text(`Balance`, 170, finalY + 28, { align: "right" });
+  doc.text(`${fulldata.balance}`, 195, finalY + 28, { align: "right" });
+  
+  
 
   // amount_paid
 
@@ -210,7 +220,6 @@ const renameIdField = (array) => {
 export const handleSearchCustomer = async (searchTerm: string) => {
   //@ts-ignore
   let response = await window.electronAPI.searchCustomer(searchTerm);
-
   return renameIdField(response.data);
 };
 

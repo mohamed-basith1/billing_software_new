@@ -29,6 +29,7 @@
     "@types/lodash.debounce": "^4.0.9",
     "@types/mongoose": "^5.11.96",
     "dayjs": "^1.11.13",
+    "electron-pos-printer": "^1.3.6",
     "i": "^0.3.7",
     "install": "^0.13.0",
     "jspdf": "^2.5.2",

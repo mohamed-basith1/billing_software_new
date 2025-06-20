@@ -908,7 +908,15 @@ const PaymentsCredit = () => {
                   gap: "10px",
                   borderRight: ".1px solid lightgrey",
                   cursor: "pointer",
-
+                  opacity:
+                    UPIBillsList.find(
+                      (data: any) =>
+                        data.bill_number === selectedBills.bill_number
+                    ).total_amount -
+                      selectedBills?.total_amount ===
+                    0
+                      ? 1
+                      : 0.3,
                   transition: "all 0.3s ease",
                   "&:hover": {
                     backgroundColor: "rgba(34, 179, 120, 0.2)",
@@ -916,7 +924,18 @@ const PaymentsCredit = () => {
                   },
                   fontSize: ".7rem",
                 }}
-                onClick={() => dispatch(setPayCreditBalanceModal(true))}
+                onClick={() => {
+                  if (
+                    UPIBillsList.find(
+                      (data: any) =>
+                        data.bill_number === selectedBills.bill_number
+                    ).total_amount -
+                      selectedBills?.total_amount ===
+                    0
+                  ) {
+                    dispatch(setPayCreditBalanceModal(true));
+                  }
+                }}
               >
                 <ReceiptLongOutlinedIcon
                   sx={{ fontSize: "1rem", color: "inherit" }}
@@ -933,7 +952,15 @@ const PaymentsCredit = () => {
                   gap: "10px",
                   borderRight: ".1px solid lightgrey",
                   cursor: "pointer",
-
+                  opacity:
+                    UPIBillsList.find(
+                      (data: any) =>
+                        data.bill_number === selectedBills.bill_number
+                    ).total_amount -
+                      selectedBills?.total_amount ===
+                    0
+                      ? 1
+                      : 0.3,
                   transition: "all 0.3s ease",
                   "&:hover": {
                     backgroundColor: "rgba(52, 152, 219, 0.2)",
@@ -941,15 +968,24 @@ const PaymentsCredit = () => {
                   },
                   fontSize: ".7rem",
                 }}
-                onClick={() =>
-                  generateInvoicePDF(
-                    selectedBills?.itemsList,
-                    selectedBills.sub_amount,
-                    selectedBills.discount,
-                    selectedBills.total_amount,
-                    selectedBills
-                  )
-                }
+                onClick={() => {
+                  if (
+                    UPIBillsList.find(
+                      (data: any) =>
+                        data.bill_number === selectedBills.bill_number
+                    ).total_amount -
+                      selectedBills?.total_amount ===
+                    0
+                  ) {
+                    generateInvoicePDF(
+                      selectedBills?.itemsList,
+                      selectedBills.sub_amount,
+                      selectedBills.discount,
+                      selectedBills.total_amount,
+                      selectedBills
+                    );
+                  }
+                }}
               >
                 <FileDownloadOutlinedIcon
                   sx={{ fontSize: "1rem", color: "inherit" }}

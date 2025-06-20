@@ -3,9 +3,10 @@ import Box from "@mui/material/Box";
 import { Suspense, lazy, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  BrowserRouter,
+  HashRouter,
   Navigate,
   Route,
-  BrowserRouter as Router,
   Routes,
 } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
@@ -18,6 +19,8 @@ import {
   setLicenseAuth,
 } from "./pages/LoginPage/LoginSlice.js";
 
+const Router =
+  import.meta.env.MODE === "development" ? BrowserRouter : HashRouter;
 // Lazy load components
 const BillsPage = lazy(() => import("./pages/BillsPage/BillsPage.js"));
 const ItemsPage = lazy(() => import("./pages/ItemsPage/ItemsPage.js"));

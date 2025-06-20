@@ -55,6 +55,7 @@ import {
   setUPIBillsList,
   setnewReturnBill,
 } from "./PaymentsSlice";
+import { handlePrinter } from "../../utils/printer";
 
 const Row = ({ index, style, data }) => {
   const bill = data.items[index];
@@ -277,7 +278,6 @@ const PaymentsUPI = () => {
         ).total_amount - selectedBills?.total_amount,
       method: method,
     };
-    console.log("validaton", validatorPayload);
     //@ts-ignore
     let amountAvalaible = await window.electronAPI.amountValidator(
       validatorPayload
@@ -301,9 +301,9 @@ const PaymentsUPI = () => {
         //     Number(selectedBills?.discount)
         // ),
         amount:
-        UPIBillsList.find(
-          (data: any) => data.bill_number === selectedBills.bill_number
-        ).total_amount - selectedBills?.total_amount,
+          UPIBillsList.find(
+            (data: any) => data.bill_number === selectedBills.bill_number
+          ).total_amount - selectedBills?.total_amount,
         handler: userName,
         billtransactionhistory: true,
         password: "",
@@ -335,7 +335,6 @@ const PaymentsUPI = () => {
         returnBillHistoryPayload
       );
 
-      console.log("selectedBills in upi", selectedBills);
       //@ts-ignore
       let response: any = await window.electronAPI.returnBill(
         selectedBills._id,
@@ -784,7 +783,15 @@ const PaymentsUPI = () => {
                   gap: "10px",
                   borderRight: ".1px solid lightgrey",
                   cursor: "pointer",
-
+                  opacity:
+                    UPIBillsList.find(
+                      (data: any) =>
+                        data.bill_number === selectedBills.bill_number
+                    ).total_amount -
+                      selectedBills?.total_amount ===
+                    0
+                      ? 1
+                      : 0.3,
                   transition: "all 0.3s ease",
                   "&:hover": {
                     backgroundColor: "rgba(34, 179, 120, 0.2)",
@@ -792,7 +799,18 @@ const PaymentsUPI = () => {
                   },
                   fontSize: ".7rem",
                 }}
-                onClick={() => handleChangePaymentMethod()}
+                onClick={() => {
+                  if (
+                    UPIBillsList.find(
+                      (data: any) =>
+                        data.bill_number === selectedBills.bill_number
+                    ).total_amount -
+                      selectedBills?.total_amount ===
+                    0
+                  ) {
+                    handleChangePaymentMethod();
+                  }
+                }}
               >
                 <PublishedWithChangesIcon
                   sx={{ fontSize: "1rem", color: "inherit" }}
@@ -809,7 +827,15 @@ const PaymentsUPI = () => {
                   gap: "10px",
                   borderRight: ".1px solid lightgrey",
                   cursor: "pointer",
-
+                  opacity:
+                    UPIBillsList.find(
+                      (data: any) =>
+                        data.bill_number === selectedBills.bill_number
+                    ).total_amount -
+                      selectedBills?.total_amount ===
+                    0
+                      ? 1
+                      : 0.3,
                   transition: "all 0.3s ease",
                   "&:hover": {
                     backgroundColor: "rgba(52, 152, 219, 0.2)",
@@ -817,11 +843,45 @@ const PaymentsUPI = () => {
                   },
                   fontSize: ".7rem",
                 }}
+                onClick={() => alert("hi")}
               >
                 <FileDownloadOutlinedIcon
                   sx={{ fontSize: "1rem", color: "inherit" }}
                 />
                 GENERATE INVOICE
+              </Box>
+
+              <Box
+                sx={{
+                  px: 2,
+                  py: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  borderRight: ".1px solid lightgrey",
+                  cursor: "pointer",
+                  opacity:
+                    UPIBillsList.find(
+                      (data: any) =>
+                        data.bill_number === selectedBills.bill_number
+                    ).total_amount -
+                      selectedBills?.total_amount ===
+                    0
+                      ? 1
+                      : 0.3,
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: "rgba(52, 52, 219, 0.2)",
+                    color: "rgba(52, 52, 219, 1)",
+                  },
+                  fontSize: ".7rem",
+                }}
+                onClick={() => handlePrinter(selectedBills)}
+              >
+                <FileDownloadOutlinedIcon
+                  sx={{ fontSize: "1rem", color: "inherit" }}
+                />
+                PRINT BILL
               </Box>
               <Box
                 sx={{
@@ -857,6 +917,15 @@ const PaymentsUPI = () => {
                   gap: "10px",
                   borderRight: ".1px solid lightgrey",
                   cursor: "pointer",
+                  opacity:
+                    UPIBillsList.find(
+                      (data: any) =>
+                        data.bill_number === selectedBills.bill_number
+                    ).total_amount -
+                      selectedBills?.total_amount ===
+                    0
+                      ? 1
+                      : 0.3,
                   transition: "all 0.3s ease",
                   "&:hover": {
                     backgroundColor: "rgba(220, 53, 69, 0.2)", // Light red background
@@ -864,7 +933,18 @@ const PaymentsUPI = () => {
                   },
                   fontSize: ".7rem",
                 }}
-                onClick={() => dispatch(setCustomerDeleteModal(true))}
+                onClick={() => {
+                  if (
+                    UPIBillsList.find(
+                      (data: any) =>
+                        data.bill_number === selectedBills.bill_number
+                    ).total_amount -
+                      selectedBills?.total_amount ===
+                    0
+                  ) {
+                    dispatch(setCustomerDeleteModal(true));
+                  }
+                }}
               >
                 <DeleteOutlineOutlinedIcon
                   sx={{ fontSize: "1rem", color: "inherit" }}

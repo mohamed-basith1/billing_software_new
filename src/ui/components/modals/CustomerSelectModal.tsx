@@ -18,7 +18,7 @@ import {
   setCustomerSelectModal,
   setCustomersList,
 } from "../../pages/CustomersPage/CustomersSlice";
-import { handleSearchCustomer } from "../../utils/utils";
+import { getTotalAmount, handleSearchCustomer } from "../../utils/utils";
 import CustomerCreateModal, { style } from "./CustomerCreateModal";
 
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
@@ -33,6 +33,7 @@ import {
 } from "../../pages/BillsPage/BillsSlice";
 import { toast } from "react-toastify";
 import { selectUserName } from "../../pages/LoginPage/LoginSlice";
+import { handlePrinter } from "../../utils/printer";
 const CustomerSelectModal = () => {
   const dispatch = useDispatch();
   const customerSelectModal = useSelector(selectCustomerSelectModal);
@@ -57,6 +58,10 @@ const CustomerSelectModal = () => {
   };
 
   const handleBillPrint = async () => {
+    //@ts-ignore
+    let customerBillresponse = await window.electronAPI.getCustomerBillHistory(
+      selectedBill.customer_id
+    );
     let payload: any = {
       customer_name: selectedBill.customer_name,
       customer_id: selectedBill.customer_id,
@@ -78,6 +83,7 @@ const CustomerSelectModal = () => {
       dispatch(setCustomerSelectModal(false));
       dispatch(setClearBill());
       toast.success(`${response.message}`, { position: "bottom-left" });
+      handlePrinter(response.data, getTotalAmount(customerBillresponse.data, "balance"));
     }
   };
   const handleBillWithoutPrint = async () => {
