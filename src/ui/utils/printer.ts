@@ -1,3 +1,5 @@
+import { formatUOM } from "./utils";
+
 export const handlePrinter = async (printerData: any, balance = 0) => {
   const formattedDate = new Date(printerData.createdAt).toLocaleDateString(
     "en-IN"
@@ -11,7 +13,7 @@ export const handlePrinter = async (printerData: any, balance = 0) => {
     },
     {
       type: "text",
-      value: item.qty.toString(),
+      value: `${item.qty.toString()}${formatUOM(item.uom)}`,
       style: { textAlign: "center" },
     },
     {
@@ -365,7 +367,7 @@ export const handlePrinter = async (printerData: any, balance = 0) => {
 
       tableHeaderStyle: {
         borderBottom: "1px dashed black",
-      
+
         fontWeight: "bold",
         fontSize: "12px",
       },

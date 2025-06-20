@@ -313,3 +313,14 @@ export const getTimeSlot = (): "morning" | "night" | null => {
 
   return null;
 };
+
+export function formatUOM(uom) {
+  const uomMap = {
+    Kg: "KG",
+    gram: "G",
+    liter: "L",
+    piece: "PC",
+  };
+
+  return uomMap[uom.toLowerCase()] || uom.toUpperCase();
+}
