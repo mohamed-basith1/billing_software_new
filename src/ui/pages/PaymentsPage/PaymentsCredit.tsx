@@ -63,6 +63,7 @@ import {
   setCustomerDeleteModal,
 } from "../CustomersPage/CustomersSlice";
 import { FixedSizeList as List } from "react-window";
+import { handlePrinter } from "../../utils/printer";
 
 const Row = ({ index, style, data }) => {
   const bill = data.items[index];
@@ -991,6 +992,51 @@ const PaymentsCredit = () => {
                   sx={{ fontSize: "1rem", color: "inherit" }}
                 />
                 GENERATE INVOICE
+              </Box>
+
+              <Box
+                sx={{
+                  px: 2,
+                  py: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  borderRight: ".1px solid lightgrey",
+                  cursor: "pointer",
+                  opacity:
+                    UPIBillsList.find(
+                      (data: any) =>
+                        data.bill_number === selectedBills.bill_number
+                    ).total_amount -
+                      selectedBills?.total_amount ===
+                    0
+                      ? 1
+                      : 0.3,
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: "rgba(52, 52, 219, 0.2)",
+                    color: "rgba(52, 52, 219, 1)",
+                  },
+                  fontSize: ".7rem",
+                }}
+                onClick={async () => {
+                  //@ts-ignore
+                  let customerBillresponse =
+                    //@ts-ignore
+                    await window.electronAPI.getCustomerBillHistory(
+                      selectedBills.customer_id
+                    );
+
+                  handlePrinter(
+                    selectedBills,
+                    getTotalAmount(customerBillresponse.data, "balance")
+                  );
+                }}
+              >
+                <FileDownloadOutlinedIcon
+                  sx={{ fontSize: "1rem", color: "inherit" }}
+                />
+                PRINT BILL
               </Box>
               <Box
                 sx={{

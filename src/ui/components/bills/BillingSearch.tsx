@@ -403,7 +403,10 @@ const BillingSearch = () => {
     }
 
     if (results.length === 0) {
-      console.log("This product is not available in items list");
+      toast.warn("This product is not available in items list", {
+        position: "bottom-left",
+      });
+
       return;
     }
 
