@@ -11,7 +11,7 @@ import { BillsRouter } from "./Routes/BillsRouter.js";
 import { TransactionRouter } from "./Routes/TransactionRouter.js";
 import { DealerBillRouter } from "./Routes/DealerBillHistory.js";
 import startMongo from "./startMongo.js";
-import posPrinterPkg from "electron-pos-printer"; // ✅ CommonJS fix
+import posPrinterPkg from "electron-pos-printer";
 const { PosPrinter } = posPrinterPkg;
 
 app.commandLine.appendSwitch("disable-features", "AutofillServerCommunication");
@@ -34,15 +34,15 @@ app.on("ready", async () => {
   DealerBillRouter();
 
   const mainWindow = new BrowserWindow({
+    autoHideMenuBar: true,
     webPreferences: {
       preload: getPreloadPath(),
       nodeIntegration: false,
       contextIsolation: true,
-      // devTools: false,
     },
   });
 
-  Menu.setApplicationMenu(null);
+  // Menu.setApplicationMenu(null);
   if (isDev()) {
     mainWindow.loadURL(getUIPath());
   } else {

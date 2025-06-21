@@ -1,0 +1,9 @@
+.itemListTable {
+  max-height: calc(100% - 6rem);
+}
+
+@media (max-height: 800px) {
+  .itemListTable {
+    max-height: calc(100% - 12rem);
+  }
+}

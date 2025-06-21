@@ -10,16 +10,20 @@ import { DataGrid } from "@mui/x-data-grid";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  deleteItemList,
   selectItemList,
-  selectItemListSearch, selectSelectedItem,
+  selectItemListSearch,
+  selectSelectedItem,
   setEditItemModal,
   setItemList,
   setItemListSearch,
+  setItemSummary,
   setSelectItemName,
-  setSelectedItem
+  setSelectedItem,
 } from "../../pages/ItemsPage/ItemsSlice";
 import { setCustomerDeleteModal } from "../../pages/CustomersPage/CustomersSlice";
 import DeleteModal from "../modals/DeleteModal";
+import "./ItemTable.css";
 import { toast } from "react-toastify";
 
 const ItemsListTable = () => {
@@ -53,7 +57,6 @@ const ItemsListTable = () => {
       headerAlign: "center",
       renderCell: (params) => {
         try {
-
           return (
             <Box>
               <Button
@@ -127,6 +130,19 @@ const ItemsListTable = () => {
     //@ts-ignore
     let response = await window.electronAPI.deleteItem(selectedItem.unique_id);
     if (response.status === 200) {
+      const itemSummaryHandle = async () => {
+        //@ts-ignore
+        let response: any = await window.electronAPI.itemSummary();
+
+        if (response.status !== 200) {
+          // toast.error(`${response.message}`, { position: "bottom-left" });
+        } else {
+          dispatch(setItemSummary(response?.data));
+        }
+      };
+      itemSummaryHandle();
+      dispatch(deleteItemList(selectedItem.unique_id));
+      dispatch(setCustomerDeleteModal(false));
       toast.success(`${response.message}`, { position: "bottom-left" });
     }
   };
@@ -183,14 +199,10 @@ const ItemsListTable = () => {
       </Box>
 
       {/* Data Grid Wrapper */}
-      <Box
-        sx={{ flexGrow: 1, maxHeight: "calc(100% - 6rem)", overflow: "auto" }}
-      >
+      <Box className="itemListTable" sx={{ flexGrow: 1, overflow: "auto" }}>
         <DataGrid
           rows={ItemList}
           columns={columns}
-          // disableColumnMenu
-          // hideFooter
           sx={{
             minHeight: "400px", // Ensure it has a scrollable area
 

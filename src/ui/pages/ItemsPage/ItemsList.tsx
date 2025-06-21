@@ -6,7 +6,12 @@ import InventoryIcon from "@mui/icons-material/Inventory2Outlined";
 import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 import LayersIcon from "@mui/icons-material/Layers";
 import ItemsListTable from "../../components/items/ItemsListTable";
-import { selectItemsTab, setItemsTab } from "./ItemsSlice";
+import {
+  selectItemsSummary,
+  selectItemsTab,
+  setItemsTab,
+  setItemSummary,
+} from "./ItemsSlice";
 
 import ItemsLowStock from "../../components/items/ItemsLowStock";
 import { AnimatedCounter } from "../ReportPage/Dashboard";
@@ -15,7 +20,7 @@ import EditSelectedItemModal from "../../components/modals/EditSelectedItemModal
 const ItemsList = () => {
   const dispatch = useDispatch();
   const itemsTab = useSelector(selectItemsTab);
-  const [itemSummary, setItemSummary] = useState({});
+  const itemSummary = useSelector(selectItemsSummary);
   useEffect(() => {
     const itemSummaryHandle = async () => {
       //@ts-ignore
@@ -24,8 +29,7 @@ const ItemsList = () => {
       if (response.status !== 200) {
         // toast.error(`${response.message}`, { position: "bottom-left" });
       } else {
-        setItemSummary(response?.data);
-  
+        dispatch(setItemSummary(response?.data));
       }
     };
     itemSummaryHandle();
@@ -152,7 +156,6 @@ const ItemsList = () => {
               color="text.secondary"
               width={"10rem"}
               sx={{ mt: 2 }}
-              
             >
               {item.description}
             </Typography>

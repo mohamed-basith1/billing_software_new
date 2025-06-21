@@ -5,6 +5,7 @@ const initialState: any = {
   currentTab: 0,
   itemsTab: 0,
   itemsEntryTab: 0,
+  summary:{},
   itemName: "",
   itemUOM: "",
   itemPurchasedQuantity: "",
@@ -58,6 +59,9 @@ const itemsSlice = createSlice({
     setItemSearch: (state, action) => {
   
       state.itemSearch = action.payload;
+    },
+    setItemSummary: (state, action) => {
+      state.summary = action.payload;
     },
     setItemListSearch: (state, action) => {
       state.itemListSearch = action.payload;
@@ -224,6 +228,15 @@ const itemsSlice = createSlice({
         state.itemList[existingItemIndex] = action.payload;
       }
     },
+    deleteItemList: (state, action) => {
+      const Income_unique_id = action.payload;
+      const existingItemIndex = state.itemList.findIndex(
+        (item) => item.unique_id === Income_unique_id
+      );
+      if (existingItemIndex !== -1) {
+        state.itemList.splice(existingItemIndex, 1);
+      }
+    },
     setDeleteDealerBill: (state, action) => {
       const Income_unique_id = action.payload._id;
       //This is for remove exist item in the list
@@ -276,6 +289,8 @@ export const {
   setSelectItemName,
   setEditItemModal,
   updateItemList,
+  deleteItemList,
+  setItemSummary,
   setEditSelectItem,
   setDeleteDealerBill,
   setUpdateDealerBill,
@@ -310,6 +325,7 @@ export const {
 
 export const selectCurrentTab = (state: any) => state.items.currentTab;
 export const selectItemsTab = (state: any) => state.items.itemsTab;
+export const selectItemsSummary = (state: any) => state.items.summary;
 export const selectItemsEntryTab = (state: any) => state.items.itemsEntryTab;
 export const selectItemSearch = (state: any) => state.items.itemSearch;
 export const selectItemListSearch = (state: any) => state.items.itemListSearch;
