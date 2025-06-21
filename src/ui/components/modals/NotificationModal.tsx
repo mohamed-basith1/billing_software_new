@@ -34,7 +34,6 @@ const NotificationModal: React.FC = () => {
             let response: any = await window.electronAPI.getLowStockItem();
 
             let count = response.length;
-            console.log("response", response, response.length);
 
             if (count > 0) {
               setCount(response.length);

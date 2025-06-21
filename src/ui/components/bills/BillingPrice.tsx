@@ -49,7 +49,6 @@ const BillingPrice = () => {
         ...item,
         no: index + 1, // Adding index starting from 1
       })) || [];
-    console.log("updatedItems", updatedItems);
     const calculatedSubAmount = updatedItems.reduce(
       (total: number, item: any) => total + item.amount,
       0
@@ -59,7 +58,6 @@ const BillingPrice = () => {
     setTotalAmount(Math.floor(calculatedSubAmount - discountAmount));
     const maxDiscount = calculateMaxDiscountPercentage(updatedItems);
     setMaxDiscountPercentage(maxDiscount);
-    console.log(`Maximum Discount Allowed: ${maxDiscount}%`);
 
     function calculateMaxDiscountPercentage(items: any) {
       let totalSellingPrice = 0;

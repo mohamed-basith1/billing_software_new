@@ -35,7 +35,6 @@ const startMongo = (): void => {
   // Ensure the DB directory exists
   if (!fs.existsSync(dbPath)) {
     fs.mkdirSync(dbPath, { recursive: true });
-    // console.log(`📁 Created MongoDB data directory at: ${dbPath}`);
   }
 
   // Use valid stdio options for spawn

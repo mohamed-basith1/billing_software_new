@@ -286,7 +286,6 @@ const PaymentsCash = () => {
         ).total_amount - selectedBills?.total_amount,
       method: method,
     };
-    console.log("validaton", validatorPayload);
     //@ts-ignore
     let amountAvalaible = await window.electronAPI.amountValidator(
       validatorPayload
@@ -342,15 +341,11 @@ const PaymentsCash = () => {
           ).total_amount - selectedBills?.total_amount,
         returned_by: userName,
       };
-
-      console.log("");
       // createBillReturnHistory
       // @ts-ignore
       await window.electronAPI.createBillReturnHistory(
         returnBillHistoryPayload
       );
-
-      console.log("selectedBills cash", selectedBills);
       //@ts-ignore
       let response: any = await window.electronAPI.returnBill(
         selectedBills._id,

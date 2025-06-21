@@ -91,7 +91,7 @@ export function ItemsRouter() {
           { code: { $regex: searchTerm, $options: "i" } },
         ],
       })
-        .limit(8)
+        .limit(20)
         .lean(); // Convert Mongoose documents to plain objects
 
      

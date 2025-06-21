@@ -17,6 +17,7 @@ import {
 import { calculateAmount } from "../../utils/utils";
 import { toast } from "react-toastify";
 import BarcodeScanner from "./BarCodeScanner";
+import ItemSelectionModal from "../modals/ItemSelectionModal";
 
 const BillingSearch = () => {
   const dispatch = useDispatch();
@@ -26,7 +27,8 @@ const BillingSearch = () => {
   const enterPressCount = useRef(0);
   const [suggestions, setSuggestions] = useState<[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number>(-1);
-
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modelData, setModelData] = useState([]);
   const billingSearch = useSelector(selectBillValue).find(
     (bill: any) => bill.bill_number === currentTab
   ) || {
@@ -378,8 +380,37 @@ const BillingSearch = () => {
       enterPressCount.current = 0; // Reset count if a different key is pressed
     }
   };
-  const handleScan = (data) => {
-    console.log("Scanned:", data);
+  const handleScan = async (data: string) => {
+    //@ts-ignore
+    const results = await window.electronAPI.searchItem(data);
+
+    if (results.length > 0 && results.length === 1) {
+      const data = results[0];
+      let payload: any = {
+        bill_number: currentTab,
+        code: data.code,
+        uom: data.uom,
+        qty: data.qty,
+        rate: data.rate,
+        amount: data.amount,
+        item_name: data.item_name,
+        createdAt: data.createdAt,
+        purchased_rate: data.purchased_rate,
+        stock_qty: data.stock_qty,
+        unique_id: data.unique_id,
+      };
+      dispatch(setItem(payload));
+    }
+
+    if (results.length === 0) {
+      console.log("This product is not available in items list");
+      return;
+    }
+
+    if (results.length > 1) {
+      setModalOpen(true);
+      setModelData(results);
+    }
   };
   return (
     <Box
@@ -392,6 +423,12 @@ const BillingSearch = () => {
         position: "relative",
       }}
     >
+      <ItemSelectionModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        data={modelData}
+      />
+
       <BarcodeScanner onScan={handleScan} />
       <TextField
         label="Item Name or Code"

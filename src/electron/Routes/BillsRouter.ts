@@ -514,13 +514,9 @@ ipcMain.handle("get-dashboard-data", async (_event, { fromDate, toDate }) => {
       } else {
         itemRevenue =
           item.rate * item.qty - (item.rate * item.qty * bill.discount) / 100;
-
-        console.log("itemRevenue", itemRevenue);
         itemProfit =
           (item.rate - item.purchased_rate) * item.qty -
           (item.rate * item.qty * bill.discount) / 100;
-
-        console.log("itemProfit", itemProfit);
       }
 
       // Accumulate totals

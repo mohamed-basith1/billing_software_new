@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, Menu } from "electron";
 import connectDB from "./db.js";
 
 import { isDev } from "./utils.js";
@@ -41,6 +41,8 @@ app.on("ready", async () => {
       // devTools: false,
     },
   });
+
+  Menu.setApplicationMenu(null);
   if (isDev()) {
     mainWindow.loadURL(getUIPath());
   } else {

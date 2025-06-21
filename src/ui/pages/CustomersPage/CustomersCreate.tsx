@@ -14,7 +14,7 @@ import {
   setCustomerDetails,
 } from "./CustomersSlice";
 import { useDispatch, useSelector } from "react-redux";
-import customerImage from "../../assets/Image/Illustrate/customer.png";
+import customerImage from "../../assets/Image/illustrate/customer.png";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import { toast } from "react-toastify";
 const CustomersCreate = () => {

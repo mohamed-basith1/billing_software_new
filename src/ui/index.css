@@ -21,10 +21,10 @@
   /* all: unset; */
 }
 
-::-webkit-scrollbar: {
-  display: "none"; // Chrome, Safari, Edge
+::-webkit-scrollbar {
+  display: none
 }
-,
+
 /* Enable smooth scrolling */
 html {
   scroll-behavior: smooth;
