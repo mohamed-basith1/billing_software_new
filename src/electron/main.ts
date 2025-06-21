@@ -34,7 +34,10 @@ app.on("ready", async () => {
   DealerBillRouter();
 
   const mainWindow = new BrowserWindow({
+    width: 1280,
+    height: 800,
     autoHideMenuBar: true,
+    resizable: true,
     webPreferences: {
       preload: getPreloadPath(),
       nodeIntegration: false,
