@@ -100,8 +100,6 @@ const ItemsNewEntry = () => {
     }
 
     if (field === "sellingPrice") {
-     
-
       dispatch(
         setField({
           field: "sellingPricePerUOM",
@@ -146,6 +144,14 @@ const ItemsNewEntry = () => {
 
     if (fieldsToCheck.some((field) => !String(field || "").trim())) {
       // toast.error("All fields must be filled!", { position: "bottom-left" });
+      return false;
+    }
+
+    //checking if qty is less than stock remainder qty
+    if (Number(itemPurchasedQuantity) < Number(lowStockReminder)) {
+      return false;
+    }
+    if (Number(itemPurchasedQuantity) === Number(lowStockReminder)) {
       return false;
     }
 
@@ -215,7 +221,7 @@ const ItemsNewEntry = () => {
         ],
       };
       const sanitizedData = JSON.parse(JSON.stringify(itemPayload)); // Removes undefined & BigInt
-     
+
       if (ItemsEntryTab === 0) {
         //@ts-ignore
         let response = await window.electronAPI.existItemValidate(
