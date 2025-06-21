@@ -769,38 +769,7 @@ const PaymentsCash = () => {
                 CHANGE TO UPI BILL
               </Box>
 
-              <Box
-                sx={{
-                  px: 2,
-                  py: 1,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  borderRight: ".1px solid lightgrey",
-                  cursor: "pointer",
-                  opacity:
-                    UPIBillsList.find(
-                      (data: any) =>
-                        data.bill_number === selectedBills.bill_number
-                    ).total_amount -
-                      selectedBills?.total_amount ===
-                    0
-                      ? 1
-                      : 0.3,
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    backgroundColor: "rgba(52, 152, 219, 0.2)",
-                    color: "#217DBB",
-                  },
-                  fontSize: ".7rem",
-                }}
-                onClick={() => alert("hi")}
-              >
-                <FileDownloadOutlinedIcon
-                  sx={{ fontSize: "1rem", color: "inherit" }}
-                />
-                GENERATE INVOICE
-              </Box>
+        
               <Box
                 sx={{
                   px: 2,

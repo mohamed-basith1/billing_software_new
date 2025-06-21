@@ -969,7 +969,7 @@ const PaymentsCredit = () => {
                   },
                   fontSize: ".7rem",
                 }}
-                onClick={() => {
+                onClick={async() => {
                   if (
                     UPIBillsList.find(
                       (data: any) =>
@@ -978,12 +978,21 @@ const PaymentsCredit = () => {
                       selectedBills?.total_amount ===
                     0
                   ) {
+                    //@ts-ignore
+                    let customerBillresponse =
+                      //@ts-ignore
+                      await window.electronAPI.getCustomerBillHistory(
+                        selectedBills.customer_id
+                      );
+
+                    //here
                     generateInvoicePDF(
                       selectedBills?.itemsList,
                       selectedBills.sub_amount,
                       selectedBills.discount,
                       selectedBills.total_amount,
-                      selectedBills
+                      selectedBills,
+                      getTotalAmount(customerBillresponse.data, "balance")
                     );
                   }
                 }}

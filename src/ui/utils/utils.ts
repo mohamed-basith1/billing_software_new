@@ -60,23 +60,25 @@ export const generateInvoicePDF = (
   subAmount,
   discount,
   totalAmount,
-  fulldata
+  fulldata,
+  Outstanding
 ) => {
   const doc = new jsPDF();
 
+  console.log("inovice items", items);
   doc.addImage(backgroundImage, "PNG", 0, 0, 210, 297);
   // Company Name (Centered Top)
   doc.setFontSize(22);
-  doc.text("New Grocery Shop", 195, 28, { align: "right" });
+  doc.text("New Karnataka Store", 195, 28, { align: "right" });
   doc.setFontSize(10);
   doc.setTextColor(177, 177, 177);
-  doc.text("4/53,west street, Vadakku Mangudi Main Rd", 195, 36, {
+  doc.text("No. 48,8th Main Road, Vasanth Nagar, Bangalore-560052", 195, 36, {
     align: "right",
   });
   doc.setFontSize(10);
-  doc.text("Tel: +91 7010809398", 195, 41, { align: "right" });
+  doc.text("Tel: +91 7904657184", 195, 41, { align: "right" });
   doc.setFontSize(10);
-  doc.text("Tel: +91 7010809398", 195, 46, { align: "right" });
+  doc.text("Tel: +91 9538543025", 195, 46, { align: "right" });
 
   // Invoice Details (Left)
   doc.setTextColor(0, 0, 0);
@@ -116,8 +118,20 @@ export const generateInvoicePDF = (
     item.item_name,
     item.qty,
     item.uom,
-    { content: `${item.rate}`, styles: { halign: "right" } }, // Align Rate Right
-    { content: `${item.amount}`, styles: { halign: "right" } }, // Align Amount Right
+    {
+      content: item.rate.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }),
+      styles: { halign: "right" },
+    }, // Align Rate Right
+    {
+      content: item.amount.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }),
+      styles: { halign: "right" },
+    }, // Align Amount Right
   ]);
 
   // AutoTable settings
@@ -152,23 +166,80 @@ export const generateInvoicePDF = (
   // doc.setFontSize(12);
   doc.setTextColor(0, 0, 0);
   doc.text(`Sub Total`, 170, finalY, { align: "right" });
-  doc.text(`${subAmount}`, 195, finalY, { align: "right" });
-  
-  doc.text(`Discount`, 170, finalY + 7, { align: "right" });
-  doc.text(`${discount}%`, 195, finalY + 7, { align: "right" });
-  
-  doc.text(`Total`, 170, finalY + 14, { align: "right" }); // new line
-  doc.text(`${totalAmount}`, 195, finalY + 14, { align: "right" }); // amount after discount
-  
-  doc.text(`Paid Amount`, 170, finalY + 21, { align: "right" });
-  doc.text(`${fulldata.amount_paid}`, 195, finalY + 21, { align: "right" });
-  
-  doc.text(`Balance`, 170, finalY + 28, { align: "right" });
-  doc.text(`${fulldata.balance}`, 195, finalY + 28, { align: "right" });
-  
-  
+  doc.text(
+    `${subAmount.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`,
+    195,
+    finalY,
+    { align: "right" }
+  );
 
-  // amount_paid
+  doc.text(`Discount(-)`, 170, finalY + 7, { align: "right" });
+  doc.text(`${discount}%`, 195, finalY + 7, { align: "right" });
+
+  doc.text(`Total`, 170, finalY + 14, { align: "right" }); // new line
+  doc.text(
+    `${totalAmount.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`,
+    195,
+    finalY + 14,
+    { align: "right" }
+  ); // amount after discount
+
+  doc.text(`Paid Amount`, 170, finalY + 21, { align: "right" });
+  doc.text(
+    `${fulldata.amount_paid.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`,
+    195,
+    finalY + 21,
+    {
+      align: "right",
+    }
+  );
+
+  doc.text(`Balance(This Bill)`, 170, finalY + 28, { align: "right" });
+  doc.text(
+    `${fulldata.balance.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`,
+    195,
+    finalY + 28,
+    {
+      align: "right",
+    }
+  );
+  doc.text(`Outstanding Balance`, 170, finalY + 35, { align: "right" });
+  doc.text(
+    `${(Number(Outstanding) - Number(fulldata.balance)).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`,
+    195,
+    finalY + 35,
+    {
+      align: "right",
+    }
+  );
+  doc.text(`Total Due`, 170, finalY + 42, { align: "right" });
+  doc.text(
+    `${Outstanding.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`,
+    195,
+    finalY + 42,
+    {
+      align: "right",
+    }
+  );
+
 
   // Save PDF
   doc.save(`${fulldata.bill_number}-Invoice.pdf`);
