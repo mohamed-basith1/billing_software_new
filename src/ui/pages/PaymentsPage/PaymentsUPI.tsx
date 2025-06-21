@@ -1,6 +1,6 @@
 import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
+import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import PublishedWithChangesIcon from "@mui/icons-material/PublishedWithChanges";
 import QrCode2Icon from "@mui/icons-material/QrCode2";
@@ -31,7 +31,7 @@ import {
   getTotalAmount,
 } from "../../utils/utils";
 import { setCustomerDeleteModal } from "../CustomersPage/CustomersSlice";
-import { selectUserName } from "../LoginPage/LoginSlice";
+import { selectUserName, selectUserRole } from "../LoginPage/LoginSlice";
 import { AnimatedCounter } from "../ReportPage/Dashboard";
 import {
   clearPaymentBillsDetail,
@@ -192,6 +192,8 @@ const PaymentsUPI = () => {
   const tempRemoveItem: any = useSelector(selectTempRemoveItem);
   const billSearch: any = useSelector(selectBillSearch);
   const userName = useSelector(selectUserName);
+  const role = useSelector(selectUserRole);
+
   const dispatch: any = useDispatch();
 
   useEffect(() => {
@@ -847,7 +849,7 @@ const PaymentsUPI = () => {
                 }}
                 onClick={() => handlePrinter(selectedBills)}
               >
-                <FileDownloadOutlinedIcon
+                <PrintOutlinedIcon
                   sx={{ fontSize: "1rem", color: "inherit" }}
                 />
                 PRINT BILL
@@ -881,7 +883,7 @@ const PaymentsUPI = () => {
                 sx={{
                   px: 2,
                   py: 1,
-                  display: "flex",
+                  display:role==="administrator"? "flex":"none",
                   alignItems: "center",
                   gap: "10px",
                   borderRight: ".1px solid lightgrey",

@@ -1,6 +1,7 @@
 import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
+import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
 
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
@@ -52,7 +53,7 @@ import {
   setUPIBillsList,
   setnewReturnBill,
 } from "./PaymentsSlice";
-import { selectUserName } from "../LoginPage/LoginSlice";
+import { selectUserName, selectUserRole } from "../LoginPage/LoginSlice";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { AnimatedCounter } from "../ReportPage/Dashboard";
@@ -224,6 +225,7 @@ const PaymentsCredit = () => {
   const tempRemoveItem: any = useSelector(selectTempRemoveItem);
   const billSearch: any = useSelector(selectBillSearch);
   const creditBillFilter: any = useSelector(selectCreditBillFilter);
+  const role = useSelector(selectUserRole);
 
   const dispatch: any = useDispatch();
   const userName = useSelector(selectUserName);
@@ -1042,7 +1044,7 @@ const PaymentsCredit = () => {
                   );
                 }}
               >
-                <FileDownloadOutlinedIcon
+                <PrintOutlinedIcon
                   sx={{ fontSize: "1rem", color: "inherit" }}
                 />
                 PRINT BILL
@@ -1123,7 +1125,7 @@ const PaymentsCredit = () => {
                 sx={{
                   px: 2,
                   py: 1,
-                  display: "flex",
+                  display: role==="administrator"?"flex":"none",
                   alignItems: "center",
                   gap: "10px",
                   borderRight: ".1px solid lightgrey",

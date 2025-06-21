@@ -18,6 +18,7 @@ import {
 import { colorsList, getTotalAmount } from "../../utils/utils";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
+import { selectUserRole } from "../../pages/LoginPage/LoginSlice";
 
 const purchaseHistoryColumn: any = [
   {
@@ -214,6 +215,7 @@ const purchaseHistoryRow = [
 const CustomerDetails = () => {
   const selectedCustomer = useSelector(selectSelectedCustomer);
   const customerBillHistory = useSelector(selectCustomerBillHistory);
+  const role = useSelector(selectUserRole);
 
   useEffect(() => {
     const fetchCustomerBillHistoryHandle = async () => {
@@ -225,7 +227,6 @@ const CustomerDetails = () => {
         toast.error(`${response.message}`, { position: "bottom-left" });
       } else {
         dispatch(setCustomerBillHistory(response.data));
-     
       }
     };
     if (selectedCustomer) {
@@ -350,12 +351,14 @@ const CustomerDetails = () => {
                   variant="outlined"
                   sx={{ height: "2.2rem" }}
                   onClick={() => handleEdit()}
+                  disabled={role === "employee" ? true : false}
                 >
                   Edit
                 </Button>
                 <Button
                   variant="contained"
                   onClick={() => handleDelete()}
+                  disabled={role === "employee" ? true : false}
                   sx={{
                     height: "2.2rem",
                     bgcolor: "rgb(193,9,21)",

@@ -25,8 +25,11 @@ import { setCustomerDeleteModal } from "../../pages/CustomersPage/CustomersSlice
 import DeleteModal from "../modals/DeleteModal";
 import "./ItemTable.css";
 import { toast } from "react-toastify";
+import { selectUserRole } from "../../pages/LoginPage/LoginSlice";
 
 const ItemsListTable = () => {
+  const role = useSelector(selectUserRole);
+
   const columns = [
     { field: "item_name", headerName: "ITEM NAME", flex: 2 },
     { field: "code", headerName: "CODE", flex: 1 },
@@ -79,6 +82,7 @@ const ItemsListTable = () => {
                 Edit
               </Button>
               <Button
+                disabled={role === "administrator" ? false : true}
                 onClick={() => {
                   dispatch(setSelectedItem(params.row));
                   dispatch(setCustomerDeleteModal(true));

@@ -42,7 +42,7 @@ import {
   setnewReturnBill,
 } from "./PaymentsSlice";
 
-import { selectUserName } from "../LoginPage/LoginSlice";
+import { selectUserName, selectUserRole } from "../LoginPage/LoginSlice";
 import utc from "dayjs/plugin/utc";
 
 import timezone from "dayjs/plugin/timezone";
@@ -143,6 +143,8 @@ const PaymentsSelfUse = () => {
   const billSearch: any = useSelector(selectBillSearch);
   const dispatch: any = useDispatch();
   const userName = useSelector(selectUserName);
+  const role = useSelector(selectUserRole);
+
 
   useEffect(() => {
     dispatch((dispatch) => {
@@ -535,7 +537,7 @@ const PaymentsSelfUse = () => {
                 sx={{
                   px: 2,
                   py: 1,
-                  display: "flex",
+                  display:role==="administrator"? "flex":"none",
                   alignItems: "center",
                   gap: "10px",
                   borderRight: ".1px solid lightgrey",

@@ -302,9 +302,7 @@ const AddTransactionModal = () => {
                     {employeeList.map((data: any) => (
                       <MenuItem value={data.username}>{data.username}</MenuItem>
                     ))}
-                    {/* <MenuItem value={"admin"}>Admin</MenuItem>
-                    <MenuItem value={"amrin"}>Amrin</MenuItem>
-                    <MenuItem value={"test"}>Test</MenuItem> */}
+              
                   </Select>
                 </FormControl>
               </Box>

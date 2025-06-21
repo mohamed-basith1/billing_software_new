@@ -2,6 +2,7 @@ import { Box, Tabs, Tab } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectCurrentTab, setCurrentTab } from "./ItemsSlice";
+import { selectUserRole } from "../LoginPage/LoginSlice";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -33,6 +34,8 @@ function a11yProps(index: number) {
 }
 const ItemsTabs = () => {
   const currentTab = useSelector(selectCurrentTab);
+  const role = useSelector(selectUserRole);
+
   const dispatch = useDispatch();
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     dispatch(setCurrentTab(newValue));
@@ -55,7 +58,11 @@ const ItemsTabs = () => {
         <Tab label="Items" {...a11yProps(0)} />
 
         <Tab label="Items Entry" {...a11yProps(1)} />
-        <Tab label="Items Purchased History" {...a11yProps(2)} />
+
+        {role === "administrator" ? (
+          <Tab label="Items Purchased History" {...a11yProps(2)} />
+        ) : null}
+
         {/* <Tab label="Expired Item" {...a11yProps(3)} /> */}
       </Tabs>
     </Box>

@@ -649,7 +649,6 @@ ipcMain.handle("get-dashboard-data", async (_event, { fromDate, toDate }) => {
     topcustomer: topCustomers,
     paymentSummary,
   };
-  console.log(data);
   return {
     status: 200,
     message: "Bill updated successfully, and stock quantities adjusted.",

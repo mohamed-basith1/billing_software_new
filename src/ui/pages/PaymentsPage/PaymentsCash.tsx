@@ -1,6 +1,7 @@
 import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
+
+import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import PaymentsIcon from "@mui/icons-material/PaymentsOutlined";
 import PublishedWithChangesIcon from "@mui/icons-material/PublishedWithChanges";
@@ -50,7 +51,7 @@ import {
 } from "./PaymentsSlice";
 
 import utc from "dayjs/plugin/utc";
-import { selectUserName } from "../LoginPage/LoginSlice";
+import { selectUserName, selectUserRole } from "../LoginPage/LoginSlice";
 
 import timezone from "dayjs/plugin/timezone";
 import DeleteModal from "../../components/modals/DeleteModal";
@@ -196,6 +197,8 @@ const PaymentsCash = () => {
   const billSearch: any = useSelector(selectBillSearch);
   const dispatch: any = useDispatch();
   const userName = useSelector(selectUserName);
+  const role = useSelector(selectUserRole);
+
 
   useEffect(() => {
     dispatch((dispatch) => {
@@ -797,7 +800,7 @@ const PaymentsCash = () => {
                 }}
                 onClick={() => handlePrinter(selectedBills)}
               >
-                <FileDownloadOutlinedIcon
+                <PrintOutlinedIcon
                   sx={{ fontSize: "1rem", color: "inherit" }}
                 />
                 PRINT BILL
@@ -834,7 +837,7 @@ const PaymentsCash = () => {
                 sx={{
                   px: 2,
                   py: 1,
-                  display: "flex",
+                  display:role==="administrator"? "flex":"none",
                   alignItems: "center",
                   gap: "10px",
                   borderRight: ".1px solid lightgrey",
@@ -855,6 +858,8 @@ const PaymentsCash = () => {
                   },
                   fontSize: ".7rem",
                 }}
+
+                
                 onClick={() => {
                   if (
                     UPIBillsList.find(
